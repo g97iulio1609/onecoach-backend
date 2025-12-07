@@ -46,10 +46,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/lib-core": "workspace:*",
     "@OneCoach/constants": "workspace:*",
     "@OneCoach/types": "workspace:*",
+    "@OneCoach/lib-theme": "workspace:*",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

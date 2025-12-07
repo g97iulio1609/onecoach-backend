@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@OneCoach/lib-core": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/lib-marketplace": "workspace:*",
     "@OneCoach/types": "workspace:*",
     "@tanstack/react-query": "^5.0.0",

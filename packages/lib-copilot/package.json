@@ -13,7 +13,7 @@
     "@OneCoach/lib-chat-core": "workspace:*",
     "@OneCoach/lib-core": "workspace:*",
     "@OneCoach/lib-design-system": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/lib-stores": "workspace:*",
     "@OneCoach/schemas": "workspace:*",
     "@OneCoach/types": "workspace:*",

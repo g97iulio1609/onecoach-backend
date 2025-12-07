@@ -79,7 +79,7 @@
     "@OneCoach/constants": "workspace:*",
     "@OneCoach/contracts": "workspace:*",
     "@OneCoach/lib-core": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/lib-ai": "workspace:*",
     "@OneCoach/lib-ai-agents": "workspace:*",
     "@prisma/client": "7.0.0",

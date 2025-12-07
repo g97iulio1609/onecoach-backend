@@ -144,7 +144,7 @@
   "dependencies": {
     "@OneCoach/contracts": "workspace:*",
     "@OneCoach/lib-config": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/schemas": "workspace:*",
     "@OneCoach/constants": "workspace:*",
     "@OneCoach/types": "workspace:*",

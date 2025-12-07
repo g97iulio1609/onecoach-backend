@@ -35,7 +35,7 @@
     "@OneCoach/lib-ai": "workspace:*",
     "@OneCoach/lib-ai-agents": "workspace:*",
     "@OneCoach/lib-core": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/one-agent": "workspace:*",
     "@OneCoach/schemas": "workspace:*",
     "@OneCoach/types": "workspace:*",

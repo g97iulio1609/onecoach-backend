@@ -8,10 +8,8 @@
 export { useAuthStore } from './auth.store';
 export {
   useUIStore,
-  useTheme,
   useSidebar,
   useWizard,
-  useSystemThemeSync,
   useSystemThemeSyncNative,
 } from './ui.store';
 export * from './ui.store';
@@ -20,7 +18,25 @@ export * from './utils/dialog-global';
 export * from './sidebar.store';
 export * from './workout-builder.store';
 
-export { lightColors, darkColors } from './ui.store';
+// Theme exports from @OneCoach/lib-theme (single source of truth)
+export {
+  useTheme,
+  useSystemThemeSync,
+  useThemeStore,
+  lightColors,
+  darkColors,
+  ThemeProvider,
+  cn,
+  darkModeClasses,
+  THEME_STORAGE_KEY,
+} from '@OneCoach/lib-theme';
+
+export type {
+  ThemePreference,
+  ResolvedTheme,
+  ThemeColors,
+  ThemeProviderProps,
+} from '@OneCoach/lib-theme';
 
 export {
   useHealthStore,

@@ -57,7 +57,7 @@
     "@OneCoach/types": "workspace:*",
     "@OneCoach/schemas": "workspace:*",
     "@OneCoach/contracts": "workspace:*",
-    "@OneCoach/lib-shared": "workspace:*",
+    "@onecoach/lib-shared": "workspace:*",
     "@OneCoach/constants": "workspace:*",
     "@OneCoach/types": "workspace:*",
     "@OneCoach/lib-config": "workspace:*",
