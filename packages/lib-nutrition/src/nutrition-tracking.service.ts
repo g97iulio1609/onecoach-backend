@@ -18,7 +18,7 @@ import type {
   NutritionPlanStats,
   Macros,
 } from '@OneCoach/types';
-import type { Prisma, nutrition_day_logs } from '@prisma/client';
+import { Prisma, type nutrition_day_logs } from '@prisma/client';
 import { toMacros, ensureDecimalNumber } from '@OneCoach/lib-shared';
 
 type NutritionDayLogRecord = nutrition_day_logs;
@@ -32,7 +32,7 @@ function toNutritionDayLog(record: NutritionDayLogRecord): NutritionDayLog {
   const waterIntakeValue = record.waterIntake;
   const waterIntake =
     waterIntakeValue !== null && waterIntakeValue !== undefined
-      ? ensureDecimalNumber(waterIntakeValue as number | null)
+      ? ensureDecimalNumber(Number(waterIntakeValue))
       : null;
   const actualDailyMacros =
     record.actualDailyMacros !== null && record.actualDailyMacros !== undefined

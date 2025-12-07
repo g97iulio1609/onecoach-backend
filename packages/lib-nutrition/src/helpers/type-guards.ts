@@ -5,7 +5,7 @@
  * Used to validate Json fields from Prisma and unknown data from external sources.
  */
 
-import type { Macros, NutritionWeek, NutritionDay, Meal, Food } from '@OneCoach/types';
+import type { Macros, NutritionWeek, NutritionDay, Meal, Food, PersonalizedPlan, Adaptations } from '@OneCoach/types';
 import {
   MacrosSchema,
   CompleteMacrosSchema,
@@ -128,7 +128,7 @@ export function parseCompleteMacrosSafe(value: unknown): Macros & { fiber: numbe
  */
 export function isPersonalizedPlan(
   value: unknown
-): value is import('types/nutrition.types').PersonalizedPlan {
+): value is PersonalizedPlan {
   if (!value || typeof value !== 'object') return false;
   const p = value as Record<string, unknown>;
   return (
@@ -143,7 +143,7 @@ export function isPersonalizedPlan(
  */
 export function isAdaptations(
   value: unknown
-): value is import('types/nutrition.types').Adaptations {
+): value is Adaptations {
   if (!value || typeof value !== 'object') return false;
   const a = value as Record<string, unknown>;
   return (

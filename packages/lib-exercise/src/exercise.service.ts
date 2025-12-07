@@ -1145,7 +1145,7 @@ export class ExerciseService {
       throw new Error('È richiesta una traduzione in inglese');
     }
 
-    const slug = payload.slug?.trim() || toSlug(englishTranslation.name);
+    const slug = payload.slug?.trim() || toSlug((englishTranslation as any).name);
 
     const exerciseId = generateId('exr');
 

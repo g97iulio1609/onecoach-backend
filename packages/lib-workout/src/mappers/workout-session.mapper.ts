@@ -20,7 +20,7 @@ export function mapToWorkoutSession(prismaSession: workout_sessions): WorkoutSes
     id: prismaSession.id,
     createdAt: prismaSession.createdAt.toISOString(),
     updatedAt: prismaSession.updatedAt.toISOString(),
-    userId: prismaSession.userId,
+    userId: prismaSession.userId ?? '',
     programId: prismaSession.programId,
     weekNumber: prismaSession.weekNumber,
     dayNumber: prismaSession.dayNumber,

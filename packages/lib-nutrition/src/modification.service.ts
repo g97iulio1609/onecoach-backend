@@ -14,9 +14,9 @@ import {
 import { prepareProgramForPersistence } from '@OneCoach/lib-workout/helpers/program-transform';
 import { normalizeWorkoutProgram } from '@OneCoach/lib-workout/helpers/normalizers/workout-normalizer';
 import { normalizeAgentWorkoutPayload } from '@OneCoach/lib-workout/helpers/program-server-transform';
-import type { NutritionPlan, Macros, Meal, NutritionWeek, NutritionDay } from '@OneCoach/types';
-import type { WorkoutProgram, WorkoutWeek } from '@OneCoach/types';
+import type { NutritionPlan, Macros, Meal, NutritionWeek, NutritionDay, WorkoutProgram, WorkoutWeek } from '@OneCoach/types';
 import { Prisma } from '@prisma/client';
+
 import { createId } from '@OneCoach/lib-shared';
 
 /**
@@ -74,7 +74,7 @@ export class ModificationService {
       throw new Error('Unauthorized: Plan does not belong to user');
     }
 
-    const normalizedPlanToUpdate = normalizeNutritionPlan(planToUpdate);
+    const normalizedPlanToUpdate = normalizeNutritionPlan(planToUpdate as any);
 
     const { getNutritionPlanDay, getNutritionPlanTotalDays } = await import(
       '@OneCoach/lib-shared/utils/nutrition-plan-helpers'
@@ -194,7 +194,7 @@ export class ModificationService {
       throw new Error('Failed to load updated plan');
     }
 
-    return normalizeNutritionPlan(updatedPlan);
+    return normalizeNutritionPlan(updatedPlan as any);
   }
 
   /**

@@ -44,7 +44,7 @@ export class NutritionImportService {
       onProgress?: (progress: ImportProgress) => void;
       context?: { requestId?: string; userId: string };
     }
-  ) {}
+  ) { }
 
   private emit(progress: ImportProgress) {
     if (this.params.onProgress) {
@@ -68,7 +68,7 @@ export class NutritionImportService {
     }
   }
 
-  private buildRouter(userId: string) {
+  private buildRouter() {
     const prompt = buildNutritionPrompt();
     const handler = async (content: string, mimeType: string) =>
       this.params.aiContext.parseWithAI(content, mimeType, prompt);
@@ -91,7 +91,7 @@ export class NutritionImportService {
     this.validateFiles(files);
 
     NutritionImportOptionsSchema.parse(options ?? {});
-    const router = this.buildRouter(userId);
+    const router = this.buildRouter();
 
     const warnings: string[] = [];
     const errors: string[] = [];

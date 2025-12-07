@@ -356,7 +356,7 @@ function mapToCalendarAssignment(
     planType: assignment.planType,
     planId: assignment.planId ?? '',
     isRecurring: assignment.isRecurring,
-    recurrenceRule: assignment.recurrenceRule as RecurrenceRule | null,
+    recurrenceRule: assignment.recurrenceRule as unknown as RecurrenceRule | null,
     createdAt: assignment.createdAt,
     updatedAt: assignment.updatedAt,
   };

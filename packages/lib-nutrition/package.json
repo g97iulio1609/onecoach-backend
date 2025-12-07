@@ -37,10 +37,6 @@
       "types": "./src/nutrition-plan.service.ts",
       "default": "./src/nutrition-plan.service.ts"
     },
-    "./helpers/macro-recalculator": {
-      "types": "./src/helpers/macro-recalculator.ts",
-      "default": "./src/helpers/macro-recalculator.ts"
-    },
     "./helpers/plan-server-transform": {
       "types": "./src/helpers/plan-server-transform.ts",
       "default": "./src/helpers/plan-server-transform.ts"

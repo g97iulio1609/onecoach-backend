@@ -3,6 +3,7 @@
  */
 
 export * from './use-auth';
+export * from './use-guards';
 export * from './use-auth-unified';
 export * from './use-coach';
 export * from './use-fetch';

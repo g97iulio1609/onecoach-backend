@@ -21,7 +21,7 @@ import {
   isCoachRole,
   normalizeRole,
   roleSatisfies,
-} from '@OneCoach/lib-core/auth/roles';
+} from '@OneCoach/lib-core';
 
 /**
  * Unified auth hook return type

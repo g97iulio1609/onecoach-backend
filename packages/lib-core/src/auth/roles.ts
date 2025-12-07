@@ -6,6 +6,7 @@
  */
 
 export type AppUserRole = 'USER' | 'ADMIN' | 'SUPER_ADMIN' | 'COACH';
+export type UserRole = AppUserRole;
 
 const ROLE_ALIAS_MAP: Record<string, AppUserRole> = {
   USER: 'USER',

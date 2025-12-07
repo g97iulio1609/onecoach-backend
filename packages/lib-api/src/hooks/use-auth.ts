@@ -13,7 +13,7 @@ import { authKeys, authQueries } from '../queries/auth.queries';
 import { useAuthStore } from '@OneCoach/lib-stores/auth';
 import type { RefreshTokenRequest } from '../queries/auth.queries';
 import type { User } from '@OneCoach/lib-stores/auth';
-import { normalizeRole, roleSatisfies } from '@OneCoach/lib-core/auth/roles';
+import { normalizeRole, roleSatisfies } from '@OneCoach/lib-core';
 
 /**
  * Hook to sync NextAuth session with Zustand store
@@ -77,7 +77,7 @@ export function useMe() {
     data: user,
     isLoading: isLoading || status === 'loading',
     error: null,
-    refetch: () => {}, // No-op, sync happens automatically
+    refetch: () => { }, // No-op, sync happens automatically
   };
 }
 

@@ -114,17 +114,17 @@ export function normalizeWeek(rawWeek: unknown, index: number): WorkoutWeek {
       days.length > 0
         ? days
         : [
-            {
-              dayNumber: 1,
-              name: `Giorno 1`,
-              exercises: [],
-              notes: '',
-              totalDuration: undefined,
-              targetMuscles: [],
-              warmup: undefined,
-              cooldown: '',
-            },
-          ],
+          {
+            dayNumber: 1,
+            name: `Giorno 1`,
+            exercises: [],
+            notes: '',
+            totalDuration: undefined,
+            targetMuscles: [],
+            warmup: undefined,
+            cooldown: '',
+          },
+        ],
   };
 }
 
@@ -175,24 +175,24 @@ export function normalizeWorkoutProgram(
     weeks.length > 0
       ? weeks
       : [
-          {
-            weekNumber: 1,
-            notes: '',
-            days: [
-              {
-                dayNumber: 1,
-                name: `Giorno 1`,
-                exercises: [],
-                notes: '',
-                totalDuration: undefined,
-                targetMuscles: [],
-                warmup: undefined,
-                cooldown: '',
-              },
-            ],
-            focus: '',
-          },
-        ];
+        {
+          weekNumber: 1,
+          notes: '',
+          days: [
+            {
+              dayNumber: 1,
+              name: `Giorno 1`,
+              exercises: [],
+              notes: '',
+              totalDuration: undefined,
+              targetMuscles: [],
+              warmup: undefined,
+              cooldown: '',
+            },
+          ],
+          focus: '',
+        },
+      ];
 
   const createdAtDate =
     program.createdAt instanceof Date
@@ -214,7 +214,7 @@ export function normalizeWorkoutProgram(
     weeks: normalizedWeeks,
     goals: ensureArrayOfStrings(program.goals),
     status: normalizeStatus(program.status),
-    userId: 'userId' in program ? program.userId : undefined,
+    userId: 'userId' in program ? (program.userId ?? undefined) : undefined,
     metadata: normalizeMetadata(program.metadata),
     createdAt: createdAtDate.toISOString(),
     updatedAt: updatedAtDate.toISOString(),

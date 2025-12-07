@@ -6,12 +6,7 @@
 
 import { BaseApiClient } from './base-client';
 import type { RequestOptions } from './types';
-import {
-  getAccessToken,
-  getRefreshToken,
-  updateAccessToken,
-  clearSession,
-} from '@OneCoach/lib-core/auth/session.native';
+import { NativeSession } from '@OneCoach/lib-core';
 
 export class NativeApiClient extends BaseApiClient {
   private refreshPromise: Promise<void> | null = null;
@@ -21,7 +16,7 @@ export class NativeApiClient extends BaseApiClient {
   }
 
   protected async getAuthToken(): Promise<string | null> {
-    return await getAccessToken();
+    return await NativeSession.getAccessToken();
   }
 
   protected async saveAuthToken(_token: string): Promise<void> {
@@ -41,7 +36,7 @@ export class NativeApiClient extends BaseApiClient {
 
     this.refreshPromise = (async () => {
       try {
-        const refreshToken = await getRefreshToken();
+        const refreshToken = await NativeSession.getRefreshToken();
         if (!refreshToken) {
           throw new Error('No refresh token available');
         }
@@ -61,7 +56,7 @@ export class NativeApiClient extends BaseApiClient {
         const data = await response.json();
         const expiresAt = Date.now() + data.expiresIn * 1000;
 
-        await updateAccessToken(data.accessToken, expiresAt);
+        await NativeSession.updateAccessToken(data.accessToken, expiresAt);
       } finally {
         this.refreshPromise = null;
       }
@@ -84,7 +79,7 @@ export class NativeApiClient extends BaseApiClient {
           return this.request<T>(endpoint, options);
         } catch (refreshError: unknown) {
           // Refresh failed, clear session and throw
-          await clearSession();
+          await NativeSession.clearSession();
           throw new ApiError('Session expired', 401);
         }
       }

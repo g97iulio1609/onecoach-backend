@@ -189,9 +189,7 @@ export class WorkoutProgressionService {
     return updatedOccurrences;
   }
 
-  private static updateSetCount(group: SetGroup, count: number) {
-    this.resizeSetGroup(group, count);
-  }
+
 
   private static updateSet(
     set: ExerciseSet,

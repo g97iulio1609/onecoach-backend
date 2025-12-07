@@ -190,7 +190,7 @@ export class MealTemplateService {
       meal: template.meal as unknown as Meal,
       tags: template.tags,
       isPublic: template.isPublic,
-      userId: template.userId ?? undefined,
+      userId: template.userId ?? '',
       createdAt: template.createdAt.toISOString(),
       updatedAt: template.updatedAt.toISOString(),
     };

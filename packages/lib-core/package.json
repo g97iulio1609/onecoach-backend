@@ -146,6 +146,7 @@
     "@OneCoach/lib-config": "workspace:*",
     "@OneCoach/lib-shared": "workspace:*",
     "@OneCoach/schemas": "workspace:*",
+    "@OneCoach/constants": "workspace:*",
     "@OneCoach/types": "workspace:*",
     "@auth/prisma-adapter": "^2.0.0",
     "@prisma/adapter-pg": "7.0.0",

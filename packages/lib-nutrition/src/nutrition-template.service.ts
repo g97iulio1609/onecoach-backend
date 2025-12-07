@@ -322,7 +322,7 @@ export class NutritionTemplateService {
         isPublic: template.isPublic,
         usageCount: template.usageCount,
         lastUsedAt: template.lastUsedAt?.toISOString() || undefined,
-        userId: template.userId,
+        userId: template.userId ?? '',
         createdAt: template.createdAt.toISOString(),
         updatedAt: template.updatedAt.toISOString(),
       };

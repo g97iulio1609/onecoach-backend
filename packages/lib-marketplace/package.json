@@ -46,6 +46,7 @@
     "@OneCoach/schemas": "workspace:*",
     "@OneCoach/contracts": "workspace:*",
     "@OneCoach/lib-core": "workspace:*",
+    "@OneCoach/lib-shared": "workspace:*",
     "@prisma/client": "7.0.0"
   },
   "devDependencies": {
