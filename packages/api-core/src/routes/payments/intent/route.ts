@@ -7,10 +7,10 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { paymentService } from '@onecoach/lib-core';
-import { PromotionService, cartService } from '@onecoach/lib-marketplace';
+import { PromotionService, cartService, marketplaceService } from '@onecoach/lib-marketplace';
 import type { PromotionValidationResult } from '@onecoach/lib-marketplace';
 import { findCreditPackOption } from '@onecoach/constants/credit-packs';
-import { marketplaceService } from '@onecoach/lib-marketplace';
+
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
 export const dynamic = 'force-dynamic';

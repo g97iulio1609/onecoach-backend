@@ -6,7 +6,7 @@
  * - Operazioni batch (CRUD) e automazioni AI
  */
 
-import { prisma } from '@onecoach/lib-core';
+import { AIConfigService, prisma } from '@onecoach/lib-core';
 import { ExerciseService } from './exercise.service';
 import { ExerciseApprovalStatus, ExerciseRelationType, MuscleRole, Prisma } from '@prisma/client';
 import { toSlug } from '@onecoach/lib-shared';
@@ -29,7 +29,7 @@ import {
   createAgentInstance,
   createAIAgentConfig,
 } from '@onecoach/one-agent';
-import { AIConfigService } from '@onecoach/lib-core';
+
 import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing';
 import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import { getAllMetadataForLocale, validateExerciseTypeByName } from '@onecoach/lib-metadata';

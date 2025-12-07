@@ -5,13 +5,13 @@
  * Supporta estrazione etichette e segmentazione piatti
  */
 
-import { type CoreMessage } from 'ai';
+import { Output, streamText, type CoreMessage } from 'ai';
 import { z } from 'zod';
 import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai/ai-provider-config';
 import { creditService } from '@onecoach/lib-core/credit.service';
 import { prisma } from '@onecoach/lib-core/prisma';
 import type { LabelExtractionResult, DishSegmentationResult } from '@onecoach/types';
-import { streamText, Output } from 'ai';
+
 import { parseJsonResponse } from '@onecoach/lib-ai-utils/json-parser';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
