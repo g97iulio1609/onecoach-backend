@@ -13,7 +13,9 @@
   "scripts": {
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@onecoach/lib-ai-utils": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^24.10.1",
     "typescript": "^5.9.3"
