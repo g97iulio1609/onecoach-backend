@@ -25,7 +25,7 @@ import {
   selectSelectedModelName,
   selectModels,
   selectSelectedModelId,
-} from '../stores/ai-models.store';
+} from '@onecoach/lib-stores';
 
 // ============================================================================
 // Hook

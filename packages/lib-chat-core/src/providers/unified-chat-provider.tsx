@@ -23,7 +23,7 @@ import {
   useAIModelsStore,
   selectSelectedModelId,
   selectModels,
-} from '../stores/ai-models.store';
+} from '@onecoach/lib-stores';
 
 // ============================================================================
 // Context
