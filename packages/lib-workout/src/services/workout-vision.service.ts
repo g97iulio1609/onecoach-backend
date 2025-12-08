@@ -662,7 +662,7 @@ Parse this data and return ONLY valid JSON.`;
       });
 
       // TIMEOUT per evitare che l'AI rimanga in stallo
-      const AI_TIMEOUT_MS = 600000; // 10 minuti
+
 
       // Usa streamObject come workout-generation-orchestrator.service.ts
       // Questo garantisce oggetti completi con validazione Zod
@@ -672,7 +672,7 @@ Parse this data and return ONLY valid JSON.`;
         model,
         schema: ImportedWorkoutProgramSchema,
         prompt: fullPrompt,
-        abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS),
+
         // Reasoning models non supportano temperature
         ...(isReasoningModel ? {} : { temperature: 0.2 }),
         providerOptions: {
@@ -717,25 +717,18 @@ Parse this data and return ONLY valid JSON.`;
 
       // Attendi l'oggetto COMPLETO - streamResult.object è una Promise
       // che si risolve quando l'oggetto è stato completamente generato e validato contro lo schema
-      const completeObject = await Promise.race([
-        (async () => {
-          await progressPromise; // Attendi che il tracking finisca
-          return await streamResult.object; // Ottieni l'oggetto COMPLETO validato
-        })(),
-        new Promise<never>((_, reject) => {
-          setTimeout(
-            () => reject(new Error(`AI timeout dopo ${AI_TIMEOUT_MS}ms`)),
-            AI_TIMEOUT_MS
-          );
-        }),
-      ]).catch((error: unknown) => {
+      let completeObject;
+      try {
+        await progressPromise; // Attendi che il tracking finisca
+        completeObject = await streamResult.object; // Ottieni l'oggetto COMPLETO validato
+      } catch (error: unknown) {
         console.error('[WorkoutVision] ❌ streamObject failed:', {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
           partialCount,
         });
         throw error;
-      });
+      }
 
       if (!completeObject) {
         console.error('[WorkoutVision] ❌ streamObject returned null/undefined');
