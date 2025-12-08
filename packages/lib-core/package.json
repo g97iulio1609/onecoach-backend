@@ -150,7 +150,7 @@
     "@onecoach/types": "workspace:*",
     "@auth/prisma-adapter": "^2.0.0",
     "@prisma/adapter-pg": "7.0.0",
-    "@prisma/client": "7.0.0",
+    "@prisma/client": "7.1.0",
     "bcryptjs": "^2.4.3",
     "next": "^16.0.6",
     "next-auth": "5.0.0-beta.30",

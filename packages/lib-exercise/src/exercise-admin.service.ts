@@ -1192,6 +1192,15 @@ CRITICAL:
       throw new Error('Ogni esercizio deve avere almeno una traduzione');
     }
 
+    const legacyMuscleField =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (payload as any).muscleGroup ?? (payload as any).muscleGroups;
+    if (legacyMuscleField !== undefined) {
+      throw new Error(
+        'I campi legacy "muscleGroup" o "muscleGroups" non sono supportati. Fornisci "muscles": [{ id, role }] e "bodyPartIds".'
+      );
+    }
+
     if (!payload.muscles || !Array.isArray(payload.muscles) || payload.muscles.length === 0) {
       throw new Error('Ogni esercizio deve avere almeno un muscolo');
     }

@@ -11,9 +11,9 @@
   "exclude": ["node_modules", "dist"],
   "references": [
     { "path": "../lib-core" },
-    { "path": "../lib-shared" },
-    { "path": "../constants" },
-    { "path": "../schemas" },
-    { "path": "../types" }
+    { "path": "../../../onecoach-shared/packages/lib-shared" },
+    { "path": "../../../onecoach-shared/packages/constants" },
+    { "path": "../../../onecoach-shared/packages/schemas" },
+    { "path": "../../../onecoach-shared/packages/types" }
   ]
 }

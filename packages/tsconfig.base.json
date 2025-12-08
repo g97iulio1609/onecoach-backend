@@ -114,16 +114,16 @@
         "./packages/lib-api/src/*"
       ],
       "@onecoach/lib-ai": [
-        "./packages/lib-ai/src/index.ts"
+        "../lib-ai/src/index.ts"
       ],
       "@onecoach/lib-ai/*": [
-        "./packages/lib-ai/src/*"
+        "../lib-ai/src/*"
       ],
       "@onecoach/lib-ai-agents": [
-        "./packages/lib-ai-agents/src/index.ts"
+        "../lib-ai-agents/src/index.ts"
       ],
       "@onecoach/lib-ai-agents/*": [
-        "./packages/lib-ai-agents/src/*"
+        "../lib-ai-agents/src/*"
       ],
       "@onecoach/lib-ai-utils": [
         "./packages/lib-ai-utils/src/index.ts"

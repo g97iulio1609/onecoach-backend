@@ -233,3 +233,19 @@ export type {
   ChatActions,
   ChatStore,
 } from './chat.store';
+
+// AI Models Store (SSOT per AI model selection)
+export {
+  useAIModelsStore,
+  selectModels,
+  selectSelectedModelId,
+  selectSelectedModel,
+  selectSelectedModelName,
+  selectSelectedProvider,
+  selectIsLoading as selectModelsLoading,
+  selectError as selectModelsError,
+  useSelectedModelName,
+  useSelectedModel,
+  useAvailableModels,
+} from './ai-models.store';
+export type { AIModel } from './ai-models.store';

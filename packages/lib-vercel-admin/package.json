@@ -21,7 +21,7 @@
     "@onecoach/types": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/contracts": "workspace:*",
-    "@prisma/client": "7.0.0"
+    "@prisma/client": "7.1.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

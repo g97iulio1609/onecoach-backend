@@ -30,13 +30,18 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@onecoach/constants": "workspace:*",
+    "@onecoach/lib-ai": "workspace:*",
+    "@onecoach/lib-ai-agents": "workspace:*",
     "@onecoach/types": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/contracts": "workspace:*",
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
+    "@onecoach/lib-metadata": "workspace:*",
     "@onecoach/one-agent": "workspace:*",
-    "@prisma/client": "7.0.0"
+    "@prisma/client": "7.1.0",
+    "ai": "6.0.0-beta.124"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

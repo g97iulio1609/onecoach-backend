@@ -20,6 +20,12 @@ import { useUnifiedChatContextSafe } from '../providers/unified-chat-provider';
 import type { UseUnifiedChatOptions, UseUnifiedChatResult } from '../types/unified-chat';
 import { DEFAULT_CHAT_FEATURES } from '../types/unified-chat';
 import type { ChatConversation } from '../types';
+import {
+  useAIModelsStore,
+  selectSelectedModelName,
+  selectModels,
+  selectSelectedModelId,
+} from '../stores/ai-models.store';
 
 // ============================================================================
 // Hook
@@ -67,18 +73,30 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   const [localCurrentConversation, setLocalCurrentConversation] = useState<string | null>(
     initialConversationId
   );
-  const [localSelectedModel, setLocalSelectedModel] = useState<string | null>(
-    initialModelId || null
-  );
   const [localIsOpen, setLocalIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Use Zustand store for AI models (SSOT)
+  const storeModels = useAIModelsStore(selectModels);
+  const selectedModelId = useAIModelsStore(selectSelectedModelId);
+  const selectedModelName = useAIModelsStore(selectSelectedModelName);
+  const { selectModel: storeSelectModel, setModels: storeSetModels } = useAIModelsStore();
+
+  // Initialize store with models from provider if available
+  useEffect(() => {
+    if (providerContext?.models && providerContext.models.length > 0) {
+      storeSetModels(providerContext.models);
+    }
+    if (initialModelId && !selectedModelId) {
+      storeSelectModel(initialModelId);
+    }
+  }, [providerContext?.models, initialModelId, selectedModelId, storeSetModels, storeSelectModel]);
 
   // Determine effective values (provider or local)
   const screenContext = contextOverride || providerContext?.screenContext || null;
   const features = providerContext?.features || DEFAULT_CHAT_FEATURES;
-  const models = providerContext?.models || [];
-  const selectedModel =
-    providerContext?.selectedModel || localSelectedModel || models[0]?.id || null;
+  const models = storeModels.length > 0 ? storeModels : (providerContext?.models || []);
+  const selectedModel = selectedModelId || models[0]?.id || null;
   const userRole = providerContext?.userRole || 'USER';
   const userCredits = providerContext?.userCredits || 0;
   const userId = providerContext?.userId || null;
@@ -89,25 +107,18 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   const currentConversation = localCurrentConversation;
 
   // Build request body with screen context
+  // Uses Zustand store selector for modelName (already converted from database ID)
   const requestBody = useMemo(() => {
-    // FIX: Lookup inside useMemo to ensure reactivity when models/selectedModel change
-    const selectedModelObject = models.find(m => m.id === selectedModel);
-
     const body: Record<string, unknown> = {
       tier: 'balanced',
       enableTools: true,
-      reasoning: reasoningEnabled, // Use toggle state, not features flag
+      reasoning: reasoningEnabled,
     };
 
-    // Add model if selected - use modelId (API name) not id (database PK)
-    if (selectedModelObject) {
-      body.model = selectedModelObject.modelId;
-      console.warn(`🎯 [useUnifiedChat] Sending model: ${selectedModelObject.modelId} (id: ${selectedModel})`);
-    } else if (selectedModel) {
-      // Fallback: if selectedModel doesn't match any model.id, try using it directly
-      // (in case it's already a modelId like 'zhipu-ai/glm-4.6v')
-      body.model = selectedModel;
-      console.warn(`⚠️ [useUnifiedChat] Model not found in models array, using selectedModel directly: ${selectedModel}`);
+    // Use selectedModelName from Zustand store (already the API model name)
+    if (selectedModelName) {
+      body.model = selectedModelName;
+      console.warn(`🎯 [useUnifiedChat] Sending model from store: ${selectedModelName}`);
     }
 
     // Add screen context
@@ -122,7 +133,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     }
 
     return body;
-  }, [models, selectedModel, screenContext, reasoningEnabled]);
+  }, [selectedModelName, screenContext, reasoningEnabled]);
 
   // Fetch conversations
   const fetchConversations = useCallback(async () => {
@@ -186,13 +197,14 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
 
   const setSelectedModel = useCallback(
     (modelId: string) => {
+      // Use Zustand store as SSOT for model selection
+      storeSelectModel(modelId);
+      // Also update provider if available for backward compatibility
       if (providerContext) {
         providerContext.setSelectedModel(modelId);
-      } else {
-        setLocalSelectedModel(modelId);
       }
     },
-    [providerContext]
+    [storeSelectModel, providerContext]
   );
 
   const setIsOpen = useCallback(

@@ -47,7 +47,7 @@
     "@onecoach/contracts": "workspace:*",
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
-    "@prisma/client": "7.0.0"
+    "@prisma/client": "7.1.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

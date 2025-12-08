@@ -83,7 +83,7 @@
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/lib-ai": "workspace:*",
     "@onecoach/lib-ai-agents": "workspace:*",
-    "@prisma/client": "7.0.0",
+    "@prisma/client": "7.1.0",
     "ai": "6.0.0-beta.124",
     "xlsx": "^0.18.5"
   },
