@@ -14,7 +14,8 @@
  * @module lib-workout/services/workout-vision
  */
 
-import { type ModelMessage, streamText, Output } from 'ai';
+import { streamObject } from 'ai';
+import type { ModelMessage } from 'ai';
 import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai/ai-provider-config';
 import {
   AIFrameworkConfigService,
@@ -322,7 +323,7 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   if (!config) {
     throw new Error(
       'Configurazione AI per import workout non trovata. ' +
-        'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
+      'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
     );
   }
 
@@ -343,7 +344,7 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   if (!model) {
     throw new Error(
       `Modello AI per tipo "${type}" non configurato. ` +
-        'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
+      'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
     );
   }
 
@@ -353,7 +354,7 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   if (!fallbackModel) {
     throw new Error(
       'Modello fallback non configurato. ' +
-        'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
+      'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i modelli.'
     );
   }
 
@@ -362,7 +363,7 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   if (creditCost === undefined || Number.isNaN(Number(creditCost))) {
     throw new Error(
       `Costo crediti per "${type}" non configurato. ` +
-        'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i costi.'
+      'Vai su Admin > AI Settings > Framework & Agents > Vision & Import Models per configurare i costi.'
     );
   }
 
@@ -656,80 +657,47 @@ Parse this data and return ONLY valid JSON.`;
         isReasoningModel,
       });
 
-      // Usa streamText con Output.object() come in workout-generation-orchestrator
-      // Questo è più affidabile di streamObject per alcuni modelli
-      const streamResult = streamText({
+      // Usa streamObject per structured output - più affidabile di streamText+Output.object
+      // e evita problemi di bundling Turbopack con il namespace Output
+      const streamResult = streamObject({
         model,
-        output: Output.object({
-          schema: ImportedWorkoutProgramSchema,
-        }),
+        schema: ImportedWorkoutProgramSchema,
         prompt: fullPrompt,
-        maxOutputTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
+        maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
         // Solo passa temperature per modelli non-reasoning
         ...(isReasoningModel ? {} : { temperature: 0.2 }),
-        providerOptions: {
+        experimental_providerMetadata: {
           openrouter: {
             usage: { include: true },
           },
         },
       });
 
-      // Raccogli il testo di risposta per debug
-      let rawTextOutput = '';
-      let chunkCount = 0;
+      // Raccogli i progressi per debug
+      let partialCount = 0;
 
-      console.log('[WorkoutVision] 📡 Streaming response...');
+      console.log('[WorkoutVision] 📡 Streaming structured response...');
 
-      for await (const part of streamResult.fullStream) {
-        chunkCount++;
-        if (part.type === 'text-delta') {
-          rawTextOutput += part.text || '';
-        }
-        // Log progress ogni 50 chunk
-        if (chunkCount % 50 === 0) {
+      for await (const partial of streamResult.partialObjectStream) {
+        partialCount++;
+        // Log progress ogni 10 partial updates
+        if (partialCount % 10 === 0) {
           console.log(
-            `[WorkoutVision] 📊 Stream progress: ${chunkCount} chunks, ${rawTextOutput.length} bytes`
+            `[WorkoutVision] 📊 Stream progress: ${partialCount} partial updates, ` +
+            `weeks: ${partial?.weeks?.length || 0}`
           );
         }
       }
 
+      // Ottieni l'oggetto finale validato
+      const parsedOutput = await streamResult.object;
+
       console.log('[WorkoutVision] ✅ Stream completed:', {
-        chunkCount,
-        rawTextLength: rawTextOutput.length,
+        partialCount,
         durationMs: Date.now() - startTime,
-        rawTextPreview: rawTextOutput.substring(0, 500) + (rawTextOutput.length > 500 ? '...' : ''),
+        programName: parsedOutput?.name,
+        weeksCount: parsedOutput?.weeks?.length,
       });
-
-      // Prova a ottenere l'output strutturato
-      let parsedOutput: ImportedWorkoutProgram | null = null;
-
-      try {
-        parsedOutput = (await streamResult.output) as ImportedWorkoutProgram;
-        console.log('[WorkoutVision] ✅ Structured output parsed successfully:', {
-          hasOutput: Boolean(parsedOutput),
-          programName: parsedOutput?.name,
-          weeksCount: parsedOutput?.weeks?.length,
-        });
-      } catch (parseError) {
-        console.error(
-          '[WorkoutVision] ⚠️ Structured output failed, trying JSON extraction:',
-          parseError
-        );
-
-        // Fallback: estrai JSON dal testo raw
-        if (rawTextOutput) {
-          const jsonMatch = rawTextOutput.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            try {
-              const parsed = JSON.parse(jsonMatch[0]);
-              parsedOutput = ImportedWorkoutProgramSchema.parse(parsed);
-              console.log('[WorkoutVision] ✅ Fallback JSON extraction successful');
-            } catch (jsonError) {
-              console.error('[WorkoutVision] ❌ Fallback JSON parsing failed:', jsonError);
-            }
-          }
-        }
-      }
 
       if (!parsedOutput) {
         console.error('[WorkoutVision] ❌ No valid output obtained');
@@ -739,10 +707,9 @@ Parse this data and return ONLY valid JSON.`;
       traceLog('callTextAI.end', {
         model: modelId,
         durationMs: Date.now() - startTime,
-        chunkCount,
-        rawTextLength: rawTextOutput.length,
+        partialCount,
         hasOutput: Boolean(parsedOutput),
-        mode: 'streamText+Output.object',
+        mode: 'streamObject',
       });
 
       return parsedOutput;
@@ -762,7 +729,7 @@ Parse this data and return ONLY valid JSON.`;
         model: modelId,
         durationMs: Date.now() - startTime,
         error: errorMessage,
-        mode: 'streamText+Output.object',
+        mode: 'streamObject',
       });
 
       throw err instanceof Error ? err : new Error(`AI call failed: ${errorMessage}`);
@@ -968,7 +935,7 @@ Parse this data and return ONLY valid JSON.`;
     if (config.fallback) workoutModels.fallback = config.fallback;
 
     await prisma.ai_provider_configs.update({
-      where: { provider: PROVIDER_MAP.openrouter.enum },
+      where: { provider: PROVIDER_MAP.openrouter?.enum ?? 'OPENROUTER' },
       data: {
         metadata: {
           ...metadata,
