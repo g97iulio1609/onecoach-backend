@@ -25,7 +25,7 @@ export * from './memory';
 // Export types
 export type { WorkoutProgramResponse, WorkoutProgramsResponse } from './workout';
 export type { NutritionPlanResponse, NutritionPlansResponse } from './nutrition';
-export type { ExerciseResponse, ExercisesResponse, ExerciseListParams } from './exercise';
+export type { Exercise, ExerciseResponse, ExercisesResponse, ExerciseListParams } from './exercise';
 export type { Food, FoodResponse, FoodsResponse, FoodListParams } from './food';
 export type {
   CoachProfileResponse,

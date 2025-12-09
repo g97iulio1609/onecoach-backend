@@ -17,7 +17,7 @@ const DEFAULT_LOCALE = 'en';
 const LIST_CACHE_TTL_MS = 0;
 const EXERCISE_CACHE_TTL_MS = 1000 * 60 * 10; // 10 minuti
 const MAX_LIST_PAGE_SIZE = 100;
-const SEARCH_LIMIT = 250;
+
 
 const EXERCISE_INCLUDE = {
   exercise_translations: true,
@@ -235,26 +235,25 @@ export class ExerciseService {
     const { locale, page, pageSize, search, includeTranslations, ...filters } = sanitized;
 
     if (search) {
-      const searchResults = await this.searchFullText(search, {
-        locale,
-        limit: Math.min(SEARCH_LIMIT, (page - 1) * pageSize + pageSize),
-        filters,
-      });
+      const total = await this.countSearchFullText(search, { locale, filters });
 
-      const uniqueIds = Array.from(new Set(searchResults.map((row: any) => row.id)));
-      const total = uniqueIds.length;
-      const pageIds = uniqueIds.slice((page - 1) * pageSize, page * pageSize);
-
-      if (pageIds.length === 0) {
-        const emptyResult: ExerciseListResult = {
+      if (total === 0) {
+        return {
           data: [],
           page,
           pageSize,
           total,
         };
-        listCache.set(cacheKey, emptyResult);
-        return emptyResult;
       }
+
+      const searchResults = await this.searchFullText(search, {
+        locale,
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
+        filters,
+      });
+
+      const pageIds = searchResults.map((row) => row.id);
 
       const exercises = await prisma.exercises.findMany({
         where: {
@@ -317,12 +316,15 @@ export class ExerciseService {
     });
     const searchResults = await this.searchFullText(term, {
       locale,
-      limit: Math.min(SEARCH_LIMIT, (page - 1) * pageSize + pageSize),
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
       filters,
     });
-
+    
+    // Note: search() method returns just the paginated slice as LocalizedExercise[] without total count
+    // This maintains backward compatibility with the existing method signature
     const uniqueIds = Array.from(new Set(searchResults.map((row: any) => row.id)));
-    const pageIds = uniqueIds.slice((page - 1) * pageSize, page * pageSize);
+    const pageIds = uniqueIds; // searchFullText now returns paginated results directly without extra duplicates
 
     if (!pageIds.length) {
       return [];
@@ -1031,11 +1033,35 @@ export class ExerciseService {
     return where;
   }
 
+  private static async countSearchFullText(
+    term: string,
+    options: {
+      locale: string;
+      filters: Partial<ExerciseQueryParams>;
+    }
+  ): Promise<number> {
+    const whereClause = this.getSearchConditions(term, options.locale, options.filters);
+
+    // Using a subquery because of the GROUP BY in the full text search logic
+    const result = await prisma.$queryRaw<{ count: bigint }[]>(Prisma.sql`
+      SELECT COUNT(*)::bigint as count FROM (
+        SELECT e.id
+        FROM "exercises" e
+        INNER JOIN "exercise_translations" et ON et."exerciseId" = e.id
+        WHERE ${whereClause}
+        GROUP BY e.id
+      ) as sub
+    `);
+
+    return Number(result[0]?.count ?? 0);
+  }
+
   private static async searchFullText(
     term: string,
     options: {
       locale: string;
       limit: number;
+      offset: number;
       filters: Partial<ExerciseQueryParams>;
     }
   ): Promise<SearchResultRow[]> {
@@ -1044,64 +1070,21 @@ export class ExerciseService {
       return [];
     }
 
+
+    // Use dynamic to_tsvector (like Food service) instead of indexed column
+    // This is more reliable as it doesn't require a pre-populated column
     const preparedTerm = query.replace(/[:!&|']/g, ' ');
+    const whereClause = this.getSearchConditions(term, options.locale, options.filters);
 
-    const conditions: Prisma.Sql[] = [
-      Prisma.sql`(et."locale" = ${options.locale} OR et."locale" = ${DEFAULT_LOCALE})`,
-      Prisma.sql`et."search_vector_ita" @@ to_tsquery('italian', ${preparedTerm})`,
-    ];
-
-    if (!options.filters.includeUnapproved) {
-      conditions.push(Prisma.sql`e."approvalStatus" = 'APPROVED'::"ExerciseApprovalStatus"`);
-    }
-
-    if (options.filters.approvalStatus) {
-      conditions.push(
-        Prisma.sql`e."approvalStatus" = ${options.filters.approvalStatus}::"ExerciseApprovalStatus"`
-      );
-    }
-
-    if (options.filters.exerciseTypeId) {
-      conditions.push(Prisma.sql`e."exerciseTypeId" = ${options.filters.exerciseTypeId}`);
-    }
-
-    if (options.filters.muscleIds?.length) {
-      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
-        options.filters.muscleIds.map((muscleId: unknown) => Prisma.sql`${muscleId}`)
-      )}]::text[]`;
-      conditions.push(
-        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_muscles" em WHERE em."exerciseId" = e.id AND em."muscleId" = ANY(${arraySql}))`
-      );
-    }
-
-    if (options.filters.bodyPartIds?.length) {
-      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
-        options.filters.bodyPartIds.map((partId: unknown) => Prisma.sql`${partId}`)
-      )}]::text[]`;
-      conditions.push(
-        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_body_parts" eb WHERE eb."exerciseId" = e.id AND eb."bodyPartId" = ANY(${arraySql}))`
-      );
-    }
-
-    if (options.filters.equipmentIds?.length) {
-      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
-        options.filters.equipmentIds.map((equipmentId: unknown) => Prisma.sql`${equipmentId}`)
-      )}]::text[]`;
-      conditions.push(
-        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_equipments" ee WHERE ee."exerciseId" = e.id AND ee."equipmentId" = ANY(${arraySql}))`
-      );
-    }
-
-    const whereClause = Prisma.join(conditions, ' AND ');
-
-    // Ottimizzazione: usa ts_rank standard invece di bm25_rank personalizzato
-    // Rimuove la necessità di calcolare avgLen e semplifica la query
     const rows = await prisma.$queryRaw<SearchResultRow[]>(Prisma.sql`
       SELECT
         e.id AS id,
         MAX(CASE WHEN et."locale" = ${options.locale} THEN 1 ELSE 0 END)::boolean AS has_locale,
         MAX(
-          ts_rank(et."search_vector_ita", to_tsquery('italian', ${preparedTerm})) * CASE 
+          ts_rank_cd(
+            to_tsvector('italian', et.name || ' ' || COALESCE(et.description, '')),
+            plainto_tsquery('italian', ${preparedTerm})
+          ) * CASE 
             WHEN et."locale" = ${options.locale} THEN 2.0
             WHEN et."locale" = ${DEFAULT_LOCALE} THEN 1.0
             ELSE 0.5
@@ -1112,10 +1095,67 @@ export class ExerciseService {
       WHERE ${whereClause}
       GROUP BY e.id
       ORDER BY rank DESC, e."createdAt" DESC
-      LIMIT ${options.limit}
+      LIMIT ${options.limit} OFFSET ${options.offset}
     `);
 
     return rows;
+  }
+
+  private static getSearchConditions(
+    term: string,
+    locale: string,
+    filters: Partial<ExerciseQueryParams>
+  ): Prisma.Sql {
+    const query = term.trim();
+    const preparedTerm = query.replace(/[:!&|']/g, ' ');
+
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`(et."locale" = ${locale} OR et."locale" = ${DEFAULT_LOCALE})`,
+      Prisma.sql`to_tsvector('italian', et.name || ' ' || COALESCE(et.description, '')) @@ plainto_tsquery('italian', ${preparedTerm})`,
+    ];
+
+    if (!filters.includeUnapproved) {
+      conditions.push(Prisma.sql`e."approvalStatus" = 'APPROVED'::"ExerciseApprovalStatus"`);
+    }
+
+    if (filters.approvalStatus) {
+      conditions.push(
+        Prisma.sql`e."approvalStatus" = ${filters.approvalStatus}::"ExerciseApprovalStatus"`
+      );
+    }
+
+    if (filters.exerciseTypeId) {
+      conditions.push(Prisma.sql`e."exerciseTypeId" = ${filters.exerciseTypeId}`);
+    }
+
+    if (filters.muscleIds?.length) {
+      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
+        filters.muscleIds.map((muscleId: unknown) => Prisma.sql`${muscleId}`)
+      )}]::text[]`;
+      conditions.push(
+        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_muscles" em WHERE em."exerciseId" = e.id AND em."muscleId" = ANY(${arraySql}))`
+      );
+    }
+
+    if (filters.bodyPartIds?.length) {
+      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
+        filters.bodyPartIds.map((partId: unknown) => Prisma.sql`${partId}`)
+      )}]::text[]`;
+      conditions.push(
+        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_body_parts" eb WHERE eb."exerciseId" = e.id AND eb."bodyPartId" = ANY(${arraySql}))`
+      );
+    }
+
+    if (filters.equipmentIds?.length) {
+      const arraySql = Prisma.sql`ARRAY[${Prisma.join(
+        filters.equipmentIds.map((equipmentId: unknown) => Prisma.sql`${equipmentId}`)
+      )}]::text[]`;
+      conditions.push(
+        Prisma.sql`EXISTS (SELECT 1 FROM "exercise_equipments" ee WHERE ee."exerciseId" = e.id AND ee."equipmentId" = ANY(${arraySql}))`
+      );
+    }
+
+    return Prisma.join(conditions, ' AND ');
   }
 
   private static prepareCreateData(

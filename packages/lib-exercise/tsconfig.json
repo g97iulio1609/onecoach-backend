@@ -19,6 +19,7 @@
     { "path": "../lib-metadata" },
     { "path": "../../../lib-ai" },
     { "path": "../../../lib-ai-agents" },
-    { "path": "../../../one-agent" }
+    { "path": "../../../one-agent" },
+    { "path": "../lib-api" }
   ]
 }

@@ -8,6 +8,7 @@
  * - Schema MCP-specifico con descrizioni per guidare l'AI
  * - Risoluzione automatica name → ID per tutti i campi metadata
  * - Validazione completa prima della creazione
+ * - Enum stricti per muscles e bodyParts per evitare valori inventati
  */
 
 import { z } from 'zod';
@@ -22,10 +23,78 @@ import {
 } from '@onecoach/lib-metadata';
 
 /**
+ * Valid muscle names from the database catalog.
+ * IMPORTANT: Do NOT invent new values - use only these exact strings.
+ */
+export const VALID_MUSCLES = [
+  'Chest',
+  'Back',
+  'Shoulders',
+  'Biceps',
+  'Triceps',
+  'Quadriceps',
+  'Hamstrings',
+  'Glutes',
+  'Calves',
+  'Abs',
+  'Forearms',
+] as const;
+
+export type ValidMuscle = (typeof VALID_MUSCLES)[number];
+
+/**
+ * Valid body part names from the database catalog.
+ * IMPORTANT: Do NOT invent new values - use only these exact strings.
+ */
+export const VALID_BODY_PARTS = [
+  'Upper Body',
+  'Lower Body',
+  'Core',
+  'Full Body',
+] as const;
+
+export type ValidBodyPart = (typeof VALID_BODY_PARTS)[number];
+
+/**
+ * Valid exercise type names from the database catalog.
+ */
+export const VALID_EXERCISE_TYPES = [
+  'Strength',
+  'Cardio',
+  'Flexibility',
+  'Balance',
+  'compound',
+  'isolation',
+  'plyometric',
+  'stretching',
+  'bodyweight',
+  'weighted',
+] as const;
+
+export type ValidExerciseType = (typeof VALID_EXERCISE_TYPES)[number];
+
+/**
+ * Valid equipment names from the database catalog.
+ */
+export const VALID_EQUIPMENT = [
+  'Barbell',
+  'Dumbbell',
+  'Kettlebell',
+  'Resistance Band',
+  'Pull-up Bar',
+  'Bench',
+  'Cable Machine',
+  'Bodyweight',
+] as const;
+
+export type ValidEquipment = (typeof VALID_EQUIPMENT)[number];
+
+/**
  * Schema MCP con descrizioni per l'AI
  *
  * NOTA: Usa nomi leggibili invece di ID.
  * Il sistema risolve automaticamente i nomi in ID.
+ * IMPORTANTE: Usa SOLO i valori enum specificati per muscles, bodyParts, exerciseType, equipment.
  */
 const mcpExerciseCreateSchema = z.object({
   name: z
@@ -34,36 +103,34 @@ const mcpExerciseCreateSchema = z.object({
     .describe('Exercise name in English (e.g., "Push-up", "Bench Press")'),
 
   exerciseType: z
-    .string()
-    .min(1)
+    .enum(VALID_EXERCISE_TYPES)
     .describe(
-      'Exercise type name. Valid values: "compound", "isolation", "plyometric", "stretching", "cardio", "bodyweight", "weighted"'
+      `Exercise type. VALID VALUES: ${VALID_EXERCISE_TYPES.join(', ')}`
     ),
 
   muscles: z
     .array(
       z.object({
         name: z
-          .string()
-          .min(1)
+          .enum(VALID_MUSCLES)
           .describe(
-            'Muscle name in English (e.g., "pectoralis major", "biceps brachii", "quadriceps")'
+            `Muscle name. VALID VALUES ONLY: ${VALID_MUSCLES.join(', ')}`
           ),
         role: z.nativeEnum(MuscleRole).describe('Muscle role: PRIMARY or SECONDARY'),
       })
     )
     .min(1)
-    .describe('Target muscles with their roles'),
+    .describe(`Target muscles with their roles. VALID MUSCLE NAMES: ${VALID_MUSCLES.join(', ')}`),
 
   bodyParts: z
-    .array(z.string().min(1))
+    .array(z.enum(VALID_BODY_PARTS))
     .min(1)
-    .describe('Body parts in English (e.g., "chest", "arms", "back", "legs")'),
+    .describe(`Body parts. VALID VALUES ONLY: ${VALID_BODY_PARTS.join(', ')}`),
 
   equipment: z
-    .array(z.string().min(1))
+    .array(z.enum(VALID_EQUIPMENT))
     .optional()
-    .describe('Equipment needed in English (e.g., "barbell", "dumbbell", "bodyweight", "cable")'),
+    .describe(`Equipment needed. VALID VALUES: ${VALID_EQUIPMENT.join(', ')}`),
 
   overview: z
     .string()
@@ -97,22 +164,37 @@ export const exerciseCreateTool: McpTool = {
   name: 'exercise_create',
   description: `Creates a new exercise in the database. Requires admin privileges.
 
-IMPORTANT: Use human-readable English names for all metadata fields. The system automatically resolves them to database IDs.
+CRITICAL: You MUST use ONLY the valid values listed below. Do NOT invent new values.
 
-Parameters:
-- name: Exercise name (e.g., "Push-up", "Barbell Squat")
-- exerciseType: Type name like "compound", "isolation", "plyometric", "stretching", "bodyweight"
-- muscles: Array of {name, role} where name is English muscle name (e.g., "pectoralis major") and role is "PRIMARY" or "SECONDARY"
-- bodyParts: Array of body part names (e.g., "chest", "arms", "back")
-- equipment: Optional array of equipment names (e.g., "barbell", "dumbbell", "bodyweight")
-- overview: Brief description of the exercise
-- instructions: Step-by-step execution instructions
-- exerciseTips: Tips for proper form
-- variations: Exercise variations
+VALID MUSCLES (use exact capitalization):
+  - Chest, Back, Shoulders, Biceps, Triceps, Quadriceps, Hamstrings, Glutes, Calves, Abs, Forearms
 
-The tool handles all ID resolution automatically. Do NOT look up or use database IDs directly.
+VALID BODY PARTS (use exact strings):
+  - "Upper Body", "Lower Body", "Core", "Full Body"
 
-After successful creation, always confirm to the user what was created including the exercise name and target muscles.`,
+VALID EXERCISE TYPES:
+  - Strength, Cardio, Flexibility, Balance, compound, isolation, plyometric, stretching, bodyweight, weighted
+
+VALID EQUIPMENT:
+  - Barbell, Dumbbell, Kettlebell, "Resistance Band", "Pull-up Bar", Bench, "Cable Machine", Bodyweight
+
+EXAMPLE JSON:
+{
+  "name": "Dumbbell Bicep Curl",
+  "exerciseType": "isolation",
+  "muscles": [
+    { "name": "Biceps", "role": "PRIMARY" },
+    { "name": "Forearms", "role": "SECONDARY" }
+  ],
+  "bodyParts": ["Upper Body"],
+  "equipment": ["Dumbbell"],
+  "overview": "An isolation exercise targeting the biceps.",
+  "instructions": ["Stand with dumbbells at sides", "Curl weights to shoulders", "Lower with control"],
+  "exerciseTips": ["Keep elbows stationary", "Don't swing the weights"],
+  "variations": ["Hammer Curl", "Concentration Curl"]
+}
+
+The tool handles ID resolution automatically. Do NOT use database IDs directly.`,
 
   parameters: mcpExerciseCreateSchema,
 
