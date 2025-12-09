@@ -21,7 +21,7 @@ import {
   paymentService,
   onboardingService,
 } from '@onecoach/lib-core';
-import { aiConfigService, chatService } from '@onecoach/lib-ai';
+import { chatService } from '@onecoach/lib-ai';
 import { marketplaceService } from '@onecoach/lib-marketplace';
 import { coachService } from '@onecoach/lib-coach';
 import type { IExerciseService, IFoodService, IAnalyticsService } from '@onecoach/contracts';
@@ -118,7 +118,6 @@ export function registerAllServices(): void {
   registerService('userProfile', userProfileService);
   registerService('payment', paymentService);
   registerService('onboarding', onboardingService);
-  registerService('aiConfig', aiConfigService);
   registerService('chat', chatService);
   registerService('marketplace', marketplaceService);
   registerService('coach', coachService);

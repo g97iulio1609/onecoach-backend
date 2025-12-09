@@ -13,7 +13,6 @@ import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/erro
 import { createFoodSchema } from '@onecoach/schemas/food.schema';
 import { ensureMacrosArePer100g } from '@onecoach/lib-shared/utils/macro-normalization';
 import type { Macros } from '@onecoach/types';
-import { AIConfigService } from '@onecoach/lib-ai/ai-config.service';
 import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
@@ -116,13 +115,8 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
         `\n\nUser request: ${description}\n\nReturn ONLY the JSON object, no markdown, no code blocks, no explanations.`
       );
 
-    // Get model configuration from database (same as nutrition/workout generation)
-    const foodConfig = await AIConfigService.getActiveConfigByOperationType('PLAN_GENERATION');
-    let modelId: string | null = foodConfig?.model ?? null;
-
-    if (!modelId) {
-      modelId = await AIProviderConfigService.getDefaultModel('openrouter');
-    }
+    // Get model configuration: solo default admin OpenRouter
+    let modelId: string | null = await AIProviderConfigService.getDefaultModel('openrouter');
 
     if (!modelId) {
       return NextResponse.json(
@@ -148,7 +142,7 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
       model: modelId,
       prompt: fullPrompt,
       temperature: 0.3, // Lower temperature for consistent results
-      maxTokens: foodConfig?.maxTokens || TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
+      maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
     });
 
     // Extract JSON from response (handle markdown code blocks if present)

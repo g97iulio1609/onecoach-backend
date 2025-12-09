@@ -6,9 +6,8 @@
  * - Operazioni batch (CRUD) e automazioni AI
  */
 
-import { AIConfigService, prisma } from '@onecoach/lib-core';
+import { prisma } from '@onecoach/lib-core';
 import { ExerciseService } from './exercise.service';
-import { ExerciseApprovalStatus, ExerciseRelationType, MuscleRole, Prisma } from '@prisma/client';
 import { toSlug } from '@onecoach/lib-shared';
 import {
   createExerciseSchema,
@@ -35,11 +34,46 @@ import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import { getAllMetadataForLocale, validateExerciseTypeByName } from '@onecoach/lib-metadata';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
+type ExerciseApprovalStatus = 'APPROVED' | 'PENDING';
+type ExerciseRelationType = NonNullable<ExerciseRelationInput['relation']>;
+type MuscleRole = NonNullable<CreateExerciseInput['muscles']>[number]['role'];
+
+type ExportExercise = {
+  id: string;
+  slug: string;
+  approvalStatus: ExerciseApprovalStatus;
+  approvedAt: Date | null;
+  version: number;
+  isUserGenerated: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  exerciseTypeId: string | null;
+  overview: string | null;
+  imageUrl: string | null;
+  videoUrl: string | null;
+  keywords: string[];
+  instructions: string[];
+  exerciseTips: string[];
+  variations: string[];
+  exercise_translations: Array<{
+    locale: string;
+    name: string;
+    shortName: string | null;
+    description: string | null;
+    searchTerms: string[] | null;
+  }>;
+  exercise_muscles: Array<{
+    muscleId: string;
+    role: MuscleRole;
+  }>;
+  exercise_body_parts: Array<{ bodyPartId: string }>;
+  exercise_equipments: Array<{ equipmentId: string }>;
+  relatedFrom: Array<{ toId: string; relation: ExerciseRelationType }>;
+};
+
 const DEFAULT_LOCALE = 'en';
-const DEFAULT_APPROVED_STATUS = (ExerciseApprovalStatus?.APPROVED ??
-  'APPROVED') as ExerciseApprovalStatus;
-const DEFAULT_PENDING_STATUS = (ExerciseApprovalStatus?.PENDING ??
-  'PENDING') as ExerciseApprovalStatus;
+const DEFAULT_APPROVED_STATUS: ExerciseApprovalStatus = 'APPROVED';
+const DEFAULT_PENDING_STATUS: ExerciseApprovalStatus = 'PENDING';
 
 /**
  * Schema per import payload (estende createExerciseSchema con campi admin)
@@ -48,7 +82,7 @@ const DEFAULT_PENDING_STATUS = (ExerciseApprovalStatus?.PENDING ??
  * IMPORTANTE: translations, muscles, e bodyPartIds sono OBBLIGATORI (ereditati da createExerciseSchema)
  */
 const exerciseImportExtension = z.object({
-  approvalStatus: z.nativeEnum(ExerciseApprovalStatus).optional(),
+  approvalStatus: z.enum(['APPROVED', 'PENDING']).optional(),
 });
 
 // Intersezione: mantiene i campi obbligatori da createExerciseSchema (translations, muscles, bodyPartIds)
@@ -126,7 +160,7 @@ export const exerciseAiPlanSchema = z.object({
     .array(
       z.object({
         slug: z.string().trim().min(1),
-        status: z.nativeEnum(ExerciseApprovalStatus).default(DEFAULT_APPROVED_STATUS),
+        status: z.enum(['APPROVED', 'PENDING']).default(DEFAULT_APPROVED_STATUS),
       })
     )
     .default([]),
@@ -161,11 +195,10 @@ const EXERCISE_EXPORT_INCLUDE = {
       },
     },
   },
-} satisfies Prisma.exercisesInclude;
+} as const;
 
 export type ExerciseImportPayload = z.infer<typeof exerciseImportSchema>;
 type ExerciseAiPlan = z.infer<typeof exerciseAiPlanSchema>;
-type ExportExercise = Prisma.exercisesGetPayload<{ include: typeof EXERCISE_EXPORT_INCLUDE }>;
 
 interface RelationReference {
   slug: string;
@@ -1050,14 +1083,6 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
 
     if (!basePrompt) {
       throw new Error('Il prompt non può essere vuoto');
-    }
-
-    // Check if agent is enabled
-    const isEnabled = await AIConfigService.isAgentEnabled('exercise-generation');
-    if (!isEnabled) {
-      throw new Error(
-        'Agent "exercise-generation" is currently disabled by admin. Please enable it in Settings.'
-      );
     }
 
     // Fetch available metadata IDs to include in prompt

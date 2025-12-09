@@ -16,7 +16,6 @@ import type {
   IUserProfileService,
   IPaymentService,
   IOnboardingService,
-  IAIConfigService,
   IChatService,
   IMarketplaceService,
   ICoachService,
@@ -36,7 +35,6 @@ type ServiceKey =
   | 'userProfile'
   | 'payment'
   | 'onboarding'
-  | 'aiConfig'
   | 'chat'
   | 'marketplace'
   | 'coach';
@@ -52,7 +50,6 @@ type ServiceMap = {
   userProfile: IUserProfileService;
   payment: IPaymentService;
   onboarding: IOnboardingService;
-  aiConfig: IAIConfigService;
   chat: IChatService;
   marketplace: IMarketplaceService;
   coach: ICoachService;

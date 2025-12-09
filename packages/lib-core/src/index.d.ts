@@ -31,6 +31,5 @@ export * from './policy.service';
 export * from './setup-intent.service';
 export * from './edge-config.service';
 export * from './iap-verification.server';
-export * from './ai/ai-config.service';
 export * from './direct-messaging.service';
 export * from './types/safe-types';
