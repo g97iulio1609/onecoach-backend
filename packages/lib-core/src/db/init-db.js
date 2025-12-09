@@ -186,22 +186,7 @@ export async function initializeDatabase(prisma, options) {
       result.errors.push(`Affiliate program seed failed: ${errorMsg}`);
     }
     // 6. Seed AI Configs - opzionale
-    try {
-      const admin = await prisma.users.findFirst({
-        where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
-      });
-      if (admin) {
-        const { seedAIConfigs } = await import('../seeds/seed-ai-configs');
-        await seedAIConfigs(prisma, admin.id);
-        result.initialized.push('AI configs');
-      } else {
-        result.skipped.push('AI configs (no admin found)');
-      }
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      result.errors.push(`AI configs seed failed: ${errorMsg}`);
-    }
-    // 7. Seed Marketplace - opzionale
+    // 6. Seed Marketplace - opzionale
     try {
       const { seedMarketplace } = await import('../seeds/seed-marketplace');
       await seedMarketplace(prisma);
@@ -210,7 +195,7 @@ export async function initializeDatabase(prisma, options) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       result.errors.push(`Marketplace seed failed: ${errorMsg}`);
     }
-    // 8. Seed Food Items - opzionale
+    // 7. Seed Food Items - opzionale
     try {
       const { seedFoodItems } = await import('../seeds/seed-food-items');
       await seedFoodItems(prisma);
