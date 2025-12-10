@@ -88,6 +88,19 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
   // Local state
   const [input, setInputLocal] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(initialConversationId);
+  
+  // IMPORTANTE: Manteniamo stabile il conversationId durante una sessione attiva
+  // per evitare reset dei messaggi quando viene creato un nuovo conversationId
+  const stableConversationIdRef = useRef<string | null>(initialConversationId || null);
+  
+  // Aggiorna stableConversationIdRef solo quando cambia da null a un valore (nuova conversazione)
+  // ma non quando cambia da un valore a un altro (per evitare reset durante la sessione)
+  useEffect(() => {
+    if (initialConversationId && !stableConversationIdRef.current) {
+      stableConversationIdRef.current = initialConversationId;
+      setConversationId(initialConversationId);
+    }
+  }, [initialConversationId]);
 
   // Refs for stable callbacks
   const callbacksRef = useRef({ onMessage, onError, onConversationCreated, onFinish });
@@ -119,6 +132,11 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
     };
   }, [effectiveModel, systemPrompt, staticBody, conversationId]);
 
+  // IMPORTANTE: Usa ref per il body per evitare che il transport venga ricreato
+  // quando il body cambia (es. quando viene creato un nuovo conversationId)
+  const requestBodyRef = useRef(requestBody);
+  requestBodyRef.current = requestBody;
+
   // Convert initialMessages to AI SDK v6 UIMessage format
   // STRUCTURAL FIX: Preserve full parts (tool-call, tool-result, reasoning) when available
   // Following AI SDK v6 pattern: message.parts[] is the source of truth
@@ -147,27 +165,105 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
   }, [initialMessages]);
 
   // Transport configuration with DefaultChatTransport - AI SDK v6 pattern
+  const applyConversationIdFromResponse = useCallback(
+    (response: Response) => {
+      const headerConversationId = response.headers.get('x-conversation-id');
+      if (!headerConversationId) return;
+
+      // IMPORTANTE: Non aggiorniamo il conversationId interno quando viene creato un nuovo ID
+      // durante una sessione attiva, per evitare reset dei messaggi
+      // Il nuovo ID viene gestito tramite il body della richiesta invece
+      setConversationId((prev) => {
+        if (prev === headerConversationId) {
+          return prev;
+        }
+        
+        // Se abbiamo già un conversationId (sessione attiva), non lo aggiorniamo
+        // per evitare reset dei messaggi. Il nuovo ID viene comunque propagato
+        // al livello superiore per la gestione della conversazione.
+        if (prev && prev !== headerConversationId) {
+          // Propaga l'ID al livello superiore ma mantieni quello interno stabile
+          callbacksRef.current.onConversationCreated?.(headerConversationId);
+          return prev; // Mantieni il conversationId stabile
+        }
+        
+        // Solo se non abbiamo un conversationId (nuova sessione), aggiorniamolo
+        callbacksRef.current.onConversationCreated?.(headerConversationId);
+        return headerConversationId;
+      });
+    },
+    []
+  );
+
+  // IMPORTANTE: Il transport deve essere stabile per evitare reset dei messaggi
+  // Usiamo requestBodyRef per leggere il body corrente nel fetch invece di 
+  // ricreare il transport ogni volta che il body cambia
   const transport = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DefaultChatTransport } = require('ai');
+    const { DefaultChatTransport, getOriginalFetch } = require('ai');
+
+    const baseFetch: typeof fetch = getOriginalFetch?.() ?? fetch;
+    const wrappedFetch: typeof fetch = async (input, init) => {
+      // Inietta il body corrente nel request
+      // Questo permette di aggiornare il body (es. conversationId) senza ricreare il transport
+      const currentBody = requestBodyRef.current;
+      const modifiedInit = {
+        ...init,
+        body: JSON.stringify({
+          ...JSON.parse((init?.body as string) || '{}'),
+          ...currentBody,
+        }),
+      };
+      
+      const response = await baseFetch(input as RequestInfo, modifiedInit as RequestInit);
+      applyConversationIdFromResponse(response);
+      return response;
+    };
+
     return new DefaultChatTransport({
       api,
       credentials: 'include' as RequestCredentials,
-      body: requestBody,
+      // Passa un body minimale, il body reale viene iniettato nel wrappedFetch
+      body: {},
+      fetch: wrappedFetch,
     });
-  }, [api, requestBody]);
+  }, [api, applyConversationIdFromResponse]); // RIMOSSO requestBody dalle dipendenze
 
 
   // AI SDK v6 useChat - requires transport for request configuration
-  const chatConfig = useMemo(() => ({
-    transport,
-    // Only pass id if conversationId exists
-    ...(conversationId ? { id: conversationId } : {}),
+  // IMPORTANTE: Non passiamo l'id a useChat quando viene creato durante una sessione
+  // perché useChat resetta i messaggi quando cambia l'id
+  // L'ID viene gestito tramite il body della richiesta invece
+  const stableIdRef = useRef<string | null>(initialConversationId || null);
+  
+  // Nota: NON aggiorniamo stableIdRef quando viene creato un nuovo conversationId durante
+  // la sessione (prev==null -> nuovo ID) per evitare che useChat resetti i messaggi.
+  // Lo usiamo solo per l'initialConversationId (es. pagina aperta su conversazione esistente).
+
+  const chatConfig = useMemo(() => {
+    const config: {
+      transport: typeof transport;
+      id?: string;
+      initialMessages?: UIMessage[];
+      experimental_throttle: number;
+    } = {
+      transport,
+      experimental_throttle: 30, // 30ms = ~33 FPS
+    };
+    
+    // Pass id solo se è stabile (non cambia durante la sessione)
+    // Questo evita che useChat resetti i messaggi quando viene creato un nuovo conversationId
+    if (stableIdRef.current) {
+      config.id = stableIdRef.current;
+    }
+    
     // Only pass initialMessages if they exist
-    ...(aiInitialMessages.length > 0 ? { initialMessages: aiInitialMessages } : {}),
-    // Throttle UI updates for better streaming fluidity
-    experimental_throttle: 30, // 30ms = ~33 FPS
-  }), [transport, conversationId, aiInitialMessages]);
+    if (aiInitialMessages.length > 0) {
+      config.initialMessages = aiInitialMessages;
+    }
+    
+    return config;
+  }, [transport, aiInitialMessages]);
 
   const {
     messages: aiMessages,
@@ -177,6 +273,9 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
     error: aiError,
     stop: aiStop,
   } = useAIChat(chatConfig);
+
+  // Non serve più preservare manualmente i messaggi perché non cambiamo l'id passato a useChat
+  // quando viene creato un nuovo conversationId durante una sessione
 
   // Callbacks ref to avoid re-renders
   useEffect(() => {

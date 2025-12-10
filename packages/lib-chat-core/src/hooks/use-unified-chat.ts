@@ -17,14 +17,16 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { UIMessage } from '@ai-sdk/react';
 import { useChatCore } from './use-chat-core';
 import { useUnifiedChatContextSafe } from '../providers/unified-chat-provider';
-import type { UseUnifiedChatOptions, UseUnifiedChatResult } from '../types/unified-chat';
+import type { UseUnifiedChatOptions, UseUnifiedChatResult, QueuedMessage } from '../types/unified-chat';
 import { DEFAULT_CHAT_FEATURES } from '../types/unified-chat';
-import type { ChatConversation } from '../types';
 import {
   useAIModelsStore,
   selectSelectedModelName,
   selectModels,
   selectSelectedModelId,
+  useChatStore,
+  selectConversations,
+  selectCurrentConversationId,
 } from '@onecoach/lib-stores';
 
 // ============================================================================
@@ -60,21 +62,28 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     conversationId: initialConversationId = null,
     initialConversations = [],
     onContextUpdate,
-    reasoningEnabled = false,
+    reasoningEnabled = true,
     initialModelId,
   } = options;
 
   // Try to get context from provider (may be null if not in provider)
   const providerContext = useUnifiedChatContextSafe();
 
+  // Use Zustand ChatStore (SSOT) - aggiornato via Supabase Realtime
+  const chatStoreConversations = useChatStore(selectConversations);
+  const chatStoreCurrentConversationId = useChatStore(selectCurrentConversationId);
+  const chatStoreSetCurrentConversation = useChatStore((state) => state.setCurrentConversation);
+  const chatStoreDeleteConversation = useChatStore((state) => state.deleteConversation);
+  const chatStoreDeleteConversations = useChatStore((state) => state.deleteConversations);
+  const chatStoreDeleteAllConversations = useChatStore((state) => state.deleteAllConversations);
+  const chatStoreIsDeleting = useChatStore((state) => state.isDeleting);
+
   // Local state fallbacks when not in provider
-  const [localConversations, setLocalConversations] =
-    useState<ChatConversation[]>(initialConversations);
-  const [localCurrentConversation, setLocalCurrentConversation] = useState<string | null>(
-    initialConversationId
-  );
   const [localIsOpen, setLocalIsOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Message queue state for concurrent messages
+  const [messageQueue, setMessageQueue] = useState<QueuedMessage[]>([]);
+  const isProcessingQueueRef = useRef(false);
 
   // Use Zustand store for AI models (SSOT)
   const storeModels = useAIModelsStore(selectModels);
@@ -102,12 +111,38 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   const userId = providerContext?.userId || null;
   const isOpen = providerContext?.isOpen ?? localIsOpen;
 
-  // Conversations state
-  const conversations = localConversations;
-  const currentConversation = localCurrentConversation;
+  // Track new conversation ID from response (per evitare aggiornamenti durante render)
+  // Dichiarato qui per essere disponibile prima del suo utilizzo
+  const [newConversationId, setNewConversationId] = useState<string | null>(null);
+  
+  // Conversations state - usa ChatStore (SSOT) aggiornato via Realtime
+  // Fallback a initialConversations solo al primo mount se lo store è vuoto
+  // Cast necessario perché ChatStore usa domain?: string mentre lib-chat-core usa domain?: ChatDomain
+  const conversations = (chatStoreConversations.length > 0 
+    ? chatStoreConversations 
+    : initialConversations) as typeof initialConversations;
+  
+  // IMPORTANTE: Per evitare reset dei messaggi quando viene creato un nuovo conversationId,
+  // manteniamo il conversationId stabile durante una sessione attiva
+  // Il nuovo ID viene gestito tramite il body della richiesta invece
+  const stableConversationIdRef = useRef<string | null>(initialConversationId || null);
+  
+  // Aggiorna stableConversationIdRef solo quando cambia da null a un valore (nuova conversazione)
+  // ma non quando cambia da un valore a un altro (per evitare reset durante la sessione)
+  useEffect(() => {
+    const newId = newConversationId || chatStoreCurrentConversationId || initialConversationId;
+    if (newId && !stableConversationIdRef.current) {
+      stableConversationIdRef.current = newId;
+    }
+  }, [newConversationId, chatStoreCurrentConversationId, initialConversationId]);
+  
+  // Usa l'ID stabile per useChatCore, ma il nuovo ID viene comunque inviato nel body
+  const currentConversation = stableConversationIdRef.current;
 
   // Build request body with screen context
   // Uses Zustand store selector for modelName (already converted from database ID)
+  // IMPORTANTE: Include sempre il conversationId corrente (che può essere nuovo) nel body
+  // anche se non lo passiamo a useChatCore per evitare reset dei messaggi
   const requestBody = useMemo(() => {
     const body: Record<string, unknown> = {
       tier: 'balanced',
@@ -132,26 +167,19 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       };
     }
 
-    return body;
-  }, [selectedModelName, screenContext, reasoningEnabled]);
-
-  // Fetch conversations and optionally return the latest conversation ID
-  const fetchConversations = useCallback(async (): Promise<string | null> => {
-    if (!userId) return null;
-    try {
-      const response = await fetch(`/api/copilot/conversations?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        const convs = data.conversations || [];
-        setLocalConversations(convs);
-        // Return the latest conversation ID (first in list, sorted by lastMessageAt desc)
-        return convs.length > 0 ? convs[0].id : null;
-      }
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
+    // Include sempre il conversationId corrente (può essere nuovo) nel body
+    // Questo permette al server di associare i messaggi alla conversazione corretta
+    // anche se non passiamo l'id a useChatCore per evitare reset dei messaggi
+    const effectiveConversationId = newConversationId || chatStoreCurrentConversationId || initialConversationId;
+    if (effectiveConversationId) {
+      body.conversationId = effectiveConversationId;
     }
-    return null;
-  }, [userId]);
+
+    return body;
+  }, [selectedModelName, screenContext, reasoningEnabled, newConversationId, chatStoreCurrentConversationId, initialConversationId]);
+
+  // Fetch conversations non più necessario - ChatStore viene aggiornato via Realtime
+  // Mantenuto solo per retrocompatibilità se necessario
 
   // Track if we're waiting for a new conversation ID
   const pendingNewConversationRef = useRef(false);
@@ -173,25 +201,24 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     api: '/api/chat',
     conversationId: currentConversation,
     body: requestBody,
-    onConversationCreated: (newConvId) => {
-      setLocalCurrentConversation(newConvId);
+    onConversationCreated: async (newConvId) => {
+      // Traccia il nuovo ID invece di aggiornare direttamente lo store
+      // L'aggiornamento verrà fatto in un useEffect per evitare errori di rendering
+      setNewConversationId(newConvId);
       pendingNewConversationRef.current = false;
+      // Il Realtime aggiornerà automaticamente la sidebar via useChatStore
+      // Non serve più fetchConversations qui
     },
     onFinish: async () => {
-      // Fetch conversations and auto-select new one if we were in "new conversation" mode
-      const latestConvId = await fetchConversations();
-
-      // If we were waiting for a new conversation (currentConversation was null)
-      // and now we have a latest conversation, select it
-      if (pendingNewConversationRef.current && latestConvId && !currentConversation) {
-        console.log('[useUnifiedChat] Auto-selecting new conversation:', latestConvId);
-        setLocalCurrentConversation(latestConvId);
-        pendingNewConversationRef.current = false;
-      }
+      // Il Realtime aggiornerà automaticamente le conversazioni via useChatStore
+      // Non serve più fetchConversations qui
 
       if (screenContext?.type === 'oneagenda' && onContextUpdate) {
         setTimeout(() => onContextUpdate({}), 500);
       }
+      
+      // Process next queued message if any
+      isProcessingQueueRef.current = false;
     },
     onError: (err) => {
       console.error('Chat error:', err);
@@ -200,12 +227,30 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   });
 
 
-  // Initialize conversations on mount
+  // Initialize ChatStore on mount se necessario
   useEffect(() => {
     if (userId && mode === 'fullscreen') {
-      fetchConversations();
+      const chatStore = useChatStore.getState();
+      if (!chatStore.userId || chatStore.userId !== userId) {
+        chatStore.initialize(userId);
+      }
     }
-  }, [userId, mode, fetchConversations]);
+  }, [userId, mode]);
+
+  // Aggiorna ChatStore quando viene ricevuto un nuovo conversationId dalla risposta
+  // Questo deve essere fatto in un useEffect per evitare errori di rendering
+  useEffect(() => {
+    if (newConversationId) {
+      // Usa getState() per evitare dipendenze instabili
+      const store = useChatStore.getState();
+      store.setCurrentConversation(newConversationId);
+      // Reset solo dopo aver verificato che lo store è stato aggiornato
+      // Questo evita race conditions
+      if (store.currentConversationId === newConversationId) {
+        setNewConversationId(null);
+      }
+    }
+  }, [newConversationId]);
 
   // Actions
   const setInput = useCallback(
@@ -246,10 +291,30 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     }
   }, [providerContext]);
 
+  // Message Queue CRUD operations (definite prima di sendMessage che le usa)
+  const addToQueue = useCallback((text: string, files?: File[]): string => {
+    const id = `queue-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const newItem: QueuedMessage = {
+      id,
+      text,
+      createdAt: new Date(),
+      files,
+    };
+    setMessageQueue(prev => [...prev, newItem]);
+    return id;
+  }, []);
+
   const sendMessage = useCallback(
     async (options?: { text?: string }) => {
       const messageText = options?.text?.trim() || input.trim();
-      if (!messageText || isLoading) return;
+      if (!messageText) return;
+
+      // Se già in loading, accoda il messaggio invece di bloccare
+      if (isLoading) {
+        addToQueue(messageText);
+        setInput('');
+        return;
+      }
 
       // Mark that we're expecting a new conversation if we don't have one
       if (!currentConversation) {
@@ -266,13 +331,18 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
         setInput(messageText);
       }
     },
-    [input, isLoading, coreSendMessage, setInput, currentConversation]
+    [input, isLoading, coreSendMessage, setInput, currentConversation, addToQueue]
   );
 
 
   const loadConversation = useCallback(
     async (conversationId: string) => {
       try {
+        // Usa ChatStore per caricare la conversazione
+        const chatStoreLoadConversation = useChatStore.getState().loadConversation;
+        await chatStoreLoadConversation(conversationId);
+        
+        // Carica i messaggi dalla conversazione
         const response = await fetch(`/api/copilot/conversations/${conversationId}`);
         if (response.ok) {
           const data = await response.json();
@@ -296,93 +366,126 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
             }
           );
           setCoreMessages(loadedMessages);
-          setLocalCurrentConversation(conversationId);
+          chatStoreSetCurrentConversation(conversationId);
         }
       } catch (err) {
         console.error('Error loading conversation:', err);
       }
     },
-    [setCoreMessages]
+    [setCoreMessages, chatStoreSetCurrentConversation]
   );
 
   const startNewConversation = useCallback(() => {
-    setLocalCurrentConversation(null);
+    // Stop any running generation to allow immediate messaging in new chat
+    stop();
+    isProcessingQueueRef.current = false;
+    setMessageQueue([]);
+    chatStoreSetCurrentConversation(null);
     resetCore();
     setInput('');
-  }, [resetCore, setInput]);
+  }, [resetCore, setInput, stop, chatStoreSetCurrentConversation]);
 
   const deleteConversation = useCallback(
     async (id: string) => {
-      setIsDeleting(true);
       try {
-        const response = await fetch(`/api/copilot/conversations/${id}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          setLocalConversations((prev) => prev.filter((c: any) => c.id !== id));
-          if (currentConversation === id) {
-            setLocalCurrentConversation(null);
-            resetCore();
-          }
+        await chatStoreDeleteConversation(id);
+        if (currentConversation === id) {
+          chatStoreSetCurrentConversation(null);
+          resetCore();
         }
       } catch (err) {
         console.error('Error deleting conversation:', err);
-      } finally {
-        setIsDeleting(false);
       }
     },
-    [currentConversation, resetCore]
+    [currentConversation, resetCore, chatStoreDeleteConversation, chatStoreSetCurrentConversation]
   );
 
   const deleteConversations = useCallback(
     async (ids: string[]) => {
       if (ids.length === 0) return;
-      setIsDeleting(true);
       try {
-        const response = await fetch('/api/copilot/conversations', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ids }),
-        });
-        if (response.ok) {
-          setLocalConversations((prev) => prev.filter((c: any) => !ids.includes(c.id)));
-          if (currentConversation && ids.includes(currentConversation)) {
-            setLocalCurrentConversation(null);
-            resetCore();
-          }
+        await chatStoreDeleteConversations(ids);
+        if (currentConversation && ids.includes(currentConversation)) {
+          chatStoreSetCurrentConversation(null);
+          resetCore();
         }
       } catch (err) {
         console.error('Error deleting conversations:', err);
-      } finally {
-        setIsDeleting(false);
       }
     },
-    [currentConversation, resetCore]
+    [currentConversation, resetCore, chatStoreDeleteConversations, chatStoreSetCurrentConversation]
   );
 
   const deleteAllConversations = useCallback(async () => {
-    setIsDeleting(true);
     try {
-      const response = await fetch('/api/copilot/conversations', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ all: true }),
-      });
-      if (response.ok) {
-        setLocalConversations([]);
-        setLocalCurrentConversation(null);
-        resetCore();
-      }
+      await chatStoreDeleteAllConversations();
+      chatStoreSetCurrentConversation(null);
+      resetCore();
     } catch (err) {
       console.error('Error deleting all conversations:', err);
-    } finally {
-      setIsDeleting(false);
     }
-  }, [resetCore]);
+  }, [resetCore, chatStoreDeleteAllConversations, chatStoreSetCurrentConversation]);
 
   const reload = useCallback(async () => {
     await coreReload();
   }, [coreReload]);
+
+  // Message Queue CRUD operations (addToQueue già definita sopra prima di sendMessage)
+
+  const updateQueuedMessage = useCallback((id: string, text: string) => {
+    setMessageQueue(prev => prev.map(item => 
+      item.id === id ? { ...item, text } : item
+    ));
+  }, []);
+
+  const removeFromQueue = useCallback((id: string) => {
+    setMessageQueue(prev => prev.filter(item => item.id !== id));
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setMessageQueue([]);
+  }, []);
+
+  const reorderQueue = useCallback((fromIndex: number, toIndex: number) => {
+    setMessageQueue(prev => {
+      const result = [...prev];
+      const removed = result.splice(fromIndex, 1)[0];
+      if (removed) {
+        result.splice(toIndex, 0, removed);
+      }
+      return result;
+    });
+  }, []);
+
+  // Process queue: send next message when not loading
+  useEffect(() => {
+    const processNextInQueue = async () => {
+      if (isLoading || messageQueue.length === 0 || isProcessingQueueRef.current) {
+        return;
+      }
+      
+      const nextMessage = messageQueue[0];
+      if (!nextMessage) return;
+      
+      isProcessingQueueRef.current = true;
+      
+      // Remove from queue
+      setMessageQueue(prev => prev.slice(1));
+      
+      // Send the message
+      try {
+        if (!currentConversation) {
+          pendingNewConversationRef.current = true;
+        }
+        await coreSendMessage({ text: nextMessage.text });
+      } catch (err) {
+        console.error('Error sending queued message:', err);
+        isProcessingQueueRef.current = false;
+      }
+    };
+    
+    processNextInQueue();
+  }, [isLoading, messageQueue, coreSendMessage, currentConversation]);
 
   return {
     // Chat state
@@ -395,7 +498,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     // Conversation state
     conversations,
     currentConversation,
-    isDeleting,
+    isDeleting: chatStoreIsDeleting,
 
     // Context state
     screenContext,
@@ -407,6 +510,9 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
 
     // UI state
     isOpen,
+
+    // Message Queue state
+    messageQueue,
 
     // Actions
     sendMessage,
@@ -421,5 +527,12 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     stop,
     setIsOpen,
     toggleOpen,
+
+    // Message Queue actions (CRUD)
+    addToQueue,
+    updateQueuedMessage,
+    removeFromQueue,
+    clearQueue,
+    reorderQueue,
   };
 }

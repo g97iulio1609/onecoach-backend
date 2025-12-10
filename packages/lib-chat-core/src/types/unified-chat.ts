@@ -116,6 +116,20 @@ export interface AIModel {
 }
 
 // ============================================================================
+// Message Queue Types
+// ============================================================================
+
+/**
+ * Queued message waiting to be sent
+ */
+export interface QueuedMessage {
+  id: string;
+  text: string;
+  createdAt: Date;
+  files?: File[];
+}
+
+// ============================================================================
 // Unified Chat Mode Types
 // ============================================================================
 
@@ -220,6 +234,9 @@ export interface UseUnifiedChatResult {
   // UI state
   isOpen: boolean;
 
+  // Message Queue state
+  messageQueue: QueuedMessage[];
+
   // Actions
   sendMessage: (options?: { text?: string }) => Promise<void>;
   setInput: (value: string) => void;
@@ -233,6 +250,13 @@ export interface UseUnifiedChatResult {
   stop: () => void;
   setIsOpen: (open: boolean) => void;
   toggleOpen: () => void;
+
+  // Message Queue actions (CRUD)
+  addToQueue: (text: string, files?: File[]) => string; // Returns queue item ID
+  updateQueuedMessage: (id: string, text: string) => void;
+  removeFromQueue: (id: string) => void;
+  clearQueue: () => void;
+  reorderQueue: (fromIndex: number, toIndex: number) => void;
 }
 
 // ============================================================================
