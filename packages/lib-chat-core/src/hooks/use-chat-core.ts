@@ -145,39 +145,29 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
       };
     });
   }, [initialMessages]);
-  // Transport configuration with static body params - AI SDK v6 pattern
+
+  // Transport configuration with DefaultChatTransport - AI SDK v6 pattern
   // https://ai-sdk.dev/docs/ai-sdk-ui/chatbot#custom-headers-body-and-credentials
-  // Body is passed at transport level for all requests
-  const transportConfig = useMemo(() => {
-    // Dynamic import to avoid SSR issues
+  const transport = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { DefaultChatTransport } = require('ai');
     return new DefaultChatTransport({
       api,
       credentials: 'include' as RequestCredentials,
-      body: () => requestBody, // Function for dynamic values
+      body: requestBody, // Static body merged with each request
     });
   }, [api, requestBody]);
 
-  // AI SDK v6 useChat - following official pattern from AI Elements examples
-  // https://ai-sdk.dev/elements/examples/chatbot
-  // Uses DefaultChatTransport for body injection
-  const chatConfig: Parameters<typeof useAIChat>[0] = {
-    transport: transportConfig,
-    // Only pass id if conversationId exists (don't pass undefined)
+  // AI SDK v6 useChat - requires transport for request configuration
+  const chatConfig = useMemo(() => ({
+    transport,
+    // Only pass id if conversationId exists
     ...(conversationId ? { id: conversationId } : {}),
     // Only pass initialMessages if they exist
     ...(aiInitialMessages.length > 0 ? { initialMessages: aiInitialMessages } : {}),
     // Throttle UI updates for better streaming fluidity
     experimental_throttle: 30, // 30ms = ~33 FPS
-    onFinish: ({ message }: { message: UIMessage }) => {
-      log('Message finished', { messageId: message.id, role: message.role });
-      callbacksRef.current.onFinish?.();
-    },
-    onError: (error: Error) => {
-      logError('Chat error', error);
-      callbacksRef.current.onError?.(error);
-    },
-  };
+  }), [transport, conversationId, aiInitialMessages]);
 
   const {
     messages: aiMessages,
@@ -187,6 +177,20 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
     error: aiError,
     stop: aiStop,
   } = useAIChat(chatConfig);
+
+  // Callbacks ref to avoid re-renders
+  useEffect(() => {
+    callbacksRef.current.onFinish?.();
+  }, [aiMessages.length]);
+
+  useEffect(() => {
+    if (aiError) {
+      logError('Chat error', aiError);
+      callbacksRef.current.onError?.(aiError);
+    }
+  }, [aiError]);
+
+
 
 
   // Cast messages (they're compatible)
