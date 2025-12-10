@@ -119,46 +119,58 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
     };
   }, [effectiveModel, systemPrompt, staticBody, conversationId]);
 
-  // Convert legacy initialMessages to AI SDK v6 format
+  // Convert initialMessages to AI SDK v6 UIMessage format
+  // STRUCTURAL FIX: Preserve full parts (tool-call, tool-result, reasoning) when available
+  // Following AI SDK v6 pattern: message.parts[] is the source of truth
+  // https://ai-sdk.dev/elements/components/message
   const aiInitialMessages = useMemo<UIMessage[]>(() => {
     if (!initialMessages.length) return [];
 
-    return initialMessages.map((m: any) => ({
-      id: m.id,
-      role: m.role as 'user' | 'assistant' | 'system',
-      parts: [{ type: 'text' as const, text: m.content }],
-    }));
+    return initialMessages.map((m: any) => {
+      // KISS: If message already has parts array with content, use it directly
+      // This preserves tool-call/tool-result/reasoning parts from loaded conversations
+      if (m.parts && Array.isArray(m.parts) && m.parts.length > 0) {
+        return {
+          id: m.id,
+          role: m.role as 'user' | 'assistant' | 'system',
+          parts: m.parts, // Preserve original parts (tool invocations, reasoning, etc.)
+        };
+      }
+
+      // Fallback: Create text part from legacy content string
+      return {
+        id: m.id,
+        role: m.role as 'user' | 'assistant' | 'system',
+        parts: [{ type: 'text' as const, text: m.content || '' }],
+      };
+    });
   }, [initialMessages]);
+  // Transport configuration with static body params - AI SDK v6 pattern
+  // https://ai-sdk.dev/docs/ai-sdk-ui/chatbot#custom-headers-body-and-credentials
+  // Body is passed at transport level for all requests
+  const transportConfig = useMemo(() => {
+    // Dynamic import to avoid SSR issues
+    const { DefaultChatTransport } = require('ai');
+    return new DefaultChatTransport({
+      api,
+      credentials: 'include' as RequestCredentials,
+      body: () => requestBody, // Function for dynamic values
+    });
+  }, [api, requestBody]);
 
   // AI SDK v6 useChat - following official pattern from AI Elements examples
   // https://ai-sdk.dev/elements/examples/chatbot
-  // No custom transport needed - useChat handles it automatically
+  // Uses DefaultChatTransport for body injection
   const chatConfig: Parameters<typeof useAIChat>[0] = {
-    api,
+    transport: transportConfig,
     // Only pass id if conversationId exists (don't pass undefined)
     ...(conversationId ? { id: conversationId } : {}),
-    credentials: 'include' as RequestCredentials, // Include cookies for auth
     // Only pass initialMessages if they exist
     ...(aiInitialMessages.length > 0 ? { initialMessages: aiInitialMessages } : {}),
-    // Throttle UI updates per migliorare fluidità streaming in tempo reale
-    // Riduce re-render eccessivi durante lo streaming rapido
-    experimental_throttle: 30, // 30ms = ~33 FPS, bilancio ottimale tra fluidità e performance
-    // Prepare request body - include static body params
-    experimental_prepareRequestBody: ({ messages }) => {
-      return {
-        messages,
-        ...requestBody,
-      };
-    },
-    // Handle streaming data parts - minimal processing for performance
-    onData: (_dataPart: unknown) => {
-      // No logging during streaming for performance
-    },
+    // Throttle UI updates for better streaming fluidity
+    experimental_throttle: 30, // 30ms = ~33 FPS
     onFinish: ({ message }: { message: UIMessage }) => {
       log('Message finished', { messageId: message.id, role: message.role });
-
-      // Extract conversationId from response headers (if new conversation)
-      // This is handled by the API via x-conversation-id header
       callbacksRef.current.onFinish?.();
     },
     onError: (error: Error) => {
@@ -175,6 +187,7 @@ export function useChatCore(options: UseChatCoreOptions = {}): UseChatCoreResult
     error: aiError,
     stop: aiStop,
   } = useAIChat(chatConfig);
+
 
   // Cast messages (they're compatible)
   const messages = aiMessages as UIMessage[];
