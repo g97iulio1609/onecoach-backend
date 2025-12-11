@@ -76,6 +76,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   const chatStoreDeleteConversation = useChatStore((state) => state.deleteConversation);
   const chatStoreDeleteConversations = useChatStore((state) => state.deleteConversations);
   const chatStoreDeleteAllConversations = useChatStore((state) => state.deleteAllConversations);
+  const chatStoreRenameConversation = useChatStore((state) => state.renameConversation);
   const chatStoreIsDeleting = useChatStore((state) => state.isDeleting);
 
   // Local state fallbacks when not in provider
@@ -400,6 +401,17 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     [currentConversation, resetCore, chatStoreDeleteConversation, chatStoreSetCurrentConversation]
   );
 
+  const renameConversation = useCallback(
+    async (id: string, title: string) => {
+      try {
+        await chatStoreRenameConversation(id, title);
+      } catch (err) {
+        console.error('Error renaming conversation:', err);
+      }
+    },
+    [chatStoreRenameConversation]
+  );
+
   const deleteConversations = useCallback(
     async (ids: string[]) => {
       if (ids.length === 0) return;
@@ -521,6 +533,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     loadConversation,
     startNewConversation,
     deleteConversation,
+    renameConversation,
     deleteConversations,
     deleteAllConversations,
     reload,

@@ -138,6 +138,9 @@ export interface ChatActions {
   /** Elimina tutte le conversazioni */
   deleteAllConversations: () => Promise<void>;
 
+  /** Rinomina una conversazione */
+  renameConversation: (id: string, title: string) => Promise<void>;
+
   /** Inizia una nuova conversazione */
   startNewConversation: () => void;
 }
@@ -390,6 +393,33 @@ export const useChatStore = create<ChatStore>()(
           set({ lastError: 'Errore nella cancellazione di tutte le conversazioni' });
         } finally {
           set({ isDeleting: false });
+        }
+      },
+
+      renameConversation: async (id, title) => {
+        if (!id || !title.trim()) return;
+        set({ isLoading: true });
+        try {
+          const response = await fetch(`/api/copilot/conversations/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const updated = data.conversation || { title };
+            get().updateConversation(id, {
+              title: updated.title || title,
+              updatedAt: updated.updatedAt ? new Date(updated.updatedAt) : new Date(),
+            });
+          } else {
+            set({ lastError: 'Errore nel rinominare la conversazione' });
+          }
+        } catch (error) {
+          console.error('[ChatStore] Error renaming conversation:', error);
+          set({ lastError: 'Errore nel rinominare la conversazione' });
+        } finally {
+          set({ isLoading: false });
         }
       },
 

@@ -93,6 +93,8 @@ export interface ChatActions {
     deleteConversations: (ids: string[]) => Promise<void>;
     /** Elimina tutte le conversazioni */
     deleteAllConversations: () => Promise<void>;
+    /** Rinomina una conversazione */
+    renameConversation: (id: string, title: string) => Promise<void>;
     /** Inizia una nuova conversazione */
     startNewConversation: () => void;
 }

@@ -244,6 +244,7 @@ export interface UseUnifiedChatResult {
   loadConversation: (id: string) => Promise<void>;
   startNewConversation: () => void;
   deleteConversation: (id: string) => Promise<void>;
+  renameConversation: (id: string, title: string) => Promise<void>;
   deleteConversations: (ids: string[]) => Promise<void>;
   deleteAllConversations: () => Promise<void>;
   reload: () => Promise<void>;
