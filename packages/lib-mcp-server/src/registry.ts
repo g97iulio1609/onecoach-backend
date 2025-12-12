@@ -36,7 +36,8 @@ export type ToolCategory =
   | 'analytics'
   | 'chat'
   | 'settings'
-  | 'admin';
+  | 'admin'
+  | 'body_measurements';
 
 export interface ToolRegistryEntry {
   tool: McpTool;
@@ -306,6 +307,65 @@ const toolMetadataMap: Record<string, Partial<ToolMetadata>> = {
     sideEffects: 'read',
     tags: ['prediction', 'ai', 'goals'],
   },
+
+  // ===== BODY MEASUREMENTS TOOLS =====
+  body_measurements_list: {
+    category: 'body_measurements',
+    subcategory: 'crud',
+    requiredContext: ['userId'],
+    complexity: 'simple',
+    sideEffects: 'read',
+    tags: ['list', 'history'],
+  },
+  body_measurements_create: {
+    category: 'body_measurements',
+    subcategory: 'crud',
+    requiredContext: ['userId'],
+    complexity: 'moderate',
+    sideEffects: 'write',
+    tags: ['create', 'log'],
+  },
+  body_measurements_update: {
+    category: 'body_measurements',
+    subcategory: 'crud',
+    requiredContext: ['userId'],
+    complexity: 'moderate',
+    sideEffects: 'write',
+    tags: ['update'],
+  },
+  body_measurements_delete: {
+    category: 'body_measurements',
+    subcategory: 'crud',
+    requiredContext: ['userId'],
+    complexity: 'simple',
+    sideEffects: 'delete',
+    tags: ['delete'],
+  },
+  body_measurements_import: {
+    category: 'body_measurements',
+    subcategory: 'import',
+    requiredContext: ['userId'],
+    complexity: 'complex',
+    sideEffects: 'write',
+    tags: ['import', 'ai', 'vision', 'pdf', 'csv'],
+    description: 'Imports measurements from files (PDF, Images, CSV) using AI extraction.',
+  },
+  body_measurements_analyze: {
+    category: 'body_measurements',
+    subcategory: 'analytics',
+    requiredContext: ['userId'],
+    complexity: 'moderate',
+    sideEffects: 'read',
+    tags: ['analytics', 'trends', 'bmi'],
+  },
+  body_measurements_compare: {
+    category: 'body_measurements',
+    subcategory: 'analytics',
+    requiredContext: ['userId'],
+    complexity: 'moderate',
+    sideEffects: 'read',
+    tags: ['comparison', 'diff'],
+  },
 };
 
 // ============================================================================
@@ -350,6 +410,7 @@ class ToolRegistry {
       marketplace_: 'marketplace',
       affiliate_: 'marketplace',
       analytics_: 'analytics',
+      body_measurements_: 'body_measurements',
     };
 
     for (const [prefix, category] of Object.entries(prefixMap)) {

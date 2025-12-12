@@ -1,0 +1,27 @@
+{
+  "name": "@onecoach/lib-body-measurements",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc -b"
+  },
+  "dependencies": {
+    "@onecoach/lib-ai": "workspace:*",
+    "@onecoach/lib-core": "workspace:*",
+    "@onecoach/lib-import-core": "workspace:*",
+    "@onecoach/constants": "workspace:*",
+    "ai": "^4.3.16",
+    "zod": "4.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "sideEffects": false
+}

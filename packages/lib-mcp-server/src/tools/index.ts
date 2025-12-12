@@ -23,6 +23,7 @@ import { marketplaceTools } from './marketplace';
 import { analyticsTools } from './analytics';
 import { memoryToolsRecord } from './memory';
 import { profileToolsRecord } from './profile';
+import * as bodyMeasurementsTools from './body-measurements';
 import type { McpTool } from '../types';
 import { arrayToToolRecord } from '../utils/helpers';
 
@@ -84,6 +85,10 @@ export const allTools: Record<string, McpTool> = {
   ...memoryToolsRecord,
   // Profile tools
   ...profileToolsRecord,
+  // Body Measurements tools
+  ...(Object.fromEntries(
+    Object.entries(bodyMeasurementsTools).filter(([, v]) => typeof v === 'object' && 'execute' in v)
+  ) as Record<string, McpTool>),
 };
 
 /**
