@@ -9,7 +9,7 @@
  *
  * @example
  * if (hasProperty(obj, 'id')) {
- *   console.log(obj.id); // Type-safe access
+ *   console.warn(obj.id); // Type-safe access
  * }
  */
 export function hasProperty(obj, key) {
@@ -34,7 +34,7 @@ export function isError(value) {
  * @example
  * const user = safeCast(data, isUser);
  * if (user) { // Type is User
- *   console.log(user.name);
+ *   console.warn(user.name);
  * }
  */
 export function safeCast(value, validator) {

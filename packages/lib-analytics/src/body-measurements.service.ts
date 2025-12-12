@@ -31,6 +31,12 @@ export interface CreateBodyMeasurementInput {
   calf?: number;
   neck?: number;
   shoulders?: number;
+  height?: number;
+  visceralFat?: number;
+  waterPercentage?: number;
+  boneMass?: number;
+  metabolicAge?: number;
+  bmr?: number;
   notes?: string;
   photos?: string[];
 }
@@ -57,6 +63,12 @@ function normalizeBodyMeasurement(measurement: unknown): BodyMeasurement {
     calf?: unknown;
     neck?: unknown;
     shoulders?: unknown;
+    height?: unknown;
+    visceralFat?: unknown;
+    waterPercentage?: unknown;
+    boneMass?: unknown;
+    metabolicAge?: number | null;
+    bmr?: number | null;
     notes?: string | null;
     photos?: unknown;
     createdAt: Date | string;
@@ -77,6 +89,12 @@ function normalizeBodyMeasurement(measurement: unknown): BodyMeasurement {
     calf: m.calf ? Number(m.calf) : undefined,
     neck: m.neck ? Number(m.neck) : undefined,
     shoulders: m.shoulders ? Number(m.shoulders) : undefined,
+    height: m.height ? Number(m.height) : undefined,
+    visceralFat: m.visceralFat ? Number(m.visceralFat) : undefined,
+    waterPercentage: m.waterPercentage ? Number(m.waterPercentage) : undefined,
+    boneMass: m.boneMass ? Number(m.boneMass) : undefined,
+    metabolicAge: m.metabolicAge ?? undefined,
+    bmr: m.bmr ?? undefined,
     notes: m.notes || undefined,
     photos: m.photos as string[] | undefined,
     createdAt: m.createdAt instanceof Date ? m.createdAt.toISOString() : m.createdAt,
@@ -123,6 +141,12 @@ export async function createBodyMeasurement(
       calf: prepareDecimalField(data.calf),
       neck: prepareDecimalField(data.neck),
       shoulders: prepareDecimalField(data.shoulders),
+      height: prepareDecimalField(data.height),
+      visceralFat: prepareDecimalField(data.visceralFat),
+      waterPercentage: prepareDecimalField(data.waterPercentage),
+      boneMass: prepareDecimalField(data.boneMass),
+      metabolicAge: data.metabolicAge,
+      bmr: data.bmr,
       notes: data.notes,
       photos: data.photos || [],
     },
@@ -249,6 +273,12 @@ export async function updateBodyMeasurement(
       ...(data.calf !== undefined && { calf: prepareDecimalField(data.calf) }),
       ...(data.neck !== undefined && { neck: prepareDecimalField(data.neck) }),
       ...(data.shoulders !== undefined && { shoulders: prepareDecimalField(data.shoulders) }),
+      ...(data.height !== undefined && { height: prepareDecimalField(data.height) }),
+      ...(data.visceralFat !== undefined && { visceralFat: prepareDecimalField(data.visceralFat) }),
+      ...(data.waterPercentage !== undefined && { waterPercentage: prepareDecimalField(data.waterPercentage) }),
+      ...(data.boneMass !== undefined && { boneMass: prepareDecimalField(data.boneMass) }),
+      ...(data.metabolicAge !== undefined && { metabolicAge: data.metabolicAge }),
+      ...(data.bmr !== undefined && { bmr: data.bmr }),
       ...(data.notes !== undefined && { notes: data.notes }),
       ...(data.photos !== undefined && { photos: data.photos }),
     },

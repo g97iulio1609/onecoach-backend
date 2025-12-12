@@ -69,7 +69,7 @@ function createAIContext(userId: string): AIParseContext {
       }
 
       // Fallback per tipi sconosciuti - prova come documento
-      console.log(`[WorkoutImport] Unknown MIME type ${mimeType}, trying document parser`);
+      console.warn(`[WorkoutImport] Unknown MIME type ${mimeType}, trying document parser`);
       return WorkoutVisionService.parseDocument(content, mimeType, userId);
     },
   };
@@ -118,7 +118,7 @@ Cost: ${IMPORT_LIMITS.DEFAULT_CREDIT_COST} credits per import (configurable by a
       aiContext: createAIContext(context.userId),
       onProgress: (progress: ImportProgress) => {
         // Log progress for debugging
-        console.log(`[WorkoutImport][${requestId}] ${progress.step}: ${progress.message}`);
+        console.warn(`[WorkoutImport][${requestId}] ${progress.step}: ${progress.message}`);
       },
       context: { requestId, userId: context.userId },
     });

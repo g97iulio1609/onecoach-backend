@@ -21,7 +21,7 @@ export type UnknownRecord = Record<string, unknown>;
  *
  * @example
  * if (hasProperty(obj, 'id')) {
- *   console.log(obj.id); // Type-safe access
+ *   console.warn(obj.id); // Type-safe access
  * }
  */
 export declare function hasProperty<K extends string>(obj: unknown, key: K): obj is Record<K, unknown>;
@@ -40,7 +40,7 @@ export declare function isError(value: unknown): value is Error;
  * @example
  * const user = safeCast(data, isUser);
  * if (user) { // Type is User
- *   console.log(user.name);
+ *   console.warn(user.name);
  * }
  */
 export declare function safeCast<T>(value: unknown, validator: (v: unknown) => v is T): T | undefined;

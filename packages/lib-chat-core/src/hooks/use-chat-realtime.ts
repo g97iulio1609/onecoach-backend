@@ -270,7 +270,7 @@ export function useChatWithRealtime(options: UseChatWithRealtimeOptions) {
       // Qui potremmo aggiornare i messaggi se arrivano da altri client
       // Per ora loggiamo solo in development
       if (process.env.NODE_ENV === 'development') {
-        console.log('[useChatWithRealtime] Realtime event:', event, message);
+        console.warn('[useChatWithRealtime] Realtime event:', event, message);
       }
     },
   });

@@ -518,7 +518,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
                 };
             }
             try {
-                console.log(`[FileParser] Parsing CSV via AI: ${file.name}`);
+                console.warn(`[FileParser] Parsing CSV via AI: ${file.name}`);
                 const program = await aiContext.parseWithAI(file.content, file.mimeType || 'text/csv', '' // Prompt gestito internamente
                 );
                 const parsedProgram = ImportedWorkoutProgramSchema.parse({
@@ -560,7 +560,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
                 };
             }
             try {
-                console.log(`[FileParser] Parsing XLSX via AI: ${file.name}`);
+                console.warn(`[FileParser] Parsing XLSX via AI: ${file.name}`);
                 const program = await aiContext.parseWithAI(file.content, mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '');
                 const parsedProgram = ImportedWorkoutProgramSchema.parse({
                     ...program,
@@ -605,7 +605,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
         // FALLBACK: Prova tramite AI come CSV
         if (aiContext) {
             try {
-                console.log(`[FileParser] Tentativo fallback AI per file: ${file.name}`);
+                console.warn(`[FileParser] Tentativo fallback AI per file: ${file.name}`);
                 const program = await aiContext.parseWithAI(file.content, mimeType || 'text/plain', '');
                 const parsedProgram = ImportedWorkoutProgramSchema.parse({
                     ...program,

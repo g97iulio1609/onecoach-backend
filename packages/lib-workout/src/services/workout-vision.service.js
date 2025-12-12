@@ -24,10 +24,10 @@ import { ImportedWorkoutProgramSchema, } from '../schemas/imported-workout.schem
 // ==================== LOGGING ====================
 function traceLog(message, context) {
     if (context && Object.keys(context).length > 0) {
-        console.log('[WorkoutVision][trace]', message, context);
+        console.warn('[WorkoutVision][trace]', message, context);
     }
     else {
-        console.log('[WorkoutVision][trace]', message);
+        console.warn('[WorkoutVision][trace]', message);
     }
 }
 // ==================== PROMPTS ====================
@@ -314,7 +314,7 @@ async function getVisionModelConfig(type) {
     }
     const maxRetries = Math.max(0, typedConfig.maxRetries ?? 0);
     const retryDelayBaseMs = Math.max(0, typedConfig.retryDelayBaseMs ?? 0);
-    console.log(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
+    console.warn(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
         type,
         model,
         fallbackModel,
@@ -402,7 +402,7 @@ export class WorkoutVisionService {
                 suggestion: 'Configure a different fallback model in Admin > AI Settings > Vision & Import Models',
             });
         }
-        console.log(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
+        console.warn(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
             userId,
             mimeType,
             provider: config.provider,
@@ -427,7 +427,7 @@ export class WorkoutVisionService {
                 console.error(`[WorkoutVision] Spreadsheet parsing attempt ${attempt + 1} failed:`, lastError.message);
                 // Su primo fallimento, prova modello fallback
                 if (attempt === 0 && currentModel !== config.fallbackModel) {
-                    console.log(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+                    console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
                     currentModel = config.fallbackModel;
                 }
                 // Aspetta prima di retry
@@ -475,7 +475,7 @@ export class WorkoutVisionService {
         // Per XLSX, il contenuto binario non può essere decodificato direttamente
         // In questo caso usiamo vision-like approach
         if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
-            console.log('[WorkoutVision] XLSX detected, using vision approach for binary content');
+            console.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
             return this.parseWithVisionAI(contentBase64, mimeType, '', 'spreadsheet', prompt);
         }
         // Costruisci messaggio per AI
@@ -492,7 +492,7 @@ Parse this data and return ONLY valid JSON.`;
         const csvRows = textContent.split('\n').length;
         const csvPreview = textContent.substring(0, 500);
         const promptPreview = fullPrompt.substring(0, 1000);
-        console.log('[WorkoutVision] 📋 AI Request Details:', {
+        console.warn('[WorkoutVision] 📋 AI Request Details:', {
             modelId,
             mimeType,
             csvRows,
@@ -500,7 +500,7 @@ Parse this data and return ONLY valid JSON.`;
             promptBytes: fullPrompt.length,
             csvPreview: csvPreview + (textContent.length > 500 ? '...' : ''),
         });
-        console.log('[WorkoutVision] 📝 Prompt Preview:', promptPreview + (fullPrompt.length > 1000 ? '...' : ''));
+        console.warn('[WorkoutVision] 📝 Prompt Preview:', promptPreview + (fullPrompt.length > 1000 ? '...' : ''));
         // ==========================================
         const startTime = Date.now();
         try {
@@ -519,7 +519,7 @@ Parse this data and return ONLY valid JSON.`;
             const isReasoningModel = modelId.toLowerCase().includes('reasoning') ||
                 modelId.toLowerCase().includes('think') ||
                 modelId.toLowerCase().includes('reflect');
-        console.log('[WorkoutVision] 🚀 Calling AI with streamObject (structured output)...', {
+        console.warn('[WorkoutVision] 🚀 Calling AI with streamObject (structured output)...', {
                 modelId,
                 maxOutputTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
                 temperature: isReasoningModel ? 'N/A (reasoning model)' : 0.2,
@@ -545,7 +545,7 @@ Parse this data and return ONLY valid JSON.`;
             // Raccogli il testo di risposta per debug
             let rawTextOutput = '';
             let chunkCount = 0;
-            console.log('[WorkoutVision] 📡 Streaming response...');
+            console.warn('[WorkoutVision] 📡 Streaming response...');
             for await (const part of streamResult.fullStream) {
                 chunkCount++;
                 if (part.type === 'text-delta') {
@@ -553,10 +553,10 @@ Parse this data and return ONLY valid JSON.`;
                 }
                 // Log progress ogni 50 chunk
                 if (chunkCount % 50 === 0) {
-                    console.log(`[WorkoutVision] 📊 Stream progress: ${chunkCount} chunks, ${rawTextOutput.length} bytes`);
+                    console.warn(`[WorkoutVision] 📊 Stream progress: ${chunkCount} chunks, ${rawTextOutput.length} bytes`);
                 }
             }
-            console.log('[WorkoutVision] ✅ Stream completed:', {
+            console.warn('[WorkoutVision] ✅ Stream completed:', {
                 chunkCount,
                 rawTextLength: rawTextOutput.length,
                 durationMs: Date.now() - startTime,
@@ -566,7 +566,7 @@ Parse this data and return ONLY valid JSON.`;
             let parsedOutput = null;
             try {
                 parsedOutput = (await streamResult.output);
-                console.log('[WorkoutVision] ✅ Structured output parsed successfully:', {
+                console.warn('[WorkoutVision] ✅ Structured output parsed successfully:', {
                     hasOutput: Boolean(parsedOutput),
                     programName: parsedOutput?.name,
                     weeksCount: parsedOutput?.weeks?.length,
@@ -581,7 +581,7 @@ Parse this data and return ONLY valid JSON.`;
                         try {
                             const parsed = JSON.parse(jsonMatch[0]);
                             parsedOutput = ImportedWorkoutProgramSchema.parse(parsed);
-                            console.log('[WorkoutVision] ✅ Fallback JSON extraction successful');
+                            console.warn('[WorkoutVision] ✅ Fallback JSON extraction successful');
                         }
                         catch (jsonError) {
                             console.error('[WorkoutVision] ❌ Fallback JSON parsing failed:', jsonError);
@@ -668,7 +668,7 @@ Parse this data and return ONLY valid JSON.`;
                 console.error(`[WorkoutVision] Attempt ${attempt + 1} failed:`, lastError.message);
                 // Su primo fallimento, prova modello fallback
                 if (attempt === 0 && currentModel !== config.fallbackModel) {
-                    console.log(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+                    console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
                     currentModel = config.fallbackModel;
                 }
                 // Aspetta prima di retry

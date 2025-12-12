@@ -249,3 +249,18 @@ export {
   useAvailableModels,
 } from './ai-models.store';
 export type { AIModel } from './ai-models.store';
+
+// Body Measurements Store (for Realtime sync)
+export {
+  useBodyMeasurementsStore,
+  selectLatestMeasurement,
+  selectAllMeasurements,
+  selectMeasurementsLoading,
+} from './body-measurements.store';
+
+// Body Measurements Realtime Hooks
+export {
+  useBodyMeasurementsRealtime,
+  useAllBodyMeasurementsRealtime,
+  bodyMeasurementsKeys,
+} from './body-measurements.hooks';

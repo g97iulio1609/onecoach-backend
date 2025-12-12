@@ -39,9 +39,9 @@ type ImportModelKey = 'imageModel' | 'pdfModel' | 'documentModel' | 'spreadsheet
 
 function traceLog(message: string, context?: Record<string, unknown>) {
   if (context && Object.keys(context).length > 0) {
-    console.log('[WorkoutVision][trace]', message, context);
+    console.warn('[WorkoutVision][trace]', message, context);
   } else {
-    console.log('[WorkoutVision][trace]', message);
+    console.warn('[WorkoutVision][trace]', message);
   }
 }
 
@@ -370,8 +370,8 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   const retryDelayBaseMs = Math.max(0, typedConfig.retryDelayBaseMs ?? 0);
 
   // Enhanced logging for debugging model selection issue
-  console.log(`[WorkoutVision] ⚙️ RAW Config from DB:`, JSON.stringify(typedConfig, null, 2));
-  console.log(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
+  console.warn(`[WorkoutVision] ⚙️ RAW Config from DB:`, JSON.stringify(typedConfig, null, 2));
+  console.warn(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
     type,
     modelKey,
     model,
@@ -503,7 +503,7 @@ export class WorkoutVisionService {
       });
     }
 
-    console.log(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
+    console.warn(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
       userId,
       mimeType,
       provider: config.provider,
@@ -538,7 +538,7 @@ export class WorkoutVisionService {
 
         // Su primo fallimento, prova modello fallback
         if (attempt === 0 && currentModel !== config.fallbackModel) {
-          console.log(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+          console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
           currentModel = config.fallbackModel;
         }
 
@@ -601,7 +601,7 @@ export class WorkoutVisionService {
     // Per XLSX, il contenuto binario non può essere decodificato direttamente
     // In questo caso usiamo vision-like approach
     if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
-      console.log('[WorkoutVision] XLSX detected, using vision approach for binary content');
+      console.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
       return this.parseWithVisionAI(contentBase64, mimeType, '', 'spreadsheet', prompt);
     }
 
@@ -621,7 +621,7 @@ Parse this data and return ONLY valid JSON.`;
     const csvPreview = textContent.substring(0, 500);
     const promptPreview = fullPrompt.substring(0, 1000);
 
-    console.log('[WorkoutVision] 📋 AI Request Details:', {
+    console.warn('[WorkoutVision] 📋 AI Request Details:', {
       modelId,
       mimeType,
       csvRows,
@@ -630,7 +630,7 @@ Parse this data and return ONLY valid JSON.`;
       csvPreview: csvPreview + (textContent.length > 500 ? '...' : ''),
     });
 
-    console.log(
+    console.warn(
       '[WorkoutVision] 📝 Prompt Preview:',
       promptPreview + (fullPrompt.length > 1000 ? '...' : '')
     );
@@ -654,7 +654,7 @@ Parse this data and return ONLY valid JSON.`;
       // Usiamo esclusivamente modelli reasoning, quindi temperatura non supportata
       const isReasoningModel = true;
 
-      console.log('[WorkoutVision] 🚀 Calling AI with streamObject (structured output)...', {
+      console.warn('[WorkoutVision] 🚀 Calling AI with streamObject (structured output)...', {
         modelId,
         maxOutputTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
         temperature: isReasoningModel ? 'N/A (reasoning model)' : 0.2,
@@ -666,7 +666,7 @@ Parse this data and return ONLY valid JSON.`;
 
       // Usa streamObject come workout-generation-orchestrator.service.ts
       // Questo garantisce oggetti completi con validazione Zod
-      console.log('[WorkoutVision] 📡 Using streamObject for structured output...');
+      console.warn('[WorkoutVision] 📡 Using streamObject for structured output...');
 
       const streamResult = streamObject({
         model,
@@ -705,7 +705,7 @@ Parse this data and return ONLY valid JSON.`;
 
           // Log progress ogni 20 update o quando cambiano settimane/giorni
           if (partialCount % 20 === 0 || weeksCount !== lastWeeksCount || daysCount !== lastDaysCount) {
-            console.log(
+            console.warn(
               `[WorkoutVision] 📊 Stream progress: ${partialCount} partials, ` +
               `${weeksCount} weeks, ${daysCount} days`
             );
@@ -747,7 +747,7 @@ Parse this data and return ONLY valid JSON.`;
         0
       );
 
-      console.log('[WorkoutVision] ✅ Stream completed:', {
+      console.warn('[WorkoutVision] ✅ Stream completed:', {
         partialCount,
         durationMs: Date.now() - startTime,
         programName: parsedOutput.name,
@@ -862,7 +862,7 @@ Parse this data and return ONLY valid JSON.`;
 
         // Su primo fallimento, prova modello fallback
         if (attempt === 0 && currentModel !== config.fallbackModel) {
-          console.log(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+          console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
           currentModel = config.fallbackModel;
         }
 

@@ -35,7 +35,7 @@ export const oneAgendaImportTool: McpTool<OneAgendaImportParams> = {
     const service = new OneAgendaImportService({
       aiContext: createOneAgendaAIContext(),
       onProgress: (progress) => {
-        console.log(`[OneAgendaImport] ${progress.step}: ${progress.message}`);
+        console.warn(`[OneAgendaImport] ${progress.step}: ${progress.message}`);
       },
       context: { userId: context.userId, requestId },
     });

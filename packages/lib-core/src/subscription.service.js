@@ -187,7 +187,7 @@ export class SubscriptionService {
         return session.url;
     }
     async handleWebhook(event) {
-        console.log(`[SubscriptionService] Handling webhook: ${event.type}`);
+        console.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
         const eventType = event.type;
         switch (eventType) {
             case 'payment_intent.succeeded': {
@@ -370,7 +370,7 @@ export class SubscriptionService {
     }
     async handlePaymentRefunded(refundData, eventId) {
         // TODO: Implement refund logic
-        console.log(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
+        console.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
     }
     mapStripeStatus(status) {
         switch (status) {

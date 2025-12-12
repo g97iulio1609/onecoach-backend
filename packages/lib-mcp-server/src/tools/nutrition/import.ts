@@ -44,7 +44,7 @@ export const nutritionImportTool: McpTool<NutritionImportParams> = {
     const importService = new NutritionImportService({
       aiContext: createNutritionAIContext(),
       onProgress: (progress) => {
-        console.log(`[NutritionImport] ${progress.step}: ${progress.message}`);
+        console.warn(`[NutritionImport] ${progress.step}: ${progress.message}`);
       },
       context: { userId: context.userId, requestId },
     });

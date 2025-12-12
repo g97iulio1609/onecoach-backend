@@ -234,7 +234,7 @@ export class SubscriptionService implements ISubscriptionService {
   }
 
   async handleWebhook(event: Stripe.Event): Promise<void> {
-    console.log(`[SubscriptionService] Handling webhook: ${event.type}`);
+    console.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
 
     const eventType = event.type as string;
 
@@ -442,7 +442,7 @@ export class SubscriptionService implements ISubscriptionService {
 
   private async handlePaymentRefunded(refundData: Stripe.PaymentIntent, eventId: string) {
     // TODO: Implement refund logic
-    console.log(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
+    console.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
   }
 
   private mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
