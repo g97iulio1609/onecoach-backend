@@ -177,20 +177,27 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                     }
                 }
                 else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    // Only log in development to avoid console spam
+                    // Crea un errore informativo solo se necessario
+                    const error = err instanceof Error
+                        ? err
+                        : new Error(`Realtime ${status} on channel ${channelKey}${err ? `: ${String(err)}` : ''}`);
+                    // Log solo in development per evitare spam nella console
                     if (process.env.NODE_ENV === 'development') {
-                        console.warn(`[RealtimeStore] ${status} on ${channelKey}:`, err?.message || err);
+                        console.warn(`[RealtimeStore] ${status} on ${channelKey}:`, error.message);
                     }
-                    set({ lastError: err || new Error(`Realtime ${status}`) });
+                    // Aggiorna lo stato con l'errore
+                    set({ lastError: error });
                     // Notifica errore a tutti i listener senza propagare eccezioni
                     const sub = get().subscriptions.get(channelKey);
-                    const error = err || new Error(`Realtime ${status}`);
                     sub?.listeners.forEach((l) => {
                         try {
                             l.onError?.(error);
                         }
                         catch (listenerError) {
-                            console.error('[RealtimeStore] Listener onError threw:', listenerError);
+                            // Log solo in development per evitare spam
+                            if (process.env.NODE_ENV === 'development') {
+                                console.error('[RealtimeStore] Listener onError threw:', listenerError);
+                            }
                         }
                     });
                     // Auto-cleanup failed subscription to prevent retries

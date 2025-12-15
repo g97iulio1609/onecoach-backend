@@ -93,3 +93,4 @@ export declare class UserMemoryService {
     updateLastAnalyzedAt(userId: string): Promise<void>;
 }
 export declare const userMemoryService: UserMemoryService;
+//# sourceMappingURL=user-memory.service.d.ts.map

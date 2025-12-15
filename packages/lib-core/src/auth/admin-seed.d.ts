@@ -26,3 +26,4 @@ declare const _default: {
     seedAdminsFromEnv: typeof seedAdminsFromEnv;
 };
 export default _default;
+//# sourceMappingURL=admin-seed.d.ts.map

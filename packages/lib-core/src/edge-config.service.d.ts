@@ -41,3 +41,4 @@ export declare const edgeConfigService: {
     setMany(items: Record<string, unknown>): Promise<void>;
     delete(key: string): Promise<void>;
 };
+//# sourceMappingURL=edge-config.service.d.ts.map

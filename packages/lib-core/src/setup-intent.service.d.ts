@@ -25,3 +25,4 @@ export declare class SetupIntentService {
      */
     static confirmSetupIntent(setupIntentId: string, paymentMethodId: string): Promise<Stripe.SetupIntent>;
 }
+//# sourceMappingURL=setup-intent.service.d.ts.map

@@ -52,34 +52,34 @@ export type AuthStore = AuthState & AuthActions;
  * - Native: AsyncStorage (via createJSONStorage)
  */
 export declare const useAuthStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<AuthStore>, "setState" | "devtools"> & {
-    setState(partial: AuthStore | Partial<AuthStore> | ((state: AuthStore) => AuthStore | Partial<AuthStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: AuthStore | Partial<AuthStore> | ((state: AuthStore) => AuthStore | Partial<AuthStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: AuthStore | ((state: AuthStore) => AuthStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: AuthStore | ((state: AuthStore) => AuthStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: AuthStore | Partial<AuthStore> | ((state: AuthStore) => AuthStore | Partial<AuthStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: AuthStore | Partial<AuthStore> | ((state: AuthStore) => AuthStore | Partial<AuthStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
-    setState(state: AuthStore | ((state: AuthStore) => AuthStore), replace: true, action?: (string | {
+    }): unknown;
+    setState(state: AuthStore | ((state: AuthStore) => AuthStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
+    }): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<AuthStore, unknown, unknown>>) => void;
         clearStorage: () => void;
@@ -90,3 +90,4 @@ export declare const useAuthStore: import("zustand").UseBoundStore<Omit<Omit<imp
         getOptions: () => Partial<import("zustand/middleware").PersistOptions<AuthStore, unknown, unknown>>;
     };
 }>;
+//# sourceMappingURL=auth.store.d.ts.map

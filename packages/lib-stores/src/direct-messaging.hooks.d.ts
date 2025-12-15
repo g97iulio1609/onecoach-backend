@@ -157,3 +157,4 @@ export interface UseDirectMessagesSyncOptions {
  * ```
  */
 export declare function useDirectMessagesSync({ conversationId, queryKey, queryClient, enabled, onSynced, }: UseDirectMessagesSyncOptions): void;
+//# sourceMappingURL=direct-messaging.hooks.d.ts.map

@@ -5,3 +5,4 @@ interface SidebarStore {
 }
 export declare const useSidebarStore: import("zustand").UseBoundStore<import("zustand").StoreApi<SidebarStore>>;
 export {};
+//# sourceMappingURL=sidebar.store.d.ts.map

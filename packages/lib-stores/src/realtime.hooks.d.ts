@@ -308,7 +308,7 @@ export declare function useRealtimeSyncSingle<T extends {
 export declare function useRealtimeStatus(): {
     status: import("./realtime.store").ConnectionStatus;
     isReady: boolean;
-    lastError: Error | null;
+    lastError: Error;
     /** Forza reset della connessione */
     reconnect: () => void;
 };
@@ -331,3 +331,4 @@ export declare function useRealtimeDebug(): {
         filter?: string;
     }>;
 };
+//# sourceMappingURL=realtime.hooks.d.ts.map

@@ -5,3 +5,4 @@ interface HeaderActionsState {
 }
 export declare const useHeaderActions: import("zustand").UseBoundStore<import("zustand").StoreApi<HeaderActionsState>>;
 export {};
+//# sourceMappingURL=header-actions.store.d.ts.map

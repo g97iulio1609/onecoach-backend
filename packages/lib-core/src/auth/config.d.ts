@@ -10,3 +10,4 @@ export declare const auth: NextAuthReturn['auth'];
 export declare const signIn: NextAuthReturn['signIn'];
 export declare const signOut: NextAuthReturn['signOut'];
 export {};
+//# sourceMappingURL=config.d.ts.map

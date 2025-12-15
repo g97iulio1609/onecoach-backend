@@ -17,9 +17,10 @@ export declare const useOneAgendaStore: import("zustand").UseBoundStore<Omit<imp
     subscribe: {
         (listener: (selectedState: OneAgendaStore, previousSelectedState: OneAgendaStore) => void): () => void;
         <U>(selector: (state: OneAgendaStore) => U, listener: (selectedState: U, previousSelectedState: U) => void, options?: {
-            equalityFn?: ((a: U, b: U) => boolean) | undefined;
+            equalityFn?: (a: U, b: U) => boolean;
             fireImmediately?: boolean;
-        } | undefined): () => void;
+        }): () => void;
     };
 }>;
 export {};
+//# sourceMappingURL=oneagenda.store.d.ts.map

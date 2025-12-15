@@ -100,18 +100,18 @@ export interface ChatActions {
 }
 export type ChatStore = ChatState & ChatActions;
 export declare const useChatStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<ChatStore>, "setState" | "devtools"> & {
-    setState(partial: ChatStore | Partial<ChatStore> | ((state: ChatStore) => ChatStore | Partial<ChatStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: ChatStore | Partial<ChatStore> | ((state: ChatStore) => ChatStore | Partial<ChatStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: ChatStore | ((state: ChatStore) => ChatStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: ChatStore | ((state: ChatStore) => ChatStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
@@ -119,15 +119,15 @@ export declare const useChatStore: import("zustand").UseBoundStore<Omit<Omit<imp
     subscribe: {
         (listener: (selectedState: ChatStore, previousSelectedState: ChatStore) => void): () => void;
         <U>(selector: (state: ChatStore) => U, listener: (selectedState: U, previousSelectedState: U) => void, options?: {
-            equalityFn?: ((a: U, b: U) => boolean) | undefined;
+            equalityFn?: (a: U, b: U) => boolean;
             fireImmediately?: boolean;
-        } | undefined): () => void;
+        }): () => void;
     };
 }>;
 /** Selettore per le conversazioni */
 export declare const selectConversations: (state: ChatStore) => ChatConversation[];
 /** Selettore per la conversazione corrente */
-export declare const selectCurrentConversationId: (state: ChatStore) => string | null;
+export declare const selectCurrentConversationId: (state: ChatStore) => string;
 /** Selettore per i messaggi */
 export declare const selectMessages: (state: ChatStore) => ChatMessage[];
 /** Selettore per l'input */
@@ -137,14 +137,15 @@ export declare const selectIsLoading: (state: ChatStore) => boolean;
 /** Selettore per deleting state */
 export declare const selectIsDeleting: (state: ChatStore) => boolean;
 /** Selettore per l'ultimo errore */
-export declare const selectLastError: (state: ChatStore) => string | null;
+export declare const selectLastError: (state: ChatStore) => string;
 /** Selettore per verificare se c'è una conversazione attiva */
 export declare const selectHasActiveConversation: (state: ChatStore) => boolean;
 /** Selettore per la conversazione corrente (oggetto completo) */
-export declare const selectCurrentConversation: (state: ChatStore) => ChatConversation | null | undefined;
+export declare const selectCurrentConversation: (state: ChatStore) => ChatConversation;
 /** Selettore per verificare se ci sono conversazioni */
 export declare const selectHasConversations: (state: ChatStore) => boolean;
 /** Selettore per il conteggio delle conversazioni */
 export declare const selectConversationsCount: (state: ChatStore) => number;
 /** Selettore per il conteggio dei messaggi nella conversazione corrente */
 export declare const selectMessageCount: (state: ChatStore) => number;
+//# sourceMappingURL=chat.store.d.ts.map

@@ -83,18 +83,18 @@ export interface RealtimeActions {
 }
 export type RealtimeStore = RealtimeState & RealtimeActions;
 export declare const useRealtimeStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<RealtimeStore>, "setState" | "devtools"> & {
-    setState(partial: RealtimeStore | Partial<RealtimeStore> | ((state: RealtimeStore) => RealtimeStore | Partial<RealtimeStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: RealtimeStore | Partial<RealtimeStore> | ((state: RealtimeStore) => RealtimeStore | Partial<RealtimeStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: RealtimeStore | ((state: RealtimeStore) => RealtimeStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: RealtimeStore | ((state: RealtimeStore) => RealtimeStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
@@ -102,9 +102,9 @@ export declare const useRealtimeStore: import("zustand").UseBoundStore<Omit<Omit
     subscribe: {
         (listener: (selectedState: RealtimeStore, previousSelectedState: RealtimeStore) => void): () => void;
         <U>(selector: (state: RealtimeStore) => U, listener: (selectedState: U, previousSelectedState: U) => void, options?: {
-            equalityFn?: ((a: U, b: U) => boolean) | undefined;
+            equalityFn?: (a: U, b: U) => boolean;
             fireImmediately?: boolean;
-        } | undefined): () => void;
+        }): () => void;
     };
 }>;
 /** Selettore per lo stato di connessione */
@@ -112,5 +112,6 @@ export declare const selectRealtimeStatus: (state: RealtimeStore) => ConnectionS
 /** Selettore per verificare se è connesso */
 export declare const selectIsRealtimeReady: (state: RealtimeStore) => boolean;
 /** Selettore per l'ultimo errore */
-export declare const selectRealtimeError: (state: RealtimeStore) => Error | null;
+export declare const selectRealtimeError: (state: RealtimeStore) => Error;
 export {};
+//# sourceMappingURL=realtime.store.d.ts.map

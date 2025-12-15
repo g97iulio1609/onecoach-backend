@@ -87,34 +87,34 @@ export type UIStore = UIState & UIActions;
  * Supports cross-platform storage (localStorage for web, AsyncStorage for native)
  */
 export declare const useUIStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<UIStore>, "setState" | "devtools"> & {
-    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
-    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: (string | {
+    }): unknown;
+    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
+    }): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<UIStore, unknown, unknown>>) => void;
         clearStorage: () => void;
@@ -186,3 +186,4 @@ export declare function useSystemThemeSync(): void;
  */
 export declare function useSystemThemeSyncNative(nativeColorScheme: 'light' | 'dark' | null | undefined): void;
 export {};
+//# sourceMappingURL=ui.store.d.ts.map

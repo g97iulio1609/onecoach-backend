@@ -90,34 +90,34 @@ export type HealthStore = HealthState & HealthActions;
  * Persists auto-sync preference
  */
 export declare const useHealthStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<HealthStore>, "setState" | "devtools"> & {
-    setState(partial: HealthStore | Partial<HealthStore> | ((state: HealthStore) => HealthStore | Partial<HealthStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: HealthStore | Partial<HealthStore> | ((state: HealthStore) => HealthStore | Partial<HealthStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: HealthStore | ((state: HealthStore) => HealthStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: HealthStore | ((state: HealthStore) => HealthStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: HealthStore | Partial<HealthStore> | ((state: HealthStore) => HealthStore | Partial<HealthStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: HealthStore | Partial<HealthStore> | ((state: HealthStore) => HealthStore | Partial<HealthStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
-    setState(state: HealthStore | ((state: HealthStore) => HealthStore), replace: true, action?: (string | {
+    }): unknown;
+    setState(state: HealthStore | ((state: HealthStore) => HealthStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
+    }): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<HealthStore, unknown, unknown>>) => void;
         clearStorage: () => void;
@@ -132,7 +132,7 @@ export declare const useHealthStore: import("zustand").UseBoundStore<Omit<Omit<i
  * Selector hooks for better performance
  */
 export declare const useHealthPermissions: () => {
-    permissions: HealthPermissions | null;
+    permissions: HealthPermissions;
     setPermissions: (permissions: HealthPermissions | null) => void;
     hasAllPermissions: () => boolean;
 };
@@ -144,6 +144,7 @@ export declare const useHealthSync: () => {
     setIsAutoSyncEnabled: (enabled: boolean) => void;
 };
 export declare const useHealthSummary: () => {
-    healthSummary: HealthSummary | null;
+    healthSummary: HealthSummary;
     setHealthSummary: (summary: HealthSummary | null) => void;
 };
+//# sourceMappingURL=health.store.d.ts.map

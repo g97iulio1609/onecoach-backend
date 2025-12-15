@@ -42,3 +42,4 @@ export declare class TimelineService {
     performAutoTracking(userId: string): Promise<void>;
 }
 export declare const timelineService: TimelineService;
+//# sourceMappingURL=timeline.service.d.ts.map

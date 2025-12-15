@@ -72,34 +72,34 @@ export type IAPStore = IAPState & IAPActions;
  * IAP Store
  */
 export declare const useIAPStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<IAPStore>, "setState" | "devtools"> & {
-    setState(partial: IAPStore | Partial<IAPStore> | ((state: IAPStore) => IAPStore | Partial<IAPStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: IAPStore | Partial<IAPStore> | ((state: IAPStore) => IAPStore | Partial<IAPStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: IAPStore | ((state: IAPStore) => IAPStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: IAPStore | ((state: IAPStore) => IAPStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: IAPStore | Partial<IAPStore> | ((state: IAPStore) => IAPStore | Partial<IAPStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: IAPStore | Partial<IAPStore> | ((state: IAPStore) => IAPStore | Partial<IAPStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
-    setState(state: IAPStore | ((state: IAPStore) => IAPStore), replace: true, action?: (string | {
+    }): unknown;
+    setState(state: IAPStore | ((state: IAPStore) => IAPStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): unknown;
+    }): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<IAPStore, unknown, unknown>>) => void;
         clearStorage: () => void;
@@ -118,13 +118,14 @@ export declare const useIAPProducts: () => {
     setProducts: (products: IAPProduct[]) => void;
 };
 export declare const useIAPSubscription: () => {
-    subscriptionStatus: SubscriptionStatus | null;
+    subscriptionStatus: SubscriptionStatus;
     setSubscriptionStatus: (status: SubscriptionStatus | null) => void;
 };
 export declare const useIAPPurchase: () => {
     purchaseState: PurchaseState;
     setPurchaseState: (state: PurchaseState) => void;
-    error: IAPError | null;
+    error: IAPError;
     setError: (error: IAPError | null) => void;
     clearError: () => void;
 };
+//# sourceMappingURL=iap.store.d.ts.map

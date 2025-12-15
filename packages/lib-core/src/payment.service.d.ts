@@ -24,3 +24,4 @@ export declare class PaymentService implements IPaymentService {
     retrievePaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent>;
 }
 export declare const paymentService: PaymentService;
+//# sourceMappingURL=payment.service.d.ts.map

@@ -51,19 +51,20 @@ export type OnboardingStore = OnboardingState & OnboardingActions;
  * This store only manages the UI state and progress data
  */
 export declare const useOnboardingStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<OnboardingStore>, "setState" | "devtools"> & {
-    setState(partial: OnboardingStore | Partial<OnboardingStore> | ((state: OnboardingStore) => OnboardingStore | Partial<OnboardingStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: OnboardingStore | Partial<OnboardingStore> | ((state: OnboardingStore) => OnboardingStore | Partial<OnboardingStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: OnboardingStore | ((state: OnboardingStore) => OnboardingStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: OnboardingStore | ((state: OnboardingStore) => OnboardingStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
 }>;
+//# sourceMappingURL=onboarding.store.d.ts.map

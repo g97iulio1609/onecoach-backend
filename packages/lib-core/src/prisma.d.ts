@@ -7,7 +7,7 @@
  * This file is server-only and should never be imported in client components.
  * Use dynamic imports when needed in server-side code that may be bundled with client code.
  */
-import 'server-only';
 import { PrismaClient } from '@prisma/client';
-export declare const prisma: PrismaClient<import("@prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/client").DefaultArgs>;
+export declare const prisma: PrismaClient<import("@prisma/client").Prisma.PrismaClientOptions, import("@prisma/client").Prisma.LogLevel, import("@prisma/client/runtime/client").DefaultArgs>;
 export declare function disconnectPrisma(): Promise<void>;
+//# sourceMappingURL=prisma.d.ts.map

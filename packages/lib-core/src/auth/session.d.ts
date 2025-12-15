@@ -42,3 +42,4 @@ export declare function isAdmin(): Promise<boolean>;
  * Ottiene i crediti dell'utente corrente
  */
 export declare function getCurrentUserCredits(): Promise<number>;
+//# sourceMappingURL=session.d.ts.map

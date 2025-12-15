@@ -19,3 +19,4 @@ export declare function isAdminRole(role?: string | null): boolean;
 export declare function isSuperAdminRole(role?: string | null): boolean;
 export declare function isCoachRole(role?: string | null): boolean;
 export declare function isUserRole(role?: string | null): boolean;
+//# sourceMappingURL=roles.d.ts.map

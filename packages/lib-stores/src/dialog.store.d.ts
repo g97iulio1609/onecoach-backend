@@ -57,18 +57,18 @@ export type DialogStore = {
  * Dialog Store
  */
 export declare const useDialogStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<DialogStore>, "setState" | "devtools"> & {
-    setState(partial: DialogStore | Partial<DialogStore> | ((state: DialogStore) => DialogStore | Partial<DialogStore>), replace?: false | undefined, action?: (string | {
+    setState(partial: DialogStore | Partial<DialogStore> | ((state: DialogStore) => DialogStore | Partial<DialogStore>), replace?: false, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
-    setState(state: DialogStore | ((state: DialogStore) => DialogStore), replace: true, action?: (string | {
+    }): void;
+    setState(state: DialogStore | ((state: DialogStore) => DialogStore), replace: true, action?: string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }) | undefined): void;
+    }): void;
     devtools: {
         cleanup: () => void;
     };
@@ -96,3 +96,4 @@ export declare const useDialogState: () => {
     handleCancel: () => void;
     setInputValue: (value: string) => void;
 };
+//# sourceMappingURL=dialog.store.d.ts.map

@@ -5,12 +5,13 @@
  * Following SOLID principles and strong typing
  */
 export { useAuthStore } from './auth.store';
-export { useUIStore, useTheme, useSidebar, useWizard, useSystemThemeSync, useSystemThemeSyncNative, } from './ui.store';
+export { useUIStore, useSidebar, useWizard, useSystemThemeSyncNative, } from './ui.store';
 export * from './ui.store';
 export * from './utils/dialog-global';
 export * from './sidebar.store';
 export * from './workout-builder.store';
-export { lightColors, darkColors } from './ui.store';
+export { useTheme, useSystemThemeSync, useThemeStore, lightColors, darkColors, ThemeProvider, cn, darkModeClasses, THEME_STORAGE_KEY, } from '@onecoach/lib-theme';
+export type { ThemePreference, ResolvedTheme, ThemeColors, ThemeProviderProps, } from '@onecoach/lib-theme';
 export { useHealthStore, useHealthPermissions, useHealthSync, useHealthSummary, } from './health.store';
 export type { HealthPlatform, HealthPermissions, HealthSummary, SyncStatus, HealthState, HealthActions, HealthStore, } from './health.store';
 export { useIAPStore, useIAPProducts, useIAPSubscription, useIAPPurchase } from './iap.store';
@@ -37,3 +38,8 @@ export type { UseDirectConversationsRealtimeOptions, UseDirectMessagesRealtimeOp
 export type { UseRealtimeSubscriptionOptions, UseSyncFieldOptions, UseRealtimeSyncOptions, UseRealtimeSyncWithClientOptions, UseRealtimeSyncSingleOptions, MagicAnimationType, UseMagicAnimationOptions, UseMagicAnimationResult, UseRealtimeWithMagicOptions, } from './realtime.hooks';
 export { useChatStore, selectConversations, selectCurrentConversationId, selectMessages, selectInput, selectIsLoading, selectIsDeleting, selectLastError, selectCurrentConversation, selectHasConversations, selectConversationsCount, selectMessageCount, } from './chat.store';
 export type { ChatConversation, ChatMessage, ChatState, ChatActions, ChatStore, } from './chat.store';
+export { useAIModelsStore, selectModels, selectSelectedModelId, selectSelectedModel, selectSelectedModelName, selectSelectedProvider, selectIsLoading as selectModelsLoading, selectError as selectModelsError, useSelectedModelName, useSelectedModel, useAvailableModels, } from './ai-models.store';
+export type { AIModel } from './ai-models.store';
+export { useBodyMeasurementsStore, selectLatestMeasurement, selectAllMeasurements, selectMeasurementsLoading, } from './body-measurements.store';
+export { useBodyMeasurementsRealtime, useAllBodyMeasurementsRealtime, bodyMeasurementsKeys, } from './body-measurements.hooks';
+//# sourceMappingURL=index.d.ts.map
