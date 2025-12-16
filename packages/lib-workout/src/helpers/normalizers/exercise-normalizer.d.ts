@@ -29,3 +29,4 @@ export declare function normalizeSetGroup(raw: unknown): SetGroup | null;
  * Se exerciseId è presente, viene preservato per risoluzione futura nel frontend
  */
 export declare function normalizeExercise(rawExercise: unknown, dayNumber: number, index: number): Exercise;
+//# sourceMappingURL=exercise-normalizer.d.ts.map

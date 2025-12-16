@@ -8,3 +8,4 @@ export * from './analytics.service';
 export * from './body-measurements.service';
 export * from './progress-snapshot.service';
 export * from './coach-analytics.service';
+//# sourceMappingURL=index.d.ts.map

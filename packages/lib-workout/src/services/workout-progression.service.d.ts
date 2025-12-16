@@ -48,3 +48,4 @@ export declare class WorkoutProgressionService {
      */
     static applyToProgram(program: WorkoutProgram, updates: ExerciseOccurrence[]): WorkoutProgram;
 }
+//# sourceMappingURL=workout-progression.service.d.ts.map

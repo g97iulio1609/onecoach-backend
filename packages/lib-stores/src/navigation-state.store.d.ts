@@ -6,34 +6,34 @@ interface NavigationState {
     clearAll: () => void;
 }
 export declare const useNavigationStateStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<NavigationState>, "setState" | "devtools"> & {
-    setState(partial: NavigationState | Partial<NavigationState> | ((state: NavigationState) => NavigationState | Partial<NavigationState>), replace?: false, action?: string | {
+    setState(partial: NavigationState | Partial<NavigationState> | ((state: NavigationState) => NavigationState | Partial<NavigationState>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: NavigationState | ((state: NavigationState) => NavigationState), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: NavigationState | ((state: NavigationState) => NavigationState), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: NavigationState | Partial<NavigationState> | ((state: NavigationState) => NavigationState | Partial<NavigationState>), replace?: false, action?: string | {
+    setState(partial: NavigationState | Partial<NavigationState> | ((state: NavigationState) => NavigationState | Partial<NavigationState>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
-    setState(state: NavigationState | ((state: NavigationState) => NavigationState), replace: true, action?: string | {
+    }) | undefined): unknown;
+    setState(state: NavigationState | ((state: NavigationState) => NavigationState), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
+    }) | undefined): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<NavigationState, unknown, unknown>>) => void;
         clearStorage: () => void;

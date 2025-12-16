@@ -5,7 +5,7 @@
  * Supporta estrazione etichette e segmentazione piatti
  */
 
-import { streamObject, type CoreMessage } from 'ai';
+import { streamText, Output, type CoreMessage } from 'ai';
 import { z } from 'zod';
 import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai/ai-provider-config';
 import { creditService } from '@onecoach/lib-core/credit.service';
@@ -192,7 +192,7 @@ export class FoodVisionService {
         ? imageBase64
         : base64ToDataUrl(imageBase64);
 
-      // Chiama AI con immagine usando streamObject (AI SDK 6)
+      // Chiama AI con immagine usando streamText con Output.object() (AI SDK 6)
       const messages: CoreMessage[] = [
         {
           role: 'user',
@@ -209,15 +209,15 @@ export class FoodVisionService {
         },
       ];
 
-      const streamResult = streamObject({
+      const streamResult = streamText({
         model,
-        schema: labelExtractionSchema,
+        output: Output.object({ schema: labelExtractionSchema }),
         messages,
         abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
       });
 
       // Attendi oggetto completo validato
-      const validated = await streamResult.object;
+      const validated = await streamResult.output;
       if (!validated) {
         throw new Error('Failed to generate structured output');
       }
@@ -282,7 +282,7 @@ export class FoodVisionService {
         ? imageBase64
         : base64ToDataUrl(imageBase64);
 
-      // Chiama AI con immagine usando streamObject (AI SDK 6)
+      // Chiama AI con immagine usando streamText con Output.object() (AI SDK 6)
       const messages: CoreMessage[] = [
         {
           role: 'user',
@@ -299,15 +299,15 @@ export class FoodVisionService {
         },
       ];
 
-      const streamResult = streamObject({
+      const streamResult = streamText({
         model,
-        schema: dishSegmentationSchema,
+        output: Output.object({ schema: dishSegmentationSchema }),
         messages,
         abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
       });
 
       // Attendi oggetto completo validato
-      const segmentationResult = await streamResult.object;
+      const segmentationResult = await streamResult.output;
       if (!segmentationResult) {
         throw new Error('Failed to generate structured output');
       }

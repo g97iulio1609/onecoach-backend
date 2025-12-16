@@ -60,34 +60,34 @@ export interface AdminState {
  * Admin Store
  */
 export declare const useAdminStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<AdminState>, "setState" | "devtools"> & {
-    setState(partial: AdminState | Partial<AdminState> | ((state: AdminState) => AdminState | Partial<AdminState>), replace?: false, action?: string | {
+    setState(partial: AdminState | Partial<AdminState> | ((state: AdminState) => AdminState | Partial<AdminState>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: AdminState | ((state: AdminState) => AdminState), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: AdminState | ((state: AdminState) => AdminState), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: AdminState | Partial<AdminState> | ((state: AdminState) => AdminState | Partial<AdminState>), replace?: false, action?: string | {
+    setState(partial: AdminState | Partial<AdminState> | ((state: AdminState) => AdminState | Partial<AdminState>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
-    setState(state: AdminState | ((state: AdminState) => AdminState), replace: true, action?: string | {
+    }) | undefined): unknown;
+    setState(state: AdminState | ((state: AdminState) => AdminState), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
+    }) | undefined): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<AdminState, {
             exerciseFilters: {
@@ -112,7 +112,7 @@ export declare const useAdminStore: import("zustand").UseBoundStore<Omit<Omit<im
                 minFatPct?: number;
                 page: number;
             };
-            lastVisitedRoute: string;
+            lastVisitedRoute: string | null;
         }, unknown>>) => void;
         clearStorage: () => void;
         rehydrate: () => Promise<void> | void;
@@ -142,7 +142,7 @@ export declare const useAdminStore: import("zustand").UseBoundStore<Omit<Omit<im
                 minFatPct?: number;
                 page: number;
             };
-            lastVisitedRoute: string;
+            lastVisitedRoute: string | null;
         }, unknown>>;
     };
 }>;

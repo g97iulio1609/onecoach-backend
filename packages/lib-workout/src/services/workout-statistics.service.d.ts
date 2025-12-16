@@ -39,3 +39,4 @@ export interface WorkoutStatisticsResult {
 export declare class WorkoutStatisticsService {
     static calculate(program: WorkoutProgram): WorkoutStatisticsResult;
 }
+//# sourceMappingURL=workout-statistics.service.d.ts.map

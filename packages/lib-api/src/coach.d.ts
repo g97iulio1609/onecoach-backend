@@ -50,3 +50,4 @@ export declare const coachApi: {
      */
     updateProfile(data: Partial<CoachProfile>): Promise<CoachProfileResponse>;
 };
+//# sourceMappingURL=coach.d.ts.map

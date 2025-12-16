@@ -75,3 +75,4 @@ export declare const authQueries: {
      */
     refresh: (request: RefreshTokenRequest) => Promise<RefreshTokenResponse>;
 };
+//# sourceMappingURL=auth.queries.d.ts.map

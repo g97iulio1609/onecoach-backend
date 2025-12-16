@@ -9,3 +9,4 @@ export declare class WebApiClient extends BaseApiClient {
     protected getAuthToken(): Promise<string | null>;
     protected saveAuthToken(_token: string): Promise<void>;
 }
+//# sourceMappingURL=web-client.d.ts.map

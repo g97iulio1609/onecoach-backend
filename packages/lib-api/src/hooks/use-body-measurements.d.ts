@@ -50,3 +50,4 @@ export declare function useDeleteBodyMeasurement(): import("@tanstack/react-quer
     previousMeasurements?: BodyMeasurement[];
     previousMeasurement?: BodyMeasurement | null;
 }>;
+//# sourceMappingURL=use-body-measurements.d.ts.map

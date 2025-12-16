@@ -11,3 +11,4 @@ export declare function formatMuscleLabel(value: string): string;
  * Converte una stringa in Title Case
  */
 export declare function toTitleCase(value: string): string;
+//# sourceMappingURL=formatting.d.ts.map

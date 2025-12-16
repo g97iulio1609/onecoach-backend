@@ -43,3 +43,4 @@ export declare const templateApi: {
      */
     deleteNutritionTemplate(id: string): Promise<void>;
 };
+//# sourceMappingURL=templates.d.ts.map

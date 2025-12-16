@@ -63,3 +63,4 @@ export declare function useBatchFoodOperations(): import("@tanstack/react-query"
     ids: string[];
     data?: Record<string, unknown>;
 }, unknown>;
+//# sourceMappingURL=use-food.d.ts.map

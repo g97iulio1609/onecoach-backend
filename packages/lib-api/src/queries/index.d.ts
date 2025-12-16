@@ -14,3 +14,4 @@ export * from './body-measurements.queries';
 export * from './oneagenda.queries';
 export * from './health.queries';
 export * from './iap.queries';
+//# sourceMappingURL=index.d.ts.map

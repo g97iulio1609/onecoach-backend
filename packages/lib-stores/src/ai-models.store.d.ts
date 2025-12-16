@@ -49,18 +49,18 @@ interface AIModelsActions {
 }
 type AIModelsStore = AIModelsState & AIModelsActions;
 export declare const useAIModelsStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<AIModelsStore>, "setState" | "devtools"> & {
-    setState(partial: AIModelsStore | Partial<AIModelsStore> | ((state: AIModelsStore) => AIModelsStore | Partial<AIModelsStore>), replace?: false, action?: string | {
+    setState(partial: AIModelsStore | Partial<AIModelsStore> | ((state: AIModelsStore) => AIModelsStore | Partial<AIModelsStore>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: AIModelsStore | ((state: AIModelsStore) => AIModelsStore), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: AIModelsStore | ((state: AIModelsStore) => AIModelsStore), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };
@@ -68,7 +68,7 @@ export declare const useAIModelsStore: import("zustand").UseBoundStore<Omit<impo
 /** Get all available models */
 export declare const selectModels: (state: AIModelsStore) => AIModel[];
 /** Get selected model's database ID */
-export declare const selectSelectedModelId: (state: AIModelsStore) => string;
+export declare const selectSelectedModelId: (state: AIModelsStore) => string | null;
 /** Get the full selected model object */
 export declare const selectSelectedModel: (state: AIModelsStore) => AIModel | null;
 /**
@@ -81,16 +81,16 @@ export declare const selectSelectedProvider: (state: AIModelsStore) => string | 
 /** Check if models are loading */
 export declare const selectIsLoading: (state: AIModelsStore) => boolean;
 /** Get error message if any */
-export declare const selectError: (state: AIModelsStore) => string;
+export declare const selectError: (state: AIModelsStore) => string | null;
 /**
  * Hook to get the selected model name for API calls.
  * Use this in components that need to send the model to the API.
  */
-export declare const useSelectedModelName: () => string;
+export declare const useSelectedModelName: () => string | null;
 /**
  * Hook to get the selected model object.
  */
-export declare const useSelectedModel: () => AIModel;
+export declare const useSelectedModel: () => AIModel | null;
 /**
  * Hook to get available models.
  */

@@ -17,9 +17,9 @@ export declare const useOneAgendaStore: import("zustand").UseBoundStore<Omit<imp
     subscribe: {
         (listener: (selectedState: OneAgendaStore, previousSelectedState: OneAgendaStore) => void): () => void;
         <U>(selector: (state: OneAgendaStore) => U, listener: (selectedState: U, previousSelectedState: U) => void, options?: {
-            equalityFn?: (a: U, b: U) => boolean;
+            equalityFn?: ((a: U, b: U) => boolean) | undefined;
             fireImmediately?: boolean;
-        }): () => void;
+        } | undefined): () => void;
     };
 }>;
 export {};

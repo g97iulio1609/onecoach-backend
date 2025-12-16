@@ -16,8 +16,8 @@ export declare function useProfile(): import("@tanstack/react-query").UseQueryRe
  *
  * @returns Mutation result with update function
  */
-export declare function useUpdateProfile(): import("@tanstack/react-query").UseMutationResult<UserProfileData, Error, Partial<Omit<UserProfileData, "id" | "userId">>, {
-    previousProfile: UserProfileData;
+export declare function useUpdateProfile(): import("@tanstack/react-query").UseMutationResult<UserProfileData, Error, Partial<Omit<UserProfileData, "userId" | "id">>, {
+    previousProfile: UserProfileData | undefined;
 }>;
 /**
  * Hook to get user's weight unit preference

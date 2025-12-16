@@ -12,9 +12,9 @@ interface UsePromoCodeValidationOptions {
     onValidationChange?: (valid: boolean, promotion?: PromotionValidationResult['promotion']) => void;
 }
 export declare function usePromoCodeValidation({ code, userId, enabled, debounceMs, onValidationChange, }: UsePromoCodeValidationOptions): {
-    validationResult: PromotionValidationResult;
+    validationResult: PromotionValidationResult | null | undefined;
     isValidating: boolean;
-    error: string;
+    error: string | null;
 };
 export {};
 //# sourceMappingURL=use-promo-code-validation.d.ts.map

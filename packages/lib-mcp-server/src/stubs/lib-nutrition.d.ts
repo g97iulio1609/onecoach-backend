@@ -12,13 +12,14 @@ export type NutritionImportResult = {
   warnings?: string[];
   errors?: string[];
   parseResult?: unknown;
+  skipped?: number;
 };
 
 export class NutritionImportService {
   constructor(params: {
     aiContext: AIParseContext<unknown>;
     onProgress?: (progress: ImportProgress) => void;
-    context: { userId: string };
+    context: { userId: string; requestId?: string };
   });
 
   import(

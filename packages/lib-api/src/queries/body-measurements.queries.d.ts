@@ -82,3 +82,4 @@ export declare const bodyMeasurementsQueries: {
      */
     delete: (id: string) => Promise<void>;
 };
+//# sourceMappingURL=body-measurements.queries.d.ts.map

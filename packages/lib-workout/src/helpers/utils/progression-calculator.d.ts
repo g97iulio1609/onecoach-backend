@@ -21,3 +21,4 @@ export declare function calculateGroupSummary(group: SetGroup): string;
  * Verifica se un gruppo ha tutti i parametri identici (nessuna progressione effettiva)
  */
 export declare function isUniformGroup(group: SetGroup): boolean;
+//# sourceMappingURL=progression-calculator.d.ts.map

@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { generateText, Output } from 'ai';
 import { getModelByTier, createCustomModel } from './utils/model-factory';
 import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
@@ -84,19 +85,15 @@ Rispondi SOLO con un oggetto JSON valido nel formato:
       confidence: z.enum(['high', 'medium', 'low']),
     });
 
-    // Use generateObject (AI SDK 6) for structured output
-
-    const { generateObject } = require('ai') as {
-      generateObject: (options: any) => Promise<{ object: unknown }>;
-    };
-    const { object: parsed } = await generateObject({
+    // Use generateText with Output.object() (AI SDK 6) for structured output
+    const result = await generateText({
       model,
       prompt,
-      schema: extractionSchema,
+      output: Output.object({ schema: extractionSchema }),
       temperature: 0.1, // Bassa temperatura per risultati più deterministici
-    });
-
-    const extracted = parsed as ExtractionResult;
+    } as any);
+    
+    const extracted = result.output as ExtractionResult;
 
     // Valida i valori estratti
     if (extracted.dayNumber !== null && extracted.dayNumber !== undefined) {

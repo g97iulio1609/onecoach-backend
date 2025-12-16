@@ -14,7 +14,7 @@
  * @module lib-workout/services/workout-vision
  */
 
-import { streamObject } from 'ai';
+import { streamText, Output } from 'ai';
 import type { ModelMessage } from 'ai';
 import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai/ai-provider-config';
 import {
@@ -654,7 +654,7 @@ Parse this data and return ONLY valid JSON.`;
       // Usiamo esclusivamente modelli reasoning, quindi temperatura non supportata
       const isReasoningModel = true;
 
-      console.warn('[WorkoutVision] 🚀 Calling AI with streamObject (structured output)...', {
+      console.warn('[WorkoutVision] 🚀 Calling AI with streamText (structured output)...', {
         modelId,
         maxOutputTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
         temperature: isReasoningModel ? 'N/A (reasoning model)' : 0.2,
@@ -664,13 +664,13 @@ Parse this data and return ONLY valid JSON.`;
       // TIMEOUT per evitare che l'AI rimanga in stallo
 
 
-      // Usa streamObject come workout-generation-orchestrator.service.ts
+      // Usa streamText con Output.object() come workout-generation-orchestrator.service.ts
       // Questo garantisce oggetti completi con validazione Zod
-      console.warn('[WorkoutVision] 📡 Using streamObject for structured output...');
+      console.warn('[WorkoutVision] 📡 Using streamText with Output.object() for structured output...');
 
-      const streamResult = streamObject({
+      const streamResult = streamText({
         model,
-        schema: ImportedWorkoutProgramSchema,
+        output: Output.object({ schema: ImportedWorkoutProgramSchema }),
         prompt: fullPrompt,
 
         // Reasoning models non supportano temperature
@@ -688,7 +688,7 @@ Parse this data and return ONLY valid JSON.`;
       let lastDaysCount = 0;
 
       const progressPromise = (async () => {
-        for await (const partial of streamResult.partialObjectStream) {
+        for await (const partial of streamResult.partialOutputStream) {
           partialCount++;
 
           // Calcola il progresso basato su settimane e giorni generati
@@ -715,14 +715,14 @@ Parse this data and return ONLY valid JSON.`;
         }
       })();
 
-      // Attendi l'oggetto COMPLETO - streamResult.object è una Promise
+      // Attendi l'oggetto COMPLETO - streamResult.output è una Promise
       // che si risolve quando l'oggetto è stato completamente generato e validato contro lo schema
       let completeObject;
       try {
         await progressPromise; // Attendi che il tracking finisca
-        completeObject = await streamResult.object; // Ottieni l'oggetto COMPLETO validato
+        completeObject = await streamResult.output; // Ottieni l'oggetto COMPLETO validato
       } catch (error: unknown) {
-        console.error('[WorkoutVision] ❌ streamObject failed:', {
+        console.error('[WorkoutVision] ❌ streamText failed:', {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
           partialCount,
@@ -731,11 +731,11 @@ Parse this data and return ONLY valid JSON.`;
       }
 
       if (!completeObject) {
-        console.error('[WorkoutVision] ❌ streamObject returned null/undefined');
+        console.error('[WorkoutVision] ❌ streamText returned null/undefined');
         throw new Error('AI returned empty response');
       }
 
-      // L'oggetto è già validato dallo schema Zod in streamObject
+      // L'oggetto è già validato dallo schema Zod in streamText
       // Ma facciamo un double-check per sicurezza
       const parsedOutput = ImportedWorkoutProgramSchema.parse(completeObject);
 
@@ -773,7 +773,7 @@ Parse this data and return ONLY valid JSON.`;
         totalDays,
         totalExercises,
         hasOutput: true,
-        mode: 'streamObject',
+        mode: 'streamText',
       });
 
       return parsedOutput;
@@ -793,7 +793,7 @@ Parse this data and return ONLY valid JSON.`;
         model: modelId,
         durationMs: Date.now() - startTime,
         error: errorMessage,
-        mode: 'streamObject',
+        mode: 'streamText',
       });
 
       throw err instanceof Error ? err : new Error(`AI call failed: ${errorMessage}`);
@@ -941,16 +941,16 @@ Parse this data and return ONLY valid JSON.`;
       mimeType,
     });
 
-    // Usa streamObject per ottenere output strutturato validato
-    const streamResult = streamObject({
+    // Usa streamText con Output.object() per ottenere output strutturato validato
+    const streamResult = streamText({
       model,
-      schema: ImportedWorkoutProgramSchema,
+      output: Output.object({ schema: ImportedWorkoutProgramSchema }),
       messages,
       temperature: 0.3,
     });
 
     // Attendi l'oggetto completo
-    const validated = await streamResult.object;
+    const validated = await streamResult.output;
 
     if (!validated) {
       throw new Error('AI returned empty response');

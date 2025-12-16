@@ -53,3 +53,4 @@ export declare function useUpdateWorkoutSession(): import("@tanstack/react-query
     sessionId: string;
     data: unknown;
 }, unknown>;
+//# sourceMappingURL=use-workout.d.ts.map

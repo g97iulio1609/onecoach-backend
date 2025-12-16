@@ -35,3 +35,4 @@ export declare function resolveMetadataBatch(ids: {
  * @returns Record mapping ID → English name
  */
 export declare function buildIdMapForAI(type: 'equipment' | 'muscle' | 'bodyPart' | 'exerciseType', ids: string[]): Promise<Record<string, string>>;
+//# sourceMappingURL=metadata-id-resolver.service.d.ts.map

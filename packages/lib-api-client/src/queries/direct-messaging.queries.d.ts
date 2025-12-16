@@ -7,9 +7,9 @@ import type { direct_conversations, direct_messages, ConversationPriority } from
 import type { DirectConversationWithUser, DirectMessageWithSender } from '@onecoach/lib-core';
 export declare const directMessagingKeys: {
     readonly all: readonly ["direct-messaging"];
-    readonly conversations: (userId: string, role: "COACH" | "USER") => readonly ["direct-messaging", "conversations", string, "USER" | "COACH"];
+    readonly conversations: (userId: string, role: "COACH" | "USER") => readonly ["direct-messaging", "conversations", string, "COACH" | "USER"];
     readonly conversation: (id: string) => readonly ["direct-messaging", "conversation", string];
-    readonly messages: (conversationId: string, page?: number, limit?: number) => readonly ["direct-messaging", "messages", string, number, number];
+    readonly messages: (conversationId: string, page?: number, limit?: number) => readonly ["direct-messaging", "messages", string, number | undefined, number | undefined];
     readonly unreadCount: (userId: string) => readonly ["direct-messaging", "unread-count", string];
 };
 export interface DirectConversationsResponse {

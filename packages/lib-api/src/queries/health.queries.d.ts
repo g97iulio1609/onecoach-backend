@@ -56,3 +56,4 @@ export declare const healthQueries: {
      */
     syncData: (request: HealthSyncRequest) => Promise<HealthSyncResponse>;
 };
+//# sourceMappingURL=health.queries.d.ts.map

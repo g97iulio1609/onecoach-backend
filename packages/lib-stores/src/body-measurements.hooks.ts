@@ -49,8 +49,8 @@ function transformMeasurement(record: Record<string, unknown>): BodyMeasurement 
     bmr: record.bmr ? Number(record.bmr) : undefined,
     notes: (record.notes as string) ?? undefined,
     photos: (record.photos as string[]) ?? [],
-    createdAt: record.createdAt ? new Date(record.createdAt as string) : new Date(),
-    updatedAt: record.updatedAt ? new Date(record.updatedAt as string) : new Date(),
+    createdAt: record.createdAt ? new Date(record.createdAt as string).toISOString() : new Date().toISOString(),
+    updatedAt: record.updatedAt ? new Date(record.updatedAt as string).toISOString() : new Date().toISOString(),
   };
 }
 

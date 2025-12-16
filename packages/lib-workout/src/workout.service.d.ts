@@ -25,3 +25,4 @@ export declare class WorkoutService implements IWorkoutService {
  * Singleton instance
  */
 export declare const workoutService: IWorkoutService;
+//# sourceMappingURL=workout.service.d.ts.map

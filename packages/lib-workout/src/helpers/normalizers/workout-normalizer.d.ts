@@ -36,3 +36,4 @@ export declare function normalizeMetadata(value: unknown): Record<string, unknow
  */
 export declare function normalizeWorkoutProgram(program: PrismaWorkoutProgram | PrismaWorkoutProgramVersion): WorkoutProgram;
 export {};
+//# sourceMappingURL=workout-normalizer.d.ts.map

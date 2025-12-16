@@ -58,3 +58,4 @@ export declare const onboardingQueries: {
      */
     completeAll: () => Promise<OnboardingProgress>;
 };
+//# sourceMappingURL=onboarding.queries.d.ts.map

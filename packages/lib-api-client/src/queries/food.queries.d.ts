@@ -10,7 +10,7 @@ import type { FoodResponse, FoodsResponse, FoodListParams } from '../food';
 export declare const foodKeys: {
     readonly all: readonly ["foods"];
     readonly lists: () => readonly ["foods", "list"];
-    readonly list: (params?: FoodListParams) => readonly ["foods", "list", FoodListParams];
+    readonly list: (params?: FoodListParams) => readonly ["foods", "list", FoodListParams | undefined];
     readonly details: () => readonly ["foods", "detail"];
     readonly detail: (id: string) => readonly ["foods", "detail", string];
 };

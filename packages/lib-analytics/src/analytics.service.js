@@ -7,668 +7,645 @@
 import 'server-only';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { getExerciseSets } from '@onecoach/lib-workout';
-import {
-  toExerciseArrayTyped,
-  toMacros,
-  calculateSetVolume,
-} from '@onecoach/lib-shared/prisma-type-guards';
+import { toExerciseArrayTyped, toMacros, calculateSetVolume, } from '@onecoach/lib-shared/prisma-type-guards';
+import { Prisma } from '@prisma/client';
 const MAX_RANGE_DAYS = 365;
 const MAX_RANGE_MS = MAX_RANGE_DAYS * 24 * 60 * 60 * 1000;
 function clampDateRange(startDate, endDate) {
-  const safeEnd = endDate;
-  const safeStart =
-    endDate.getTime() - startDate.getTime() > MAX_RANGE_MS
-      ? new Date(endDate.getTime() - MAX_RANGE_MS)
-      : startDate;
-  return {
-    start: safeStart,
-    end: safeEnd,
-  };
+    const safeEnd = endDate;
+    const safeStart = endDate.getTime() - startDate.getTime() > MAX_RANGE_MS
+        ? new Date(endDate.getTime() - MAX_RANGE_MS)
+        : startDate;
+    return {
+        start: safeStart,
+        end: safeEnd,
+    };
 }
 // Helper functions to convert Prisma types to domain types
 function toBodyMeasurement(measurement) {
-  if (!measurement) return null;
-  return {
-    id: measurement.id,
-    userId: measurement.userId ?? '',
-    date: measurement.date,
-    weight: measurement.weight ? Number(measurement.weight) : undefined,
-    bodyFat: measurement.bodyFat ? Number(measurement.bodyFat) : undefined,
-    muscleMass: measurement.muscleMass ? Number(measurement.muscleMass) : undefined,
-    chest: measurement.chest ? Number(measurement.chest) : undefined,
-    waist: measurement.waist ? Number(measurement.waist) : undefined,
-    hips: measurement.hips ? Number(measurement.hips) : undefined,
-    thigh: measurement.thigh ? Number(measurement.thigh) : undefined,
-    arm: measurement.arm ? Number(measurement.arm) : undefined,
-    calf: measurement.calf ? Number(measurement.calf) : undefined,
-    neck: measurement.neck ? Number(measurement.neck) : undefined,
-    shoulders: measurement.shoulders ? Number(measurement.shoulders) : undefined,
-    notes: measurement.notes || undefined,
-    photos: measurement.photos || undefined,
-    createdAt: measurement.createdAt.toISOString(),
-    updatedAt: measurement.updatedAt.toISOString(),
-  };
+    if (!measurement)
+        return null;
+    return {
+        id: measurement.id,
+        userId: measurement.userId ?? '',
+        date: measurement.date,
+        weight: measurement.weight ? Number(measurement.weight) : undefined,
+        bodyFat: measurement.bodyFat ? Number(measurement.bodyFat) : undefined,
+        muscleMass: measurement.muscleMass ? Number(measurement.muscleMass) : undefined,
+        chest: measurement.chest ? Number(measurement.chest) : undefined,
+        waist: measurement.waist ? Number(measurement.waist) : undefined,
+        hips: measurement.hips ? Number(measurement.hips) : undefined,
+        thigh: measurement.thigh ? Number(measurement.thigh) : undefined,
+        arm: measurement.arm ? Number(measurement.arm) : undefined,
+        calf: measurement.calf ? Number(measurement.calf) : undefined,
+        neck: measurement.neck ? Number(measurement.neck) : undefined,
+        shoulders: measurement.shoulders ? Number(measurement.shoulders) : undefined,
+        notes: measurement.notes || undefined,
+        photos: measurement.photos || undefined,
+        createdAt: measurement.createdAt.toISOString(),
+        updatedAt: measurement.updatedAt.toISOString(),
+    };
 }
 function toUserGoal(goal) {
-  const target = goal.target || { metric: '', targetValue: 0, currentValue: 0, unit: '' };
-  const progressLogs = (goal.progressLogs || []).map((log) => ({
-    date: typeof log.date === 'string' ? new Date(log.date) : log.date,
-    value: log.value,
-    notes: log.notes,
-  }));
-  return {
-    id: goal.id,
-    userId: goal.userId ?? '',
-    type: goal.type,
-    target: {
-      metric: target.metric,
-      targetValue: target.targetValue,
-      currentValue: target.currentValue ?? 0,
-      unit: target.unit || '',
-    },
-    deadline: goal.deadline ?? undefined,
-    status: goal.status,
-    startDate: goal.startDate,
-    completedDate: goal.completedDate ?? undefined,
-    progressLogs,
-    notes: goal.notes ?? undefined,
-    createdAt: goal.createdAt.toISOString(),
-    updatedAt: goal.updatedAt.toISOString(),
-  };
+    const target = goal.target || { metric: '', targetValue: 0, currentValue: 0, unit: '' };
+    const progressLogs = (goal.progressLogs || []).map((log) => ({
+        date: typeof log.date === 'string' ? new Date(log.date) : log.date,
+        value: log.value,
+        notes: log.notes,
+    }));
+    return {
+        id: goal.id,
+        userId: goal.userId ?? '',
+        type: goal.type,
+        target: {
+            metric: target.metric,
+            targetValue: target.targetValue,
+            currentValue: target.currentValue ?? 0,
+            unit: target.unit || '',
+        },
+        deadline: goal.deadline ?? undefined,
+        status: goal.status,
+        startDate: goal.startDate,
+        completedDate: goal.completedDate ?? undefined,
+        progressLogs,
+        notes: goal.notes ?? undefined,
+        createdAt: goal.createdAt.toISOString(),
+        updatedAt: goal.updatedAt.toISOString(),
+    };
 }
 // ============================================
 // BODY METRICS ANALYTICS
 // ============================================
 export async function getBodyMetricsTimeSeries(userId, metric, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const measurements = await prisma.body_measurements.findMany({
-    where: {
-      userId,
-      date: {
-        gte: startRange,
-        lte: endRange,
-      },
-    },
-    orderBy: { date: 'asc' },
-  });
-  return measurements
-    .filter((m) => m[metric] !== null)
-    .map((m) => ({
-      date: m.date,
-      value: Number(m[metric]),
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const measurements = await prisma.body_measurements.findMany({
+        where: {
+            userId,
+            date: {
+                gte: startRange,
+                lte: endRange,
+            },
+        },
+        orderBy: { date: 'asc' },
+    });
+    return measurements
+        .filter((m) => m[metric] !== null)
+        .map((m) => ({
+        date: m.date,
+        value: Number(m[metric]),
     }));
 }
 export async function getBodyMetricsChange(userId, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const [start, end] = await Promise.all([
-    prisma.body_measurements.findFirst({
-      where: { userId, date: { gte: startRange } },
-      orderBy: { date: 'asc' },
-    }),
-    prisma.body_measurements.findFirst({
-      where: { userId, date: { lte: endRange } },
-      orderBy: { date: 'desc' },
-    }),
-  ]);
-  if (!start || !end) return null;
-  return {
-    weight: end.weight && start.weight ? Number(end.weight) - Number(start.weight) : undefined,
-    bodyFat: end.bodyFat && start.bodyFat ? Number(end.bodyFat) - Number(start.bodyFat) : undefined,
-    muscleMass:
-      end.muscleMass && start.muscleMass
-        ? Number(end.muscleMass) - Number(start.muscleMass)
-        : undefined,
-  };
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const [start, end] = await Promise.all([
+        prisma.body_measurements.findFirst({
+            where: { userId, date: { gte: startRange } },
+            orderBy: { date: 'asc' },
+        }),
+        prisma.body_measurements.findFirst({
+            where: { userId, date: { lte: endRange } },
+            orderBy: { date: 'desc' },
+        }),
+    ]);
+    if (!start || !end)
+        return null;
+    return {
+        weight: end.weight && start.weight ? Number(end.weight) - Number(start.weight) : undefined,
+        bodyFat: end.bodyFat && start.bodyFat ? Number(end.bodyFat) - Number(start.bodyFat) : undefined,
+        muscleMass: end.muscleMass && start.muscleMass
+            ? Number(end.muscleMass) - Number(start.muscleMass)
+            : undefined,
+    };
 }
 // ============================================
 // WORKOUT ANALYTICS
 // ============================================
 export async function getWorkoutVolumeTimeSeries(userId, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const sessions = await prisma.workout_sessions.findMany({
-    where: {
-      userId,
-      startedAt: {
-        gte: startRange,
-        lte: endRange,
-      },
-      completedAt: { not: null },
-    },
-    orderBy: { startedAt: 'asc' },
-  });
-  return sessions.map((session) => {
-    const exercises = toExerciseArrayTyped(session.exercises);
-    // SSOT: usa getExerciseSets() invece di exercise.sets
-    const totalVolume = exercises.reduce((sum, exercise) => {
-      const sets = getExerciseSets(exercise);
-      const exerciseVolume = sets.reduce((setSum, set) => {
-        return setSum + calculateSetVolume(set);
-      }, 0);
-      return sum + exerciseVolume;
-    }, 0);
-    return {
-      date: session.startedAt,
-      value: totalVolume,
-    };
-  });
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const sessions = await prisma.workout_sessions.findMany({
+        where: {
+            userId,
+            startedAt: {
+                gte: startRange,
+                lte: endRange,
+            },
+            completedAt: { not: null },
+        },
+        orderBy: { startedAt: 'asc' },
+    });
+    return sessions.map((session) => {
+        const exercises = toExerciseArrayTyped(session.exercises);
+        // SSOT: usa getExerciseSets() invece di exercise.sets
+        const totalVolume = exercises.reduce((sum, exercise) => {
+            const sets = getExerciseSets(exercise);
+            const exerciseVolume = sets.reduce((setSum, set) => {
+                return setSum + calculateSetVolume(set);
+            }, 0);
+            return sum + exerciseVolume;
+        }, 0);
+        return {
+            date: session.startedAt,
+            value: totalVolume,
+        };
+    });
 }
 export async function getStrengthProgress(userId, exerciseId, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const records = await prisma.exercise_performance_records.findMany({
-    where: {
-      userId,
-      exerciseId,
-      date: {
-        gte: startRange,
-        lte: endRange,
-      },
-    },
-    orderBy: { date: 'asc' },
-  });
-  if (records.length === 0) return null;
-  const firstRecord = records[0];
-  const lastRecord = records[records.length - 1];
-  if (!firstRecord || !lastRecord) {
-    return null;
-  }
-  const startMax = Number(firstRecord.weight);
-  const endMax = Number(lastRecord.weight);
-  const percentChange = ((endMax - startMax) / startMax) * 100;
-  return {
-    exerciseId,
-    startDate: firstRecord.date,
-    endDate: lastRecord.date,
-    startWeight: startMax,
-    endWeight: endMax,
-    percentChange,
-    records: records.map((r) => ({
-      date: r.date,
-      weight: Number(r.weight),
-      reps: r.reps,
-      volume: Number(r.volume),
-    })),
-  };
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const records = await prisma.exercise_performance_records.findMany({
+        where: {
+            userId,
+            exerciseId,
+            date: {
+                gte: startRange,
+                lte: endRange,
+            },
+        },
+        orderBy: { date: 'asc' },
+    });
+    if (records.length === 0)
+        return null;
+    const firstRecord = records[0];
+    const lastRecord = records[records.length - 1];
+    if (!firstRecord || !lastRecord) {
+        return null;
+    }
+    const startMax = Number(firstRecord.weight);
+    const endMax = Number(lastRecord.weight);
+    const percentChange = ((endMax - startMax) / startMax) * 100;
+    return {
+        exerciseId,
+        startDate: firstRecord.date,
+        endDate: lastRecord.date,
+        startWeight: startMax,
+        endWeight: endMax,
+        percentChange,
+        records: records.map((r) => ({
+            date: r.date,
+            weight: Number(r.weight),
+            reps: r.reps,
+            volume: Number(r.volume),
+        })),
+    };
 }
 export async function calculateWorkoutMetrics(userId, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const sessions = await prisma.workout_sessions.findMany({
-    where: {
-      userId,
-      startedAt: {
-        gte: startRange,
-        lte: endRange,
-      },
-    },
-  });
-  const completedSessions = sessions.filter((s) => s.completedAt !== null);
-  const totalVolume = completedSessions.reduce((sum, session) => {
-    const exercises = toExerciseArrayTyped(session.exercises);
-    // SSOT: usa getExerciseSets() invece di exercise.sets
-    const sessionVolume = exercises.reduce((exSum, exercise) => {
-      const sets = getExerciseSets(exercise);
-      const exerciseVolume = sets.reduce((setSum, set) => {
-        return setSum + calculateSetVolume(set);
-      }, 0);
-      return exSum + exerciseVolume;
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const sessions = await prisma.workout_sessions.findMany({
+        where: {
+            userId,
+            startedAt: {
+                gte: startRange,
+                lte: endRange,
+            },
+        },
+    });
+    const completedSessions = sessions.filter((s) => s.completedAt !== null);
+    const totalVolume = completedSessions.reduce((sum, session) => {
+        const exercises = toExerciseArrayTyped(session.exercises);
+        // SSOT: usa getExerciseSets() invece di exercise.sets
+        const sessionVolume = exercises.reduce((exSum, exercise) => {
+            const sets = getExerciseSets(exercise);
+            const exerciseVolume = sets.reduce((setSum, set) => {
+                return setSum + calculateSetVolume(set);
+            }, 0);
+            return exSum + exerciseVolume;
+        }, 0);
+        return sum + sessionVolume;
     }, 0);
-    return sum + sessionVolume;
-  }, 0);
-  return {
-    totalSessions: sessions.length,
-    completedSessions: completedSessions.length,
-    completionRate: sessions.length > 0 ? (completedSessions.length / sessions.length) * 100 : 0,
-    totalVolume,
-    avgVolume: completedSessions.length > 0 ? totalVolume / completedSessions.length : 0,
-  };
+    return {
+        totalSessions: sessions.length,
+        completedSessions: completedSessions.length,
+        completionRate: sessions.length > 0 ? (completedSessions.length / sessions.length) * 100 : 0,
+        totalVolume,
+        avgVolume: completedSessions.length > 0 ? totalVolume / completedSessions.length : 0,
+    };
 }
 // ============================================
 // NUTRITION ANALYTICS
 // ============================================
 export async function calculateNutritionAdherence(userId, planId, weekNumber) {
-  const plan = await prisma.nutrition_plans.findUnique({
-    where: { id: planId },
-  });
-  if (!plan || plan.userId !== userId) {
-    throw new Error('Plan not found or unauthorized');
-  }
-  // Get target macros
-  const targetMacros = toMacros(plan.targetMacros);
-  // Get logs for this week
-  const logs = await prisma.nutrition_day_logs.findMany({
-    where: {
-      userId,
-      planId,
-      weekNumber,
-    },
-  });
-  const totalDays = 7; // Standard week
-  const daysLogged = logs.length;
-  const adherenceRate = (daysLogged / totalDays) * 100;
-  // Calculate average macros
-  const totals = logs.reduce(
-    (sum, log) => {
-      const actualMacros = toMacros(log.actualDailyMacros);
-      return {
-        calories: sum.calories + actualMacros.calories,
-        protein: sum.protein + actualMacros.protein,
-        carbs: sum.carbs + actualMacros.carbs,
-        fats: sum.fats + actualMacros.fats,
-        waterIntake: sum.waterIntake + (log.waterIntake ? Number(log.waterIntake) : 0),
-      };
-    },
-    { calories: 0, protein: 0, carbs: 0, fats: 0, waterIntake: 0 }
-  );
-  const count = logs.length || 1;
-  const avgMacros = {
-    calories: totals.calories / count,
-    protein: totals.protein / count,
-    carbs: totals.carbs / count,
-    fats: totals.fats / count,
-  };
-  // Calculate variance from targets
-  const variance = {
-    calories: ((avgMacros.calories - targetMacros.calories) / targetMacros.calories) * 100,
-    protein: ((avgMacros.protein - targetMacros.protein) / targetMacros.protein) * 100,
-    carbs: ((avgMacros.carbs - targetMacros.carbs) / targetMacros.carbs) * 100,
-    fats: ((avgMacros.fats - targetMacros.fats) / targetMacros.fats) * 100,
-  };
-  return {
-    daysLogged,
-    totalDays,
-    adherenceRate,
-    avgMacros,
-    variance,
-    avgWaterIntake: totals.waterIntake / count,
-  };
+    const plan = await prisma.nutrition_plans.findUnique({
+        where: { id: planId },
+    });
+    if (!plan || plan.userId !== userId) {
+        throw new Error('Plan not found or unauthorized');
+    }
+    // Get target macros
+    const targetMacros = toMacros(plan.targetMacros);
+    // Get logs for this week
+    const logs = await prisma.nutrition_day_logs.findMany({
+        where: {
+            userId,
+            planId,
+            weekNumber,
+        },
+    });
+    const totalDays = 7; // Standard week
+    const daysLogged = logs.length;
+    const adherenceRate = (daysLogged / totalDays) * 100;
+    // Calculate average macros
+    const totals = logs.reduce((sum, log) => {
+        const actualMacros = toMacros(log.actualDailyMacros);
+        return {
+            calories: sum.calories + actualMacros.calories,
+            protein: sum.protein + actualMacros.protein,
+            carbs: sum.carbs + actualMacros.carbs,
+            fats: sum.fats + actualMacros.fats,
+            waterIntake: sum.waterIntake + (log.waterIntake ? Number(log.waterIntake) : 0),
+        };
+    }, { calories: 0, protein: 0, carbs: 0, fats: 0, waterIntake: 0 });
+    const count = logs.length || 1;
+    const avgMacros = {
+        calories: totals.calories / count,
+        protein: totals.protein / count,
+        carbs: totals.carbs / count,
+        fats: totals.fats / count,
+    };
+    // Calculate variance from targets
+    const variance = {
+        calories: ((avgMacros.calories - targetMacros.calories) / targetMacros.calories) * 100,
+        protein: ((avgMacros.protein - targetMacros.protein) / targetMacros.protein) * 100,
+        carbs: ((avgMacros.carbs - targetMacros.carbs) / targetMacros.carbs) * 100,
+        fats: ((avgMacros.fats - targetMacros.fats) / targetMacros.fats) * 100,
+    };
+    return {
+        daysLogged,
+        totalDays,
+        adherenceRate,
+        avgMacros,
+        variance,
+        avgWaterIntake: totals.waterIntake / count,
+    };
 }
 export async function getNutritionMacrosTimeSeries(userId, planId, macro, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  const logs = await prisma.nutrition_day_logs.findMany({
-    where: {
-      userId,
-      planId,
-      date: {
-        gte: startRange,
-        lte: endRange,
-      },
-    },
-    orderBy: { date: 'asc' },
-  });
-  return logs
-    .filter((log) => log.actualDailyMacros !== null)
-    .map((log) => {
-      const macros = log.actualDailyMacros;
-      if (!macros || typeof macros !== 'object') {
-        return { date: log.date, value: 0 };
-      }
-      return {
-        date: log.date,
-        value: macros[macro] || 0,
-      };
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    const logs = await prisma.nutrition_day_logs.findMany({
+        where: {
+            userId,
+            planId,
+            date: {
+                gte: startRange,
+                lte: endRange,
+            },
+        },
+        orderBy: { date: 'asc' },
+    });
+    return logs
+        .filter((log) => log.actualDailyMacros !== null)
+        .map((log) => {
+        const macros = log.actualDailyMacros;
+        if (!macros || typeof macros !== 'object') {
+            return { date: log.date, value: 0 };
+        }
+        return {
+            date: log.date,
+            value: macros[macro] || 0,
+        };
     });
 }
 // ============================================
 // COMPREHENSIVE ANALYTICS REPORT
 // ============================================
 export async function generateAnalyticsReport(userId, startDate, endDate) {
-  const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
-  // Get body metrics
-  const bodyMetricsChange = await getBodyMetricsChange(userId, startRange, endRange);
-  const [currentBodyMetricsRaw, previousBodyMetricsRaw] = await Promise.all([
-    prisma.body_measurements.findFirst({
-      where: { userId, date: { lte: endRange } },
-      orderBy: { date: 'desc' },
-    }),
-    prisma.body_measurements.findFirst({
-      where: { userId, date: { gte: startRange } },
-      orderBy: { date: 'asc' },
-    }),
-  ]);
-  const currentBodyMetrics = toBodyMeasurement(currentBodyMetricsRaw);
-  const previousBodyMetrics = toBodyMeasurement(previousBodyMetricsRaw);
-  // Get workout metrics
-  const workoutMetrics = await calculateWorkoutMetrics(userId, startRange, endRange);
-  // Get strength gains
-  const performanceRecords = await prisma.exercise_performance_records.findMany({
-    where: {
-      userId,
-      date: {
-        gte: startRange,
-        lte: endRange,
-      },
-    },
-    orderBy: { date: 'asc' },
-  });
-  const exerciseMap = new Map();
-  performanceRecords.forEach((record) => {
-    if (!exerciseMap.has(record.exerciseId)) {
-      exerciseMap.set(record.exerciseId, []);
-    }
-    exerciseMap.get(record.exerciseId).push(record);
-  });
-  const strengthGains = Array.from(exerciseMap.entries())
-    .map(([exerciseId, records]) => {
-      if (records.length < 2) return null;
-      const firstRecord = records[0];
-      const lastRecord = records[records.length - 1];
-      const percentChange =
-        ((Number(lastRecord.weight) - Number(firstRecord.weight)) / Number(firstRecord.weight)) *
-        100;
-      return {
-        exerciseId,
-        exerciseName: exerciseId, // Will be resolved below
-        percentChange,
-        previousMax: Number(firstRecord.weight),
-        currentMax: Number(lastRecord.weight),
-      };
-    })
-    .filter((g) => g !== null);
-  // Lookup nome esercizio dalle traduzioni (locale it), fallback exerciseId
-  if (strengthGains.length > 0) {
-    const exerciseIds = strengthGains.map((g) => g.exerciseId);
-    const translations = await prisma.exercise_translations.findMany({
-      where: { exerciseId: { in: exerciseIds }, locale: 'it' },
-      select: { exerciseId: true, name: true },
+    const { start: startRange, end: endRange } = clampDateRange(startDate, endDate);
+    // Get body metrics
+    const bodyMetricsChange = await getBodyMetricsChange(userId, startRange, endRange);
+    const [currentBodyMetricsRaw, previousBodyMetricsRaw] = await Promise.all([
+        prisma.body_measurements.findFirst({
+            where: { userId, date: { lte: endRange } },
+            orderBy: { date: 'desc' },
+        }),
+        prisma.body_measurements.findFirst({
+            where: { userId, date: { gte: startRange } },
+            orderBy: { date: 'asc' },
+        }),
+    ]);
+    const currentBodyMetrics = toBodyMeasurement(currentBodyMetricsRaw);
+    const previousBodyMetrics = toBodyMeasurement(previousBodyMetricsRaw);
+    // Get workout metrics
+    const workoutMetrics = await calculateWorkoutMetrics(userId, startRange, endRange);
+    // Get strength gains
+    const performanceRecords = await prisma.exercise_performance_records.findMany({
+        where: {
+            userId,
+            date: {
+                gte: startRange,
+                lte: endRange,
+            },
+        },
+        orderBy: { date: 'asc' },
     });
-    const nameMap = new Map(translations.map((t) => [t.exerciseId, t.name]));
-    for (const g of strengthGains) {
-      g.exerciseName = nameMap.get(g.exerciseId) || g.exerciseId;
-    }
-  }
-  // Get nutrition metrics
-  const nutritionLogs = await prisma.nutrition_day_logs.findMany({
-    where: {
-      userId,
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    orderBy: { date: 'asc' },
-  });
-  const avgMacros = nutritionLogs.reduce(
-    (sum, log) => {
-      const macros = log.actualDailyMacros;
-      if (macros && typeof macros === 'object') {
-        return {
-          calories: sum.calories + (macros.calories || 0),
-          protein: sum.protein + (macros.protein || 0),
-          carbs: sum.carbs + (macros.carbs || 0),
-          fats: sum.fats + (macros.fats || 0),
-        };
-      }
-      return sum;
-    },
-    { calories: 0, protein: 0, carbs: 0, fats: 0 }
-  );
-  const logCount = nutritionLogs.length || 1;
-  Object.keys(avgMacros).forEach((key) => {
-    const typedAvgMacros = avgMacros;
-    typedAvgMacros[key] = (typedAvgMacros[key] || 0) / logCount;
-  });
-  // Calorie variance series: target vs actual per log day
-  let calorieVariance = [];
-  if (nutritionLogs.length > 0) {
-    const planIds = Array.from(new Set(nutritionLogs.map((l) => l.planId).filter(Boolean)));
-    const plans = planIds.length
-      ? await prisma.nutrition_plans.findMany({ where: { id: { in: planIds } } })
-      : [];
-    const planTargetMap = new Map();
-    for (const p of plans) {
-      const macros = toMacros(p.targetMacros);
-      planTargetMap.set(p.id, { calories: macros.calories });
-    }
-    calorieVariance = nutritionLogs
-      .filter((log) => log.actualDailyMacros)
-      .map((log) => {
-        const target = planTargetMap.get(log.planId)?.calories ?? 0;
-        const actual = log.actualDailyMacros?.calories ?? 0;
-        const variance = target > 0 ? ((actual - target) / target) * 100 : 0;
-        return {
-          date: log.date.toISOString(),
-          target,
-          actual,
-          variance,
-        };
-      });
-  }
-  // Calcolo aderenza: giorni con log su totale giorni nel periodo
-  const totalDaysInPeriod = Math.max(
-    1,
-    Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
-  );
-  // Considera giorni unici con almeno un log
-  const uniqueLoggedDays = new Set(
-    nutritionLogs.map((l) => new Date(l.date.toDateString()).toISOString())
-  );
-  const adherenceRate = (uniqueLoggedDays.size / totalDaysInPeriod) * 100;
-  // Varianze dai target: usa il piano attivo più recente nel periodo, fallback ultimo piano dell'utente
-  const userPlans = await prisma.nutrition_plans.findMany({
-    where: { userId },
-    orderBy: { updatedAt: 'desc' },
-  });
-  let targetForVariance = { calories: 0, protein: 0, carbs: 0, fats: 0 };
-  if (userPlans.length > 0) {
-    // Preferisci un piano con status ACTIVE, altrimenti il più recente
-    const activePlan = userPlans.find((p) => p.status === 'ACTIVE') ?? userPlans[0];
-    const targetMacros = activePlan.targetMacros;
-    if (targetMacros) {
-      targetForVariance = toMacros(targetMacros);
-    }
-  }
-  const varianceFromTargets =
-    targetForVariance.calories > 0
-      ? {
-          calories:
-            ((avgMacros.calories - targetForVariance.calories) / targetForVariance.calories) * 100,
-          protein:
-            targetForVariance.protein > 0
-              ? ((avgMacros.protein - targetForVariance.protein) / targetForVariance.protein) * 100
-              : 0,
-          carbs:
-            targetForVariance.carbs > 0
-              ? ((avgMacros.carbs - targetForVariance.carbs) / targetForVariance.carbs) * 100
-              : 0,
-          fats:
-            targetForVariance.fats > 0
-              ? ((avgMacros.fats - targetForVariance.fats) / targetForVariance.fats) * 100
-              : 0,
+    const exerciseMap = new Map();
+    performanceRecords.forEach((record) => {
+        if (!exerciseMap.has(record.exerciseId)) {
+            exerciseMap.set(record.exerciseId, []);
         }
-      : { calories: 0, protein: 0, carbs: 0, fats: 0 };
-  // Get goals
-  const goals = await prisma.user_goals.findMany({
-    where: { userId },
-  });
-  const activeGoals = goals.filter((g) => g.status === 'ACTIVE').map(toUserGoal);
-  const completedGoals = goals.filter((g) => g.status === 'COMPLETED').map(toUserGoal);
-  return {
-    userId,
-    period: { start: startDate, end: endDate },
-    bodyMetrics: {
-      current: currentBodyMetrics,
-      previous: previousBodyMetrics,
-      changes: bodyMetricsChange || {},
-    },
-    workoutAnalytics: {
-      ...workoutMetrics,
-      strengthGains,
-    },
-    nutritionAnalytics: {
-      totalLogs: nutritionLogs.length,
-      adherenceRate,
-      avgMacros,
-      varianceFromTargets,
-      calorieVariance,
-    },
-    goals: (() => {
-      // Calculate onTrack and atRisk goals
-      const now = new Date();
-      let onTrackCount = 0;
-      let atRiskCount = 0;
-      for (const goal of activeGoals) {
-        const progressLogs = goal.progressLogs || [];
-        const latestProgress =
-          progressLogs.length > 0 ? progressLogs[progressLogs.length - 1] : null;
-        const target = goal.target;
-        const currentValue = target.currentValue ?? latestProgress?.value ?? 0;
-        const targetValue = target.targetValue;
-        if (goal.deadline) {
-          const deadline = new Date(goal.deadline);
-          const startDate =
-            typeof goal.startDate === 'string' ? new Date(goal.startDate) : goal.startDate;
-          const totalDays = Math.max(
-            1,
-            Math.ceil((deadline.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-          );
-          const daysElapsed = Math.max(
-            0,
-            Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-          );
-          const daysRemaining = Math.max(
-            0,
-            Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-          );
-          const expectedProgress = (daysElapsed / totalDays) * 100;
-          const actualProgress = targetValue > 0 ? (currentValue / targetValue) * 100 : 0;
-          // Goal is on track if actual progress >= 70% of expected progress
-          if (actualProgress >= expectedProgress * 0.7) {
-            onTrackCount++;
-          }
-          // Goal is at risk if actual progress < 50% of expected progress and deadline is within 30 days
-          else if (actualProgress < expectedProgress * 0.5 && daysRemaining <= 30) {
-            atRiskCount++;
-          }
-        } else {
-          // Goals without deadline are considered on track if they have any progress
-          if (currentValue > 0) {
-            onTrackCount++;
-          }
+        exerciseMap.get(record.exerciseId).push(record);
+    });
+    const strengthGains = Array.from(exerciseMap.entries())
+        .map(([exerciseId, records]) => {
+        if (records.length < 2)
+            return null;
+        const firstRecord = records[0];
+        const lastRecord = records[records.length - 1];
+        const percentChange = ((Number(lastRecord.weight) - Number(firstRecord.weight)) / Number(firstRecord.weight)) *
+            100;
+        return {
+            exerciseId,
+            exerciseName: exerciseId, // Will be resolved below
+            percentChange,
+            previousMax: Number(firstRecord.weight),
+            currentMax: Number(lastRecord.weight),
+        };
+    })
+        .filter((g) => g !== null);
+    // Lookup nome esercizio dalle traduzioni (locale it), fallback exerciseId
+    if (strengthGains.length > 0) {
+        const exerciseIds = strengthGains.map((g) => g.exerciseId);
+        const translations = await prisma.exercise_translations.findMany({
+            where: { exerciseId: { in: exerciseIds }, locale: 'it' },
+            select: { exerciseId: true, name: true },
+        });
+        const nameMap = new Map(translations.map((t) => [t.exerciseId, t.name]));
+        for (const g of strengthGains) {
+            g.exerciseName = nameMap.get(g.exerciseId) || g.exerciseId;
         }
-      }
-      return {
-        active: activeGoals,
-        completed: completedGoals,
-        onTrack: onTrackCount,
-        atRisk: atRiskCount,
-      };
-    })(),
-  };
+    }
+    // Get nutrition metrics
+    const nutritionLogs = await prisma.nutrition_day_logs.findMany({
+        where: {
+            userId,
+            date: {
+                gte: startDate,
+                lte: endDate,
+            },
+        },
+        orderBy: { date: 'asc' },
+    });
+    const avgMacros = nutritionLogs.reduce((sum, log) => {
+        const macros = log.actualDailyMacros;
+        if (macros && typeof macros === 'object') {
+            return {
+                calories: sum.calories + (macros.calories || 0),
+                protein: sum.protein + (macros.protein || 0),
+                carbs: sum.carbs + (macros.carbs || 0),
+                fats: sum.fats + (macros.fats || 0),
+            };
+        }
+        return sum;
+    }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+    const logCount = nutritionLogs.length || 1;
+    Object.keys(avgMacros).forEach((key) => {
+        const typedAvgMacros = avgMacros;
+        typedAvgMacros[key] = (typedAvgMacros[key] || 0) / logCount;
+    });
+    // Calorie variance series: target vs actual per log day
+    let calorieVariance = [];
+    if (nutritionLogs.length > 0) {
+        const planIds = Array.from(new Set(nutritionLogs.map((l) => l.planId).filter(Boolean)));
+        const plans = planIds.length
+            ? await prisma.nutrition_plans.findMany({ where: { id: { in: planIds } } })
+            : [];
+        const planTargetMap = new Map();
+        for (const p of plans) {
+            const macros = toMacros(p.targetMacros);
+            planTargetMap.set(p.id, { calories: macros.calories });
+        }
+        calorieVariance = nutritionLogs
+            .filter((log) => log.actualDailyMacros)
+            .map((log) => {
+            const target = planTargetMap.get(log.planId)?.calories ?? 0;
+            const actual = log.actualDailyMacros?.calories ?? 0;
+            const variance = target > 0 ? ((actual - target) / target) * 100 : 0;
+            return {
+                date: log.date.toISOString(),
+                target,
+                actual,
+                variance,
+            };
+        });
+    }
+    // Calcolo aderenza: giorni con log su totale giorni nel periodo
+    const totalDaysInPeriod = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    // Considera giorni unici con almeno un log
+    const uniqueLoggedDays = new Set(nutritionLogs.map((l) => new Date(l.date.toDateString()).toISOString()));
+    const adherenceRate = (uniqueLoggedDays.size / totalDaysInPeriod) * 100;
+    // Varianze dai target: usa il piano attivo più recente nel periodo, fallback ultimo piano dell'utente
+    const userPlans = await prisma.nutrition_plans.findMany({
+        where: { userId },
+        orderBy: { updatedAt: 'desc' },
+    });
+    let targetForVariance = { calories: 0, protein: 0, carbs: 0, fats: 0 };
+    if (userPlans.length > 0) {
+        // Preferisci un piano con status ACTIVE, altrimenti il più recente
+        const activePlan = userPlans.find((p) => p.status === 'ACTIVE') ?? userPlans[0];
+        const targetMacros = activePlan.targetMacros;
+        if (targetMacros) {
+            targetForVariance = toMacros(targetMacros);
+        }
+    }
+    const varianceFromTargets = targetForVariance.calories > 0
+        ? {
+            calories: ((avgMacros.calories - targetForVariance.calories) / targetForVariance.calories) * 100,
+            protein: targetForVariance.protein > 0
+                ? ((avgMacros.protein - targetForVariance.protein) / targetForVariance.protein) * 100
+                : 0,
+            carbs: targetForVariance.carbs > 0
+                ? ((avgMacros.carbs - targetForVariance.carbs) / targetForVariance.carbs) * 100
+                : 0,
+            fats: targetForVariance.fats > 0
+                ? ((avgMacros.fats - targetForVariance.fats) / targetForVariance.fats) * 100
+                : 0,
+        }
+        : { calories: 0, protein: 0, carbs: 0, fats: 0 };
+    // Get goals
+    const goals = await prisma.user_goals.findMany({
+        where: { userId },
+    });
+    const activeGoals = goals.filter((g) => g.status === 'ACTIVE').map(toUserGoal);
+    const completedGoals = goals.filter((g) => g.status === 'COMPLETED').map(toUserGoal);
+    return {
+        userId,
+        period: { start: startDate, end: endDate },
+        bodyMetrics: {
+            current: currentBodyMetrics,
+            previous: previousBodyMetrics,
+            changes: bodyMetricsChange || {},
+        },
+        workoutAnalytics: {
+            ...workoutMetrics,
+            strengthGains,
+        },
+        nutritionAnalytics: {
+            totalLogs: nutritionLogs.length,
+            adherenceRate,
+            avgMacros,
+            varianceFromTargets,
+            calorieVariance,
+        },
+        goals: (() => {
+            // Calculate onTrack and atRisk goals
+            const now = new Date();
+            let onTrackCount = 0;
+            let atRiskCount = 0;
+            for (const goal of activeGoals) {
+                const progressLogs = goal.progressLogs || [];
+                const latestProgress = progressLogs.length > 0 ? progressLogs[progressLogs.length - 1] : null;
+                const target = goal.target;
+                const currentValue = target.currentValue ?? latestProgress?.value ?? 0;
+                const targetValue = target.targetValue;
+                if (goal.deadline) {
+                    const deadline = new Date(goal.deadline);
+                    const startDate = typeof goal.startDate === 'string' ? new Date(goal.startDate) : goal.startDate;
+                    const totalDays = Math.max(1, Math.ceil((deadline.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+                    const daysElapsed = Math.max(0, Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+                    const daysRemaining = Math.max(0, Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+                    const expectedProgress = (daysElapsed / totalDays) * 100;
+                    const actualProgress = targetValue > 0 ? (currentValue / targetValue) * 100 : 0;
+                    // Goal is on track if actual progress >= 70% of expected progress
+                    if (actualProgress >= expectedProgress * 0.7) {
+                        onTrackCount++;
+                    }
+                    // Goal is at risk if actual progress < 50% of expected progress and deadline is within 30 days
+                    else if (actualProgress < expectedProgress * 0.5 && daysRemaining <= 30) {
+                        atRiskCount++;
+                    }
+                }
+                else {
+                    // Goals without deadline are considered on track if they have any progress
+                    if (currentValue > 0) {
+                        onTrackCount++;
+                    }
+                }
+            }
+            return {
+                active: activeGoals,
+                completed: completedGoals,
+                onTrack: onTrackCount,
+                atRisk: atRiskCount,
+            };
+        })(),
+    };
 }
 // ============================================
 // GOALS MANAGEMENT
 // ============================================
 export async function getUserGoals(userId) {
-  const goals = await prisma.user_goals.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-  });
-  return goals.map(toUserGoal);
+    const goals = await prisma.user_goals.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+    });
+    return goals.map(toUserGoal);
 }
 export async function createUserGoal(userId, goal) {
-  const targetData = {
-    metric: goal.target.metric,
-    targetValue: goal.target.targetValue,
-    currentValue: goal.target.currentValue,
-    unit: goal.target.unit,
-  };
-  const newGoal = await prisma.user_goals.create({
-    data: {
-      userId,
-      type: goal.type,
-      target: targetData,
-      startDate: goal.startDate,
-      deadline: goal.deadline,
-      status: goal.status,
-      notes: goal.notes,
-      progressLogs: goal.progressLogs,
-      completedDate: goal.completedDate,
-    },
-  });
-  return toUserGoal(newGoal);
+    const targetData = {
+        metric: goal.target.metric,
+        targetValue: goal.target.targetValue,
+        currentValue: goal.target.currentValue,
+        unit: goal.target.unit,
+    };
+    const progressLogs = goal.progressLogs?.map((log) => ({
+        date: log.date instanceof Date ? log.date.toISOString() : log.date,
+        value: log.value,
+        notes: log.notes ?? null,
+    })) ?? [];
+    const newGoal = await prisma.user_goals.create({
+        data: {
+            userId,
+            type: goal.type,
+            target: targetData,
+            startDate: goal.startDate,
+            deadline: goal.deadline,
+            status: goal.status,
+            notes: goal.notes,
+            progressLogs,
+            completedDate: goal.completedDate,
+        },
+    });
+    return toUserGoal(newGoal);
 }
 // ============================================
 // CHART DATA GENERATION
 // ============================================
 export async function generateWeightChart(userId, startDate, endDate) {
-  const data = await getBodyMetricsTimeSeries(userId, 'weight', startDate, endDate);
-  return {
-    type: 'line',
-    title: 'Weight Progress',
-    xLabel: 'Date',
-    yLabel: 'Weight (kg)',
-    datasets: [
-      {
-        label: 'Weight',
-        data,
-        color: '#3b82f6',
-      },
-    ],
-  };
+    const data = await getBodyMetricsTimeSeries(userId, 'weight', startDate, endDate);
+    return {
+        type: 'line',
+        title: 'Weight Progress',
+        xLabel: 'Date',
+        yLabel: 'Weight (kg)',
+        datasets: [
+            {
+                label: 'Weight',
+                data,
+                color: '#3b82f6',
+            },
+        ],
+    };
 }
 export async function generateVolumeChart(userId, startDate, endDate) {
-  const data = await getWorkoutVolumeTimeSeries(userId, startDate, endDate);
-  return {
-    type: 'bar',
-    title: 'Training Volume',
-    xLabel: 'Date',
-    yLabel: 'Volume (kg)',
-    datasets: [
-      {
-        label: 'Total Volume',
-        data,
-        color: '#10b981',
-      },
-    ],
-  };
+    const data = await getWorkoutVolumeTimeSeries(userId, startDate, endDate);
+    return {
+        type: 'bar',
+        title: 'Training Volume',
+        xLabel: 'Date',
+        yLabel: 'Volume (kg)',
+        datasets: [
+            {
+                label: 'Total Volume',
+                data,
+                color: '#10b981',
+            },
+        ],
+    };
 }
 export async function generateMacrosChart(userId, planId, startDate, endDate) {
-  const [calories, protein, carbs, fats] = await Promise.all([
-    getNutritionMacrosTimeSeries(userId, planId, 'calories', startDate, endDate),
-    getNutritionMacrosTimeSeries(userId, planId, 'protein', startDate, endDate),
-    getNutritionMacrosTimeSeries(userId, planId, 'carbs', startDate, endDate),
-    getNutritionMacrosTimeSeries(userId, planId, 'fats', startDate, endDate),
-  ]);
-  return {
-    type: 'area',
-    title: 'Nutrition Macros',
-    xLabel: 'Date',
-    yLabel: 'Grams',
-    datasets: [
-      { label: 'Calories', data: calories, color: '#f59e0b' },
-      { label: 'Protein', data: protein, color: '#ef4444' },
-      { label: 'Carbs', data: carbs, color: '#3b82f6' },
-      { label: 'Fats', data: fats, color: '#8b5cf6' },
-    ],
-  };
+    const [calories, protein, carbs, fats] = await Promise.all([
+        getNutritionMacrosTimeSeries(userId, planId, 'calories', startDate, endDate),
+        getNutritionMacrosTimeSeries(userId, planId, 'protein', startDate, endDate),
+        getNutritionMacrosTimeSeries(userId, planId, 'carbs', startDate, endDate),
+        getNutritionMacrosTimeSeries(userId, planId, 'fats', startDate, endDate),
+    ]);
+    return {
+        type: 'area',
+        title: 'Nutrition Macros',
+        xLabel: 'Date',
+        yLabel: 'Grams',
+        datasets: [
+            { label: 'Calories', data: calories, color: '#f59e0b' },
+            { label: 'Protein', data: protein, color: '#ef4444' },
+            { label: 'Carbs', data: carbs, color: '#3b82f6' },
+            { label: 'Fats', data: fats, color: '#8b5cf6' },
+        ],
+    };
 }
 // ============================================
 // CHECKOUT EVENTS
 // ============================================
 export async function trackCheckoutEvent(params) {
-  const { type, userId, cartId, metadata } = params;
-  await prisma.checkout_events.create({
-    data: {
-      type,
-      userId: userId || null,
-      cartId: cartId || null,
-      metadata: metadata,
-    },
-  });
+    const { type, userId, cartId, metadata } = params;
+    await prisma.checkout_events.create({
+        data: {
+            type,
+            userId: userId || null,
+            cartId: cartId || null,
+            metadata: metadata ? metadata : Prisma.JsonNull,
+        },
+    });
 }
 // Export analytics service as object with all functions
 export const analyticsService = {
-  getBodyMetricsTimeSeries,
-  getBodyMetricsChange,
-  getWorkoutVolumeTimeSeries,
-  getStrengthProgress,
-  calculateWorkoutMetrics,
-  calculateNutritionAdherence,
-  getNutritionMacrosTimeSeries,
-  generateAnalyticsReport,
-  generateWeightChart,
-  generateVolumeChart,
-  generateMacrosChart,
-  getUserGoals,
-  createUserGoal,
-  trackCheckoutEvent,
+    getBodyMetricsTimeSeries,
+    getBodyMetricsChange,
+    getWorkoutVolumeTimeSeries,
+    getStrengthProgress,
+    calculateWorkoutMetrics,
+    calculateNutritionAdherence,
+    getNutritionMacrosTimeSeries,
+    generateAnalyticsReport,
+    generateWeightChart,
+    generateVolumeChart,
+    generateMacrosChart,
+    getUserGoals,
+    createUserGoal,
+    trackCheckoutEvent,
 };

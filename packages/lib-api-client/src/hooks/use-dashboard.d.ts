@@ -15,12 +15,12 @@ export declare function useDashboardData(): {
         currentStreak: number;
         weightChange30Days: number;
         totalVolumeThisMonth: number;
-    };
-    credits: import("..").CreditBalanceResponse;
+    } | undefined;
+    credits: import("..").CreditBalanceResponse | undefined;
     activities: import("..").DashboardActivity[];
     isLoading: boolean;
     isError: boolean;
-    error: Error;
+    error: Error | null;
     refetch: () => void;
 };
 //# sourceMappingURL=use-dashboard.d.ts.map

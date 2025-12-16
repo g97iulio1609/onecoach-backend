@@ -1,7 +1,7 @@
 export declare const bodyMeasurementsKeys: {
     all: readonly ["body-measurements"];
-    list: (userId?: string) => readonly ["body-measurements", "list", string];
-    latest: (userId?: string) => readonly ["body-measurements", "latest", string];
+    list: (userId?: string) => readonly ["body-measurements", "list", string | undefined];
+    latest: (userId?: string) => readonly ["body-measurements", "latest", string | undefined];
     detail: (measurementId: string) => readonly ["body-measurements", "detail", string];
 };
 interface UseBodyMeasurementsRealtimeOptions {

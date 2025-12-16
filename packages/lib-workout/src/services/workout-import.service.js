@@ -1,421 +1,230 @@
-/**
- * Workout Import Service
- *
- * Orchestratore principale per l'import di programmi di allenamento da file.
- * Coordina validazione, parsing, matching esercizi e salvataggio.
- *
- * @module lib-workout/services/workout-import
- */
 import { prisma } from '@onecoach/lib-core/prisma';
 import { createId } from '@onecoach/lib-shared/utils';
-import { logger as baseLogger } from '@onecoach/lib-shared/utils/logger';
-import { IMPORT_LIMITS, ImportOptionsSchema } from '../schemas/imported-workout.schema';
+import { ImportOptionsSchema, IMPORT_LIMITS as WORKOUT_LIMITS } from '../schemas/imported-workout.schema';
 import { FileValidatorService } from './file-validator.service';
 import { FileParserService } from './file-parser.service';
 import { ExerciseMatcherService } from './exercise-matcher.service';
+import { BaseImportService } from '@onecoach/lib-import-core';
 /**
  * Workout Import Service
  */
-export class WorkoutImportService {
-    onProgress;
-    aiContext;
-    config;
-    context;
-    logger = baseLogger.child('WorkoutImportService');
-    constructor(options) {
-        this.onProgress = options?.onProgress;
-        this.aiContext = options?.aiContext;
-        this.context = options?.context ?? {};
-        this.config = {
-            maxFileSizeMB: options?.config?.maxFileSizeMB ?? IMPORT_LIMITS.MAX_FILE_SIZE / (1024 * 1024),
-            maxFiles: options?.config?.maxFiles ?? IMPORT_LIMITS.MAX_FILES,
-            creditCost: options?.config?.creditCost ?? IMPORT_LIMITS.DEFAULT_CREDIT_COST,
-            rateLimit: options?.config?.rateLimit ?? IMPORT_LIMITS.RATE_LIMIT_PER_HOUR,
-            enableSupabaseStorage: options?.config?.enableSupabaseStorage ?? false,
-            defaultMode: options?.config?.defaultMode ?? 'auto',
-            matchThreshold: options?.config?.matchThreshold ?? 0.8,
-        };
+export class WorkoutImportService extends BaseImportService {
+    getLoggerName() {
+        return 'WorkoutImportService';
     }
-    /**
-     * Logging helper with contextual info
-     */
-    log(level, message, context) {
-        const mergedContext = Object.fromEntries(Object.entries({
+    // Override validateFiles to add domain-specific checks
+    validateFiles(files) {
+        // Basic validation
+        super.validateFiles(files);
+        // Check rate limit
+        const rateLimit = FileValidatorService.checkRateLimit(this.context.userId);
+        if (!rateLimit.allowed) {
+            const resetMinutes = Math.ceil(rateLimit.resetIn / 60000);
+            throw new Error(`Limite import raggiunto. Riprova tra ${resetMinutes} minuti.`);
+        }
+        // Advanced validation
+        const validation = FileValidatorService.validateFiles(files);
+        if (!validation.valid) {
+            throw new Error(validation.totalErrors.join('\n'));
+        }
+        this.logger.info('File validation completed', {
             requestId: this.context.requestId,
-            userId: this.context.userId,
-            ...context,
-        }).filter(([, value]) => value !== undefined));
-        if (Object.keys(mergedContext).length === 0) {
-            switch (level) {
-                case 'debug':
-                    this.logger.debug(message);
-                    return;
-                case 'info':
-                    this.logger.info(message);
-                    return;
-                case 'warn':
-                    this.logger.warn(message);
-                    return;
-                case 'error':
-                    this.logger.error(message);
-                    return;
-            }
-        }
-        switch (level) {
-            case 'debug':
-                this.logger.debug(message, mergedContext);
-                break;
-            case 'info':
-                this.logger.info(message, mergedContext);
-                break;
-            case 'warn':
-                this.logger.warn(message, mergedContext);
-                break;
-            case 'error':
-                this.logger.error(message, mergedContext);
-                break;
-        }
+            totalFiles: files.length,
+        });
     }
-    /**
-     * Emette un evento di progresso
-     */
-    emitProgress(progress) {
-        if (this.onProgress) {
-            this.onProgress(progress);
-        }
-    }
-    /**
-     * Import completo da file
-     */
-    async import(files, userId, options) {
-        const startTime = Date.now();
-        const warnings = [];
-        const errors = [];
-        // Merge options con defaults
+    // Override parseFiles to handle multiple files and use FileParserService
+    async parseFiles(files, options) {
         const importOptions = ImportOptionsSchema.parse({
             ...options,
-            mode: options?.mode ?? this.config.defaultMode,
-            matchThreshold: options?.matchThreshold ?? this.config.matchThreshold,
+            matchThreshold: options?.matchThreshold ?? 0.8,
         });
-        this.log('info', 'Starting workout import', {
-            files: files.length,
-            mode: importOptions.mode,
-            createMissingExercises: importOptions.createMissingExercises,
-            matchThreshold: importOptions.matchThreshold,
-            locale: importOptions.locale,
-            creditCost: this.config.creditCost,
-            fileNames: files.map((file) => file.name),
-        });
-        try {
-            // Step 1: Validazione
-            this.emitProgress({
-                step: 'validating',
-                stepNumber: 1,
-                totalSteps: 6,
-                progress: 0,
-                message: 'Validazione file in corso...',
-                details: { totalFiles: files.length },
-            });
-            // Check rate limit
-            const rateLimit = FileValidatorService.checkRateLimit(userId);
-            if (!rateLimit.allowed) {
-                const resetMinutes = Math.ceil(rateLimit.resetIn / 60000);
-                throw new Error(`Limite import raggiunto. Riprova tra ${resetMinutes} minuti.`);
-            }
-            // Valida i file
-            const validation = FileValidatorService.validateFiles(files);
-            if (!validation.valid) {
-                throw new Error(validation.totalErrors.join('\n'));
-            }
-            this.log('info', 'File validation completed', {
-                requestId: this.context.requestId,
-                totalFiles: files.length,
-            });
-            // Aggiungi warnings dalla validazione
-            for (const result of validation.results) {
-                if (result.result.warnings.length > 0) {
-                    warnings.push(...result.result.warnings.map((w) => `${result.file.name}: ${w}`));
-                }
-            }
-            // Controlla contenuti malevoli
-            for (const file of files) {
-                const maliciousCheck = FileValidatorService.checkForMaliciousContent(file.content);
-                if (!maliciousCheck.safe) {
-                    warnings.push(`${file.name}: ${maliciousCheck.warnings.join(', ')}`);
-                }
-            }
-            this.emitProgress({
-                step: 'validating',
-                stepNumber: 1,
-                totalSteps: 6,
-                progress: 100,
-                message: 'Validazione completata',
-            });
-            // Step 2: Parsing
-            this.emitProgress({
-                step: 'parsing',
-                stepNumber: 2,
-                totalSteps: 6,
-                progress: 0,
-                message: 'Parsing file in corso...',
-            });
-            const parseResults = await FileParserService.parseFiles(files.map((f, idx) => validation.results[idx].result.sanitizedFile || f), importOptions, this.aiContext);
-            // Aggiungi errori e warnings dal parsing
-            for (const error of parseResults.errors) {
-                errors.push(`${error.fileName}: ${error.error}`);
-            }
-            for (const warning of parseResults.warnings) {
-                warnings.push(...warning.warnings.map((w) => `${warning.fileName}: ${w}`));
-            }
-            if (parseResults.programs.length === 0) {
-                throw new Error('Nessun programma è stato estratto dai file');
-            }
-            // Combina i programmi
-            const combinedProgram = FileParserService.combinePrograms(parseResults.programs);
-            this.emitProgress({
-                step: 'parsing',
-                stepNumber: 2,
-                totalSteps: 6,
-                progress: 100,
-                message: `Parsing completato: ${parseResults.programs.length} programmi estratti`,
-            });
-            this.log('info', 'Parsing completed', {
-                parsedPrograms: parseResults.programs.length,
+        const parseResults = await FileParserService.parseFiles(files, importOptions, this.aiContext);
+        const warnings = [];
+        const errors = [];
+        for (const error of parseResults.errors) {
+            errors.push(`${error.fileName}: ${error.error}`);
+        }
+        for (const warning of parseResults.warnings) {
+            warnings.push(...warning.warnings.map((w) => `${warning.fileName}: ${w}`));
+        }
+        if (parseResults.programs.length === 0) {
+            throw new Error('Nessun programma è stato estratto dai file');
+        }
+        const combinedProgram = FileParserService.combinePrograms(parseResults.programs);
+        return {
+            combinedProgram,
+            warnings,
+            errors,
+            stats: {
+                filesProcessed: parseResults.programs.length,
                 parsingWarnings: warnings.length,
                 parsingErrors: errors.length,
-            });
-            // Step 3: Matching esercizi
-            this.emitProgress({
-                step: 'matching',
-                stepNumber: 3,
-                totalSteps: 6,
-                progress: 0,
-                message: 'Matching esercizi con database...',
-            });
-            // Estrai tutti gli esercizi unici
-            const allExercises = [];
-            for (const week of combinedProgram.weeks) {
-                for (const day of week.days) {
-                    allExercises.push(...day.exercises);
-                }
+            },
+        };
+    }
+    // Implementation is unused due to override
+    buildPrompt(_options) {
+        return '';
+    }
+    async processParsed(parsed, userId, options) {
+        const { combinedProgram } = parsed;
+        const importOptions = ImportOptionsSchema.parse(options || {});
+        // Step 3: Matching esercizi
+        this.emit({
+            step: 'matching',
+            message: 'Matching esercizi con database...',
+            progress: 0,
+        });
+        const allExercises = [];
+        for (const week of combinedProgram.weeks) {
+            for (const day of week.days) {
+                allExercises.push(...day.exercises);
             }
-            // Match con database
-            const matches = await ExerciseMatcherService.matchExercises(allExercises, importOptions.locale, importOptions.matchThreshold);
-            // Applica i match
-            const matchedExercises = ExerciseMatcherService.applyMatches(allExercises, matches);
-            // Conta risultati
-            const matchedCount = matchedExercises.filter((e) => !e.notFound).length;
-            const unmatchedCount = matchedExercises.filter((e) => e.notFound).length;
-            const unmatchedNames = [
-                ...new Set(matchedExercises.filter((e) => e.notFound).map((e) => e.name)),
-            ];
-            this.log('info', 'Matching completed', {
-                matchedCount,
-                totalExercises: allExercises.length,
-                unmatchedCount,
-            });
-            this.emitProgress({
-                step: 'matching',
-                stepNumber: 3,
-                totalSteps: 6,
-                progress: 100,
-                message: `Matching completato: ${matchedCount}/${allExercises.length} esercizi trovati`,
-                details: {
-                    exercisesMatched: matchedCount,
-                    totalExercises: allExercises.length,
-                    unmatchedExercises: unmatchedNames,
-                },
-            });
-            // Step 4: Review (solo in modalità review)
-            if (importOptions.mode === 'review' && unmatchedCount > 0) {
-                this.emitProgress({
-                    step: 'reviewing',
-                    stepNumber: 4,
-                    totalSteps: 6,
-                    progress: 0,
-                    message: `${unmatchedCount} esercizi richiedono revisione`,
-                    details: { unmatchedExercises: unmatchedNames },
-                });
-                // In modalità review, ritorniamo i risultati parziali per la revisione utente
-                const parseResult = {
+        }
+        const matches = await ExerciseMatcherService.matchExercises(allExercises, importOptions.locale, importOptions.matchThreshold);
+        const matchedExercises = ExerciseMatcherService.applyMatches(allExercises, matches);
+        const matchedCount = matchedExercises.filter((e) => !e.notFound).length;
+        const unmatchedCount = matchedExercises.filter((e) => e.notFound).length;
+        const unmatchedNames = [
+            ...new Set(matchedExercises.filter((e) => e.notFound).map((e) => e.name)),
+        ];
+        // Step 4: Review (pseudo-step)
+        // If review mode, we should technically stop here?
+        // BaseImportService doesn't support stopping/returning early easily without throwing?
+        // Or we return a result that indicates "review required"?
+        // If mode is review and unmatched > 0, we return early.
+        // We can throw a special error or just return a result?
+        // But processParsed returns 'unknown' passed to 'persist'.
+        // If we want to return from 'import', we must bubble up.
+        // We'll handle it by returning a special object that persist handles?
+        // Or just proceed and handle review logic.
+        const needsReview = importOptions.mode === 'review' && unmatchedCount > 0;
+        if (needsReview) {
+            // We package the data needed for review response
+            return {
+                needsReview: true,
+                parseResult: {
                     program: combinedProgram,
-                    warnings,
-                    unmatchedExercises: unmatchedNames.map((name) => {
-                        const match = matches.get(name);
-                        // Find first occurrence location
-                        let weekNumber = 1;
-                        let dayNumber = 1;
-                        searchLoop: for (const week of combinedProgram.weeks) {
-                            for (const day of week.days) {
-                                if (day.exercises.some((e) => e.name === name)) {
-                                    weekNumber = week.weekNumber;
-                                    dayNumber = day.dayNumber;
-                                    break searchLoop;
-                                }
-                            }
+                    warnings: parsed.warnings,
+                    unmatchedExercises: unmatchedNames.map(name => ({
+                        name,
+                        suggestions: matches.get(name)?.suggestions || []
+                    })),
+                    stats: { ...parsed.stats, matchedExercises: matchedCount, unmatchedExercises: unmatchedCount }
+                },
+                warnings: parsed.warnings,
+                errors: parsed.errors
+            };
+        }
+        // Step 5: Create missing
+        let exercisesCreated = 0;
+        if (importOptions.createMissingExercises && unmatchedCount > 0) {
+            this.emit({
+                step: 'matching', // using matching step for conversion UI
+                message: 'Creazione esercizi mancanti...',
+                progress: 0.8,
+            });
+            for (const name of unmatchedNames) {
+                try {
+                    const newId = await ExerciseMatcherService.createMissingExercise(name, combinedProgram.sourceFile || 'import', userId, importOptions.locale);
+                    // Update matches
+                    for (const exercise of matchedExercises) {
+                        if (exercise.name === name) {
+                            exercise.catalogExerciseId = newId;
+                            exercise.notFound = false;
                         }
-                        return {
-                            name,
-                            weekNumber,
-                            dayNumber,
-                            suggestions: match?.suggestions || [],
-                        };
-                    }),
-                    stats: {
-                        totalWeeks: combinedProgram.weeks.length,
-                        totalDays: combinedProgram.weeks.reduce((sum, w) => sum + w.days.length, 0),
-                        totalExercises: allExercises.length,
-                        matchedExercises: matchedCount,
-                        unmatchedExercises: unmatchedCount,
-                    },
-                };
-                return {
-                    success: true,
-                    parseResult,
-                    errors,
-                    warnings,
-                    stats: {
-                        filesProcessed: parseResults.programs.length,
-                        exercisesTotal: allExercises.length,
-                        exercisesMatched: matchedCount,
-                        exercisesCreated: 0,
-                        weeksImported: 0,
-                        daysImported: 0,
-                        creditsUsed: 0,
-                    },
-                };
-            }
-            // Step 5: Crea esercizi mancanti (modalità auto)
-            let exercisesCreated = 0;
-            if (importOptions.createMissingExercises && unmatchedCount > 0) {
-                this.emitProgress({
-                    step: 'converting',
-                    stepNumber: 5,
-                    totalSteps: 6,
-                    progress: 0,
-                    message: 'Creazione esercizi mancanti...',
-                });
-                for (const name of unmatchedNames) {
-                    try {
-                        const newId = await ExerciseMatcherService.createMissingExercise(name, combinedProgram.sourceFile || 'import', userId, importOptions.locale);
-                        // Aggiorna i match
-                        for (const exercise of matchedExercises) {
-                            if (exercise.name === name) {
-                                exercise.catalogExerciseId = newId;
-                                exercise.notFound = false;
-                            }
-                        }
-                        exercisesCreated++;
                     }
-                    catch (err) {
-                        warnings.push(`Impossibile creare esercizio "${name}": ${err}`);
-                        this.log('warn', 'Failed to create missing exercise', {
-                            name,
-                            error: err instanceof Error ? err.message : String(err),
-                        });
-                    }
+                    exercisesCreated++;
+                }
+                catch (err) {
+                    const msg = `Impossibile creare esercizio "${name}": ${err}`;
+                    parsed.warnings.push(msg);
+                    this.logger.warn(msg);
                 }
             }
-            // Step 6: Converti e salva
-            this.emitProgress({
-                step: 'converting',
-                stepNumber: 5,
-                totalSteps: 6,
-                progress: 50,
-                message: 'Conversione in formato WorkoutProgram...',
-            });
-            // Aggiorna il programma con gli esercizi matchati
-            let exerciseIdx = 0;
-            for (const week of combinedProgram.weeks) {
-                for (const day of week.days) {
-                    for (let i = 0; i < day.exercises.length; i++) {
-                        day.exercises[i] = matchedExercises[exerciseIdx];
-                        exerciseIdx++;
-                    }
+        }
+        // Apply matches back to program
+        let exerciseIdx = 0;
+        for (const week of combinedProgram.weeks) {
+            for (const day of week.days) {
+                for (let i = 0; i < day.exercises.length; i++) {
+                    day.exercises[i] = matchedExercises[exerciseIdx];
+                    exerciseIdx++;
                 }
             }
-            // Converti in WorkoutProgram
-            const workoutProgram = this.convertToWorkoutProgram(combinedProgram, userId);
-            this.emitProgress({
-                step: 'saving',
-                stepNumber: 6,
-                totalSteps: 6,
-                progress: 0,
-                message: 'Salvataggio programma...',
-            });
-            // Salva nel database
-            const programId = await this.saveProgram(workoutProgram, userId);
-            // Incrementa rate limit
-            FileValidatorService.incrementRateLimit(userId);
-            this.emitProgress({
-                step: 'completed',
-                stepNumber: 6,
-                totalSteps: 6,
-                progress: 100,
-                message: 'Import completato con successo!',
-            });
-            const elapsedMs = Date.now() - startTime;
-            this.log('info', 'Workout import completed', {
-                programId,
-                elapsedMs,
+        }
+        const workoutProgram = this.convert(combinedProgram, userId);
+        return {
+            workoutProgram,
+            stats: {
+                filesProcessed: parsed.stats.filesProcessed,
+                exercisesTotal: allExercises.length,
+                exercisesMatched: matchedCount,
                 exercisesCreated,
-                matchedExercises: matchedCount,
-                totalExercises: allExercises.length,
                 weeksImported: workoutProgram.weeks.length,
-            });
+                daysImported: workoutProgram.weeks.reduce((sum, w) => sum + w.days.length, 0),
+                creditsUsed: WORKOUT_LIMITS.DEFAULT_CREDIT_COST, // simplificied
+            },
+            warnings: parsed.warnings,
+            errors: parsed.errors
+        };
+    }
+    async persist(processed, userId) {
+        if (processed.needsReview) {
+            // Return review result without persisting
             return {
                 success: true,
-                program: workoutProgram,
-                programId,
-                errors,
-                warnings,
-                stats: {
-                    filesProcessed: parseResults.programs.length,
-                    exercisesTotal: allExercises.length,
-                    exercisesMatched: matchedCount,
-                    exercisesCreated,
-                    weeksImported: workoutProgram.weeks.length,
-                    daysImported: workoutProgram.weeks.reduce((sum, w) => sum + w.days.length, 0),
-                    creditsUsed: this.config.creditCost,
-                },
+                parseResult: processed.parseResult,
+                warnings: processed.warnings,
+                errors: processed.errors,
+                stats: processed.parseResult.stats // Map appropriately
             };
         }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
-            this.emitProgress({
-                step: 'error',
-                stepNumber: 0,
-                totalSteps: 6,
-                progress: 0,
-                message: `Errore: ${errorMessage}`,
-            });
-            this.log('error', 'Workout import failed', {
-                error: errorMessage,
-                accumulatedErrors: errors,
-                warnings,
-            });
-            return {
-                success: false,
-                errors: [errorMessage, ...errors],
-                warnings,
-                stats: {
-                    filesProcessed: 0,
-                    exercisesTotal: 0,
-                    exercisesMatched: 0,
-                    exercisesCreated: 0,
-                    weeksImported: 0,
-                    daysImported: 0,
-                    creditsUsed: 0,
-                },
-            };
-        }
+        const { workoutProgram, stats, warnings, errors } = processed;
+        const result = await prisma.workout_programs.create({
+            data: {
+                id: workoutProgram.id,
+                userId,
+                name: workoutProgram.name,
+                description: workoutProgram.description,
+                difficulty: workoutProgram.difficulty,
+                durationWeeks: workoutProgram.durationWeeks,
+                goals: workoutProgram.goals,
+                status: workoutProgram.status,
+                weeks: workoutProgram.weeks,
+                metadata: workoutProgram.metadata,
+                version: workoutProgram.version || 1,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        });
+        FileValidatorService.incrementRateLimit(userId);
+        return {
+            programId: result.id,
+            program: workoutProgram,
+            stats,
+            warnings,
+            errors
+        };
     }
-    /**
-     * Converte ImportedWorkoutProgram in WorkoutProgram
-     */
-    convertToWorkoutProgram(imported, userId) {
+    createErrorResult(errors) {
+        return {
+            success: false,
+            errors,
+            stats: {
+                filesProcessed: 0,
+                exercisesTotal: 0,
+                exercisesMatched: 0,
+                exercisesCreated: 0,
+                weeksImported: 0,
+                daysImported: 0,
+                creditsUsed: 0
+            }
+        };
+    }
+    // Helpers
+    convert(imported, userId) {
         const now = new Date().toISOString();
-        // Generiamo sempre server-side per garantire formato UUID v4
         const programId = createId();
         const weeks = imported.weeks.map((week) => this.convertWeek(week));
         return {
@@ -438,9 +247,6 @@ export class WorkoutImportService {
             updatedAt: now,
         };
     }
-    /**
-     * Converte una settimana importata
-     */
     convertWeek(imported) {
         return {
             weekNumber: imported.weekNumber,
@@ -449,9 +255,6 @@ export class WorkoutImportService {
             focus: imported.focus,
         };
     }
-    /**
-     * Converte un giorno importato
-     */
     convertDay(imported) {
         return {
             dayNumber: imported.dayNumber,
@@ -464,15 +267,11 @@ export class WorkoutImportService {
             cooldown: imported.cooldown || '',
         };
     }
-    /**
-     * Converte un esercizio importato in Exercise con SetGroups
-     */
     convertExercise(imported) {
         const sets = imported.sets || 3;
         const reps = typeof imported.reps === 'number' ? imported.reps : 10;
         const weight = typeof imported.weight === 'number' ? imported.weight : null;
         const rest = imported.rest || 90;
-        // Crea il baseSet
         const baseSet = {
             reps,
             weight,
@@ -481,9 +280,7 @@ export class WorkoutImportService {
             intensityPercent: imported.intensityPercent || null,
             rpe: imported.rpe || null,
         };
-        // Espandi in serie individuali
         const expandedSets = Array.from({ length: sets }, () => ({ ...baseSet }));
-        // Crea il SetGroup
         const setGroup = {
             id: createId(),
             count: sets,
@@ -494,8 +291,8 @@ export class WorkoutImportService {
             id: createId(),
             name: imported.name,
             description: imported.notes || '',
-            category: 'strength', // Default
-            muscleGroups: [], // Da inferire o lasciare vuoto
+            category: 'strength',
+            muscleGroups: [],
             setGroups: [setGroup],
             notes: imported.notes || '',
             typeLabel: '',
@@ -506,56 +303,5 @@ export class WorkoutImportService {
             videoUrl: undefined,
             variation: imported.variant ? { en: imported.variant } : undefined,
         };
-    }
-    /**
-     * Salva il programma nel database
-     */
-    async saveProgram(program, userId) {
-        const result = await prisma.workout_programs.create({
-            data: {
-                id: program.id,
-                userId,
-                name: program.name,
-                description: program.description,
-                difficulty: program.difficulty,
-                durationWeeks: program.durationWeeks,
-                goals: program.goals,
-                status: program.status,
-                weeks: program.weeks, // JSON field
-                metadata: program.metadata,
-                version: program.version || 1,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        });
-        return result.id;
-    }
-    /**
-     * Ottiene la configurazione import.
-     *
-     * NOTA: La tabella 'admin_settings' non esiste nel database attuale.
-     * La configurazione è gestita tramite le costanti statiche in IMPORT_LIMITS.
-     * Se in futuro si desidera rendere la configurazione dinamica, creare
-     * prima la tabella e poi implementare la lettura da database.
-     */
-    static async getConfig() {
-        // Configurazione statica da IMPORT_LIMITS - non esiste tabella admin_settings
-        return {
-            maxFileSizeMB: IMPORT_LIMITS.MAX_FILE_SIZE / (1024 * 1024),
-            maxFiles: IMPORT_LIMITS.MAX_FILES,
-            creditCost: IMPORT_LIMITS.DEFAULT_CREDIT_COST,
-            rateLimit: IMPORT_LIMITS.RATE_LIMIT_PER_HOUR,
-            enableSupabaseStorage: false,
-            defaultMode: 'auto',
-            matchThreshold: 0.8,
-        };
-    }
-    /**
-     * Calcola il costo in crediti per un import
-     */
-    static calculateCreditCost(_filesCount, config) {
-        const creditCost = config?.creditCost ?? IMPORT_LIMITS.DEFAULT_CREDIT_COST;
-        // Costo fisso fino a 10 file
-        return creditCost;
     }
 }

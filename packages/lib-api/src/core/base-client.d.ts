@@ -22,3 +22,4 @@ export declare abstract class BaseApiClient {
     patch<T>(endpoint: string, body: unknown, options?: RequestOptions): Promise<T>;
     delete<T>(endpoint: string, options?: RequestOptions): Promise<T>;
 }
+//# sourceMappingURL=base-client.d.ts.map

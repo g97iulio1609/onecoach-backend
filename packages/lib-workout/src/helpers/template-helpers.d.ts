@@ -15,3 +15,4 @@ export declare function extractTemplateData(template: WorkoutTemplate): Exercise
  * Re-ID tutti gli esercizi, giorni e settimane in un template per evitare conflitti
  */
 export declare function reIdTemplateData<T extends Exercise | WorkoutDay | WorkoutWeek>(data: T, type: WorkoutTemplateType): T;
+//# sourceMappingURL=template-helpers.d.ts.map

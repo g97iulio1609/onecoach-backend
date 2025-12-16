@@ -5,7 +5,7 @@
  */
 import { WebApiClient } from './core/web-client';
 import { NativeApiClient } from './core/native-client';
-declare const apiClient: WebApiClient | NativeApiClient;
+declare const apiClient: NativeApiClient | WebApiClient;
 export { apiClient };
 export { WebApiClient, NativeApiClient } from './core';
 export * from './core/types';

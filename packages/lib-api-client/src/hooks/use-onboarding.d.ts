@@ -34,9 +34,9 @@ export declare function useSkipStep(): {
     isSuccess: false;
     status: "idle";
     reset: () => void;
-    context: void;
+    context: void | undefined;
     failureCount: number;
-    failureReason: Error;
+    failureReason: Error | null;
     isPaused: boolean;
     submittedAt: number;
     mutateAsync: import("@tanstack/react-query").UseMutateAsyncFunction<import("@onecoach/constants").OnboardingProgress, Error, CompleteStepPayload, void>;
@@ -51,9 +51,9 @@ export declare function useSkipStep(): {
     isSuccess: false;
     status: "pending";
     reset: () => void;
-    context: void;
+    context: void | undefined;
     failureCount: number;
-    failureReason: Error;
+    failureReason: Error | null;
     isPaused: boolean;
     submittedAt: number;
     mutateAsync: import("@tanstack/react-query").UseMutateAsyncFunction<import("@onecoach/constants").OnboardingProgress, Error, CompleteStepPayload, void>;
@@ -68,9 +68,9 @@ export declare function useSkipStep(): {
     isSuccess: false;
     status: "error";
     reset: () => void;
-    context: void;
+    context: void | undefined;
     failureCount: number;
-    failureReason: Error;
+    failureReason: Error | null;
     isPaused: boolean;
     submittedAt: number;
     mutateAsync: import("@tanstack/react-query").UseMutateAsyncFunction<import("@onecoach/constants").OnboardingProgress, Error, CompleteStepPayload, void>;
@@ -85,9 +85,9 @@ export declare function useSkipStep(): {
     isSuccess: true;
     status: "success";
     reset: () => void;
-    context: void;
+    context: void | undefined;
     failureCount: number;
-    failureReason: Error;
+    failureReason: Error | null;
     isPaused: boolean;
     submittedAt: number;
     mutateAsync: import("@tanstack/react-query").UseMutateAsyncFunction<import("@onecoach/constants").OnboardingProgress, Error, CompleteStepPayload, void>;

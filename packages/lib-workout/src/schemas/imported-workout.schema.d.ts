@@ -412,3 +412,4 @@ export declare const IMPORT_LIMITS: {
     /** Rate limit: max import per ora */
     readonly RATE_LIMIT_PER_HOUR: 5;
 };
+//# sourceMappingURL=imported-workout.schema.d.ts.map

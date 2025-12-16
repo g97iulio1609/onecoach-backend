@@ -65,3 +65,4 @@ export declare class WorkoutVisionService {
         fallback?: string;
     }): Promise<void>;
 }
+//# sourceMappingURL=workout-vision.service.d.ts.map

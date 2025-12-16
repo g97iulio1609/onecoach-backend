@@ -57,18 +57,18 @@ export type DialogStore = {
  * Dialog Store
  */
 export declare const useDialogStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<DialogStore>, "setState" | "devtools"> & {
-    setState(partial: DialogStore | Partial<DialogStore> | ((state: DialogStore) => DialogStore | Partial<DialogStore>), replace?: false, action?: string | {
+    setState(partial: DialogStore | Partial<DialogStore> | ((state: DialogStore) => DialogStore | Partial<DialogStore>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: DialogStore | ((state: DialogStore) => DialogStore), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: DialogStore | ((state: DialogStore) => DialogStore), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };

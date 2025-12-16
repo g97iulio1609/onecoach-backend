@@ -67,3 +67,4 @@ export declare class CatalogProviderService {
      */
     static getFoodInstructions(): string;
 }
+//# sourceMappingURL=catalog-provider.service.d.ts.map

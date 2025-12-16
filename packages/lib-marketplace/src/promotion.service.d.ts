@@ -56,23 +56,23 @@ export declare class PromotionService {
      * Recupera promozione per codice
      */
     static getPromotionByCode(code: string): Promise<{
-        description: string | null;
         id: string;
+        description: string | null;
         type: import("@prisma/client").$Enums.PromotionType;
+        code: string;
         createdAt: Date;
         updatedAt: Date;
-        code: string;
-        maxUses: number | null;
-        createdBy: string;
         isActive: boolean;
+        createdBy: string;
         stripeCouponId: string | null;
         discountType: import("@prisma/client").$Enums.DiscountType | null;
         discountValue: Prisma.Decimal | null;
         bonusCredits: number | null;
+        maxUses: number | null;
         maxUsesPerUser: number;
         validFrom: Date;
         validUntil: Date | null;
-    }>;
+    } | null>;
     /**
      * Conta usi di una promozione per utente
      */

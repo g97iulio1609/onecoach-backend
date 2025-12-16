@@ -59,8 +59,8 @@ export declare const coachKeys: {
     readonly profile: () => readonly ["coach", "profile"];
     readonly publicProfile: (userId: string) => readonly ["coach", "public", string];
     readonly dashboardStats: () => readonly ["coach", "dashboard", "stats"];
-    readonly dashboardPlans: (filters?: CoachDashboardPlansFilters) => readonly ["coach", "dashboard", "plans", CoachDashboardPlansFilters];
-    readonly clients: (filters?: CoachClientsFilters) => readonly ["coach", "clients", CoachClientsFilters];
+    readonly dashboardPlans: (filters?: CoachDashboardPlansFilters) => readonly ["coach", "dashboard", "plans", CoachDashboardPlansFilters | undefined];
+    readonly clients: (filters?: CoachClientsFilters) => readonly ["coach", "clients", CoachClientsFilters | undefined];
 };
 /**
  * Query functions for coach

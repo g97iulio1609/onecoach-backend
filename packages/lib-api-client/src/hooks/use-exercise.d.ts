@@ -8,7 +8,7 @@ import type { ExercisesResponse, ExerciseListParams } from '../exercise';
  * Hook to get all exercises with optional filters
  * Optimized for admin panel with longer cache
  */
-export declare function useExercises(params?: ExerciseListParams, initialData?: ExercisesResponse): import("@tanstack/react-query").DefinedUseQueryResult<ExercisesResponse, Error>;
+export declare function useExercises(params?: ExerciseListParams, initialData?: ExercisesResponse): import("@tanstack/react-query").UseQueryResult<ExercisesResponse, Error>;
 /**
  * Hook to get an exercise by ID
  */

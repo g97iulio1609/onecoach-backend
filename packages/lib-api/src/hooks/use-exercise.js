@@ -36,11 +36,19 @@ export function useExercise(id) {
  * Hook to create an exercise
  */
 export function useCreateExercise() {
-    const queryClient = useQueryClient();
+    let queryClient;
+    try {
+        if (typeof window !== 'undefined') {
+            queryClient = useQueryClient();
+        }
+    }
+    catch (e) {
+        // Ignore error during SSR
+    }
     return useMutation({
         mutationFn: (data) => exerciseApi.create(data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: exerciseKeys.lists() });
+            queryClient?.invalidateQueries({ queryKey: exerciseKeys.lists() });
         },
     });
 }
@@ -48,12 +56,20 @@ export function useCreateExercise() {
  * Hook to update an exercise
  */
 export function useUpdateExercise() {
-    const queryClient = useQueryClient();
+    let queryClient;
+    try {
+        if (typeof window !== 'undefined') {
+            queryClient = useQueryClient();
+        }
+    }
+    catch (e) {
+        // Ignore error during SSR
+    }
     return useMutation({
         mutationFn: ({ id, data }) => exerciseApi.update(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: exerciseKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: exerciseKeys.detail(variables.id) });
+            queryClient?.invalidateQueries({ queryKey: exerciseKeys.lists() });
+            queryClient?.invalidateQueries({ queryKey: exerciseKeys.detail(variables.id) });
         },
     });
 }
@@ -61,11 +77,19 @@ export function useUpdateExercise() {
  * Hook to delete an exercise
  */
 export function useDeleteExercise() {
-    const queryClient = useQueryClient();
+    let queryClient;
+    try {
+        if (typeof window !== 'undefined') {
+            queryClient = useQueryClient();
+        }
+    }
+    catch (e) {
+        // Ignore error during SSR
+    }
     return useMutation({
         mutationFn: (id) => exerciseApi.delete(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: exerciseKeys.lists() });
+            queryClient?.invalidateQueries({ queryKey: exerciseKeys.lists() });
         },
     });
 }
@@ -78,13 +102,21 @@ export function useDeleteExercise() {
  * useRealtimeStore (Zustand) per una singola subscription condivisa.
  */
 export function useBatchExerciseOperations() {
-    const queryClient = useQueryClient();
+    let queryClient;
+    try {
+        if (typeof window !== 'undefined') {
+            queryClient = useQueryClient();
+        }
+    }
+    catch (e) {
+        // Ignore error during SSR
+    }
     return useMutation({
         mutationFn: ({ action, ids }) => exerciseApi.batch(action, ids),
         onSuccess: () => {
             // Il realtime (Zustand) aggiornerà automaticamente il cache quando le modifiche
             // arrivano dal database. Invalidiamo per sicurezza in caso di problemi di sincronizzazione.
-            queryClient.invalidateQueries({ queryKey: exerciseKeys.lists() });
+            queryClient?.invalidateQueries({ queryKey: exerciseKeys.lists() });
         },
     });
 }

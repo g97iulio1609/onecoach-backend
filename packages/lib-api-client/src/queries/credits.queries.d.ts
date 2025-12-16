@@ -41,7 +41,7 @@ export interface CreditHistoryResponse {
 export declare const creditsKeys: {
     readonly all: readonly ["credits"];
     readonly balance: () => readonly ["credits", "balance"];
-    readonly history: (limit?: number) => readonly ["credits", "history", number];
+    readonly history: (limit?: number) => readonly ["credits", "history", number | undefined];
 };
 /**
  * Query functions for credits

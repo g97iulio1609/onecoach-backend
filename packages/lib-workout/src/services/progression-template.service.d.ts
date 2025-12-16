@@ -8,15 +8,15 @@ export declare class ProgressionTemplateService {
      * Create a new progression template
      */
     static create(userId: string, data: ProgressionTemplateData): Promise<{
-        data: import("@prisma/client/runtime/client").JsonValue;
         name: string;
-        category: string | null;
-        description: string | null;
         userId: string | null;
         id: string;
+        description: string | null;
+        type: import("@prisma/client").$Enums.WorkoutTemplateType;
         createdAt: Date;
         updatedAt: Date;
-        type: import("@prisma/client").$Enums.WorkoutTemplateType;
+        category: string | null;
+        data: import("@prisma/client/runtime/client").JsonValue;
         tags: string[];
         isPublic: boolean;
         usageCount: number;
@@ -35,15 +35,15 @@ export declare class ProgressionTemplateService {
      * Delete a progression template
      */
     static delete(userId: string, templateId: string): Promise<{
-        data: import("@prisma/client/runtime/client").JsonValue;
         name: string;
-        category: string | null;
-        description: string | null;
         userId: string | null;
         id: string;
+        description: string | null;
+        type: import("@prisma/client").$Enums.WorkoutTemplateType;
         createdAt: Date;
         updatedAt: Date;
-        type: import("@prisma/client").$Enums.WorkoutTemplateType;
+        category: string | null;
+        data: import("@prisma/client/runtime/client").JsonValue;
         tags: string[];
         isPublic: boolean;
         usageCount: number;
@@ -59,3 +59,4 @@ export declare class ProgressionTemplateService {
         params: ProgressionParams;
     } | null>;
 }
+//# sourceMappingURL=progression-template.service.d.ts.map

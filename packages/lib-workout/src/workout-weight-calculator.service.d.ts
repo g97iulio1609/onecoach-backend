@@ -26,3 +26,4 @@ export declare function calculateWeightsInProgram(userId: string, program: Worko
  * @param catalogExerciseId - ID dell'esercizio nel catalogo per cui è stato inserito/aggiornato l'1RM
  */
 export declare function updateProgramWeightsForExerciseId(userId: string, catalogExerciseId: string): Promise<void>;
+//# sourceMappingURL=workout-weight-calculator.service.d.ts.map

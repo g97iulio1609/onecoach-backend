@@ -1,4 +1,4 @@
-import { streamObject, type CoreMessage } from 'ai';
+import { streamText, Output, type CoreMessage } from 'ai';
 import { createModel } from '@onecoach/lib-ai-utils/model-factory';
 import type { VisionParseParams } from './types';
 
@@ -37,17 +37,17 @@ export async function parseWithVisionAI<T>(params: VisionParseParams<T>): Promis
     },
   ];
 
-  // Usa streamObject per output strutturato con validazione Zod
-  const streamResult = streamObject({
+  // Usa streamText con Output.object() per output strutturato con validazione Zod
+  const streamResult = streamText({
     model,
-    schema,
+    output: Output.object({ schema }),
     messages,
     abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
     // No temperature per modelli reasoning
   });
 
   // Attendi l'oggetto completo validato
-  const validated = await streamResult.object;
+  const validated = await streamResult.output;
 
   if (!validated) {
     throw new Error('AI returned empty response');

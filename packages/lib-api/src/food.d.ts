@@ -102,3 +102,4 @@ export declare const foodApi: {
         updated?: number;
     }>;
 };
+//# sourceMappingURL=food.d.ts.map

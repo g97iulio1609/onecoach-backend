@@ -50,3 +50,4 @@ export declare function useBatchExerciseOperations(): import("@tanstack/react-qu
     action: "approve" | "reject" | "delete";
     ids: string[];
 }, unknown>;
+//# sourceMappingURL=use-exercise.d.ts.map

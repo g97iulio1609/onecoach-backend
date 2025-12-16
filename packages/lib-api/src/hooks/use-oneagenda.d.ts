@@ -68,3 +68,4 @@ export declare function useHabits(enabled?: boolean): import("@tanstack/react-qu
  * Hook to toggle habit
  */
 export declare function useToggleHabit(): import("@tanstack/react-query").UseMutationResult<unknown, Error, string, unknown>;
+//# sourceMappingURL=use-oneagenda.d.ts.map

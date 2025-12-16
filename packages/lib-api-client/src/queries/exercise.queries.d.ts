@@ -10,7 +10,7 @@ import type { ExerciseResponse, ExercisesResponse, ExerciseListParams } from '..
 export declare const exerciseKeys: {
     readonly all: readonly ["exercises"];
     readonly lists: () => readonly ["exercises", "list"];
-    readonly list: (params?: ExerciseListParams) => readonly ["exercises", "list", ExerciseListParams];
+    readonly list: (params?: ExerciseListParams) => readonly ["exercises", "list", ExerciseListParams | undefined];
     readonly details: () => readonly ["exercises", "detail"];
     readonly detail: (id: string) => readonly ["exercises", "detail", string];
 };

@@ -27,7 +27,7 @@ interface BodyMeasurementsActions {
 }
 type BodyMeasurementsStore = BodyMeasurementsState & BodyMeasurementsActions;
 export declare const useBodyMeasurementsStore: import("zustand").UseBoundStore<import("zustand").StoreApi<BodyMeasurementsStore>>;
-export declare const selectLatestMeasurement: (state: BodyMeasurementsStore) => BodyMeasurement;
+export declare const selectLatestMeasurement: (state: BodyMeasurementsStore) => BodyMeasurement | null;
 export declare const selectAllMeasurements: (state: BodyMeasurementsStore) => BodyMeasurement[];
 export declare const selectMeasurementsLoading: (state: BodyMeasurementsStore) => boolean;
 export {};

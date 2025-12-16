@@ -19,9 +19,9 @@ export declare function useSyncAuth(): void;
  * Returns Zustand user state for consistent access
  */
 export declare function useMe(): {
-    data: User;
+    data: User | null;
     isLoading: boolean;
-    error: any;
+    error: null;
     refetch: () => void;
 };
 /**
@@ -64,7 +64,7 @@ export declare function useIsAuthenticated(): boolean;
 /**
  * Hook to get current user from store
  */
-export declare function useCurrentUser(): User;
+export declare function useCurrentUser(): User | null;
 declare const CLIENT_ROLE_REQUIREMENTS: {
     readonly ATHLETE: "USER";
     readonly COACH: "COACH";

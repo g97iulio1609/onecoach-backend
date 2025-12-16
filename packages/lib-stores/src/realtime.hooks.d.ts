@@ -308,7 +308,7 @@ export declare function useRealtimeSyncSingle<T extends {
 export declare function useRealtimeStatus(): {
     status: import("./realtime.store").ConnectionStatus;
     isReady: boolean;
-    lastError: Error;
+    lastError: Error | null;
     /** Forza reset della connessione */
     reconnect: () => void;
 };

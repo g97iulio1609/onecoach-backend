@@ -10,7 +10,7 @@ import type { NutritionPlanResponse, NutritionPlansResponse } from '../nutrition
 export declare const nutritionKeys: {
     readonly all: readonly ["nutrition"];
     readonly lists: () => readonly ["nutrition", "list"];
-    readonly list: (filters?: Record<string, unknown>) => readonly ["nutrition", "list", Record<string, unknown>];
+    readonly list: (filters?: Record<string, unknown>) => readonly ["nutrition", "list", Record<string, unknown> | undefined];
     readonly details: () => readonly ["nutrition", "detail"];
     readonly detail: (id: string) => readonly ["nutrition", "detail", string];
     readonly versions: (id: string) => readonly ["nutrition", "detail", string, "versions"];

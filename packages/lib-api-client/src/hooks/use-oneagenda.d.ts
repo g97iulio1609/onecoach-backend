@@ -28,7 +28,7 @@ export declare function useUpdateTaskStatus(): import("@tanstack/react-query").U
     id: string;
     status: TaskStatus;
 }, {
-    previousTasks: Task[];
+    previousTasks: Task[] | undefined;
 }>;
 /**
  * Hook to delete task
@@ -36,7 +36,7 @@ export declare function useUpdateTaskStatus(): import("@tanstack/react-query").U
  * @returns Mutation result with delete function
  */
 export declare function useDeleteTask(): import("@tanstack/react-query").UseMutationResult<void, Error, string, {
-    previousTasks: Task[];
+    previousTasks: Task[] | undefined;
 }>;
 /**
  * Hook to get goals list
@@ -58,7 +58,7 @@ export declare function useCreateGoal(): import("@tanstack/react-query").UseMuta
  * @returns Mutation result with delete function
  */
 export declare function useDeleteGoal(): import("@tanstack/react-query").UseMutationResult<void, Error, string, {
-    previousGoals: Goal[];
+    previousGoals: Goal[] | undefined;
 }>;
 /**
  * Hook to get habits list

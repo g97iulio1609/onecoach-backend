@@ -29,3 +29,4 @@ export declare function validateExerciseTypeByName(name: string, sharedContext?:
         createdExerciseTypes?: Record<string, string>;
     };
 }): Promise<string | null>;
+//# sourceMappingURL=metadata-validator.service.d.ts.map

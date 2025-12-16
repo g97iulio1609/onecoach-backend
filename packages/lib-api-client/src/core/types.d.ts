@@ -29,8 +29,8 @@ export interface ResponseInterceptor {
 }
 export declare class ApiError extends Error {
     status: number;
-    data?: unknown;
-    config?: RequestConfig;
-    constructor(message: string, status: number, data?: unknown, config?: RequestConfig);
+    data?: unknown | undefined;
+    config?: RequestConfig | undefined;
+    constructor(message: string, status: number, data?: unknown | undefined, config?: RequestConfig | undefined);
 }
 //# sourceMappingURL=types.d.ts.map

@@ -72,3 +72,4 @@ export declare const iapQueries: {
      */
     restorePurchases: (request: RestorePurchasesRequest) => Promise<RestorePurchasesResponse>;
 };
+//# sourceMappingURL=iap.queries.d.ts.map

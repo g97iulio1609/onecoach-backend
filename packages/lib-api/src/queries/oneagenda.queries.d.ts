@@ -97,3 +97,4 @@ export declare const habitsQueries: {
      */
     toggle: (id: string) => Promise<unknown>;
 };
+//# sourceMappingURL=oneagenda.queries.d.ts.map

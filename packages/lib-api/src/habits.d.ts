@@ -24,3 +24,4 @@ export declare const habitsApi: {
         habit: Habit;
     }>;
 };
+//# sourceMappingURL=habits.d.ts.map

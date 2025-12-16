@@ -53,18 +53,18 @@ export interface MaxesActions {
 }
 export type MaxesStore = MaxesState & MaxesActions;
 export declare const useMaxesStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<MaxesStore>, "setState" | "devtools"> & {
-    setState(partial: MaxesStore | Partial<MaxesStore> | ((state: MaxesStore) => MaxesStore | Partial<MaxesStore>), replace?: false, action?: string | {
+    setState(partial: MaxesStore | Partial<MaxesStore> | ((state: MaxesStore) => MaxesStore | Partial<MaxesStore>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: MaxesStore | ((state: MaxesStore) => MaxesStore), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: MaxesStore | ((state: MaxesStore) => MaxesStore), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };
@@ -88,11 +88,11 @@ export declare const selectMaxesSortedByWeight: (state: MaxesStore) => Max[];
 /** Massimali ordinati per data aggiornamento (più recenti prima) */
 export declare const selectMaxesSortedByDate: (state: MaxesStore) => Max[];
 /** Hook per ottenere un massimale specifico */
-export declare const useMax: (exerciseId: string) => Max;
+export declare const useMax: (exerciseId: string) => Max | undefined;
 /** Hook per ottenere lo storico di un massimale */
 export declare const useMaxHistory: (exerciseId: string) => MaxVersion[];
 /** Hook per lo stato di loading */
 export declare const useMaxesLoading: () => boolean;
 /** Hook per l'errore */
-export declare const useMaxesError: () => string;
+export declare const useMaxesError: () => string | null;
 //# sourceMappingURL=maxes.store.d.ts.map

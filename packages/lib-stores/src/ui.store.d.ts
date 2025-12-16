@@ -87,34 +87,34 @@ export type UIStore = UIState & UIActions;
  * Supports cross-platform storage (localStorage for web, AsyncStorage for native)
  */
 export declare const useUIStore: import("zustand").UseBoundStore<Omit<Omit<import("zustand").StoreApi<UIStore>, "setState" | "devtools"> & {
-    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false, action?: string | {
+    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
-    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: string | {
+    }) | undefined): void;
+    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): void;
+    }) | undefined): void;
     devtools: {
         cleanup: () => void;
     };
 }, "setState" | "persist"> & {
-    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false, action?: string | {
+    setState(partial: UIStore | Partial<UIStore> | ((state: UIStore) => UIStore | Partial<UIStore>), replace?: false | undefined, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
-    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: string | {
+    }) | undefined): unknown;
+    setState(state: UIStore | ((state: UIStore) => UIStore), replace: true, action?: (string | {
         [x: string]: unknown;
         [x: number]: unknown;
         [x: symbol]: unknown;
         type: string;
-    }): unknown;
+    }) | undefined): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<UIStore, unknown, unknown>>) => void;
         clearStorage: () => void;

@@ -12,14 +12,14 @@ export declare const oneagendaKeys: {
     readonly tasks: {
         readonly all: readonly ["oneagenda", "tasks"];
         readonly lists: () => readonly ["oneagenda", "tasks", "list"];
-        readonly list: (filters?: TasksFilters) => readonly ["oneagenda", "tasks", "list", TasksFilters];
+        readonly list: (filters?: TasksFilters) => readonly ["oneagenda", "tasks", "list", TasksFilters | undefined];
         readonly details: () => readonly ["oneagenda", "tasks", "detail"];
         readonly detail: (id: string) => readonly ["oneagenda", "tasks", "detail", string];
     };
     readonly goals: {
         readonly all: readonly ["oneagenda", "goals"];
         readonly lists: () => readonly ["oneagenda", "goals", "list"];
-        readonly list: (filters?: GoalsFilters) => readonly ["oneagenda", "goals", "list", GoalsFilters];
+        readonly list: (filters?: GoalsFilters) => readonly ["oneagenda", "goals", "list", GoalsFilters | undefined];
         readonly details: () => readonly ["oneagenda", "goals", "detail"];
         readonly detail: (id: string) => readonly ["oneagenda", "goals", "detail", string];
     };

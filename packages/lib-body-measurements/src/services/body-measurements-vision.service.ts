@@ -7,7 +7,7 @@
  * @module lib-body-measurements/services/body-measurements-vision
  */
 
-import { streamObject } from 'ai';
+import { streamText, Output } from 'ai';
 import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config';
 import {
   AIFrameworkConfigService,
@@ -289,7 +289,7 @@ export class BodyMeasurementsVisionService {
 
         const model = openai(currentModel);
 
-        const result = await streamObject({
+        const result = await streamText({
           model,
           schema: ImportedBodyMeasurementsSchema,
           output: 'object',
@@ -304,7 +304,7 @@ export class BodyMeasurementsVisionService {
           ],
         });
 
-        const object = await result.object;
+        const object = await result.output;
         return object;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
@@ -404,14 +404,14 @@ export class BodyMeasurementsVisionService {
 
         const model = openai(currentModel);
 
-        const result = await streamObject({
+        const result = await streamText({
             model,
             schema: ImportedBodyMeasurementsSchema,
             output: 'object',
             prompt: `${prompt}\n\nDATA:\n\`\`\`\n${textContent.substring(0, 50000)}\n\`\`\``
         });
 
-        const object = await result.object;
+        const object = await result.output;
         return object;
 
       } catch (err) {

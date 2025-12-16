@@ -74,3 +74,4 @@ export declare function removeSetGroup(program: WorkoutProgram, weekNumber: numb
  * Duplica un gruppo di serie
  */
 export declare function duplicateSetGroup(program: WorkoutProgram, weekNumber: number, dayNumber: number, exerciseId: string, groupId: string): WorkoutProgram;
+//# sourceMappingURL=workout-operations.d.ts.map

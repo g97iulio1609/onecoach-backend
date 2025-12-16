@@ -9,3 +9,4 @@ export declare class AuthInterceptor implements RequestInterceptor {
     constructor(getToken: () => Promise<string | null>);
     onRequest(config: RequestConfig): Promise<RequestConfig>;
 }
+//# sourceMappingURL=auth.interceptor.d.ts.map

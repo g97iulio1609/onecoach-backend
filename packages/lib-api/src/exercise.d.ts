@@ -69,3 +69,4 @@ export declare const exerciseApi: {
         status?: string;
     }>;
 };
+//# sourceMappingURL=exercise.d.ts.map

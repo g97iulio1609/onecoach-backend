@@ -10,7 +10,7 @@ import type { WorkoutProgramResponse, WorkoutProgramsResponse } from '../workout
 export declare const workoutKeys: {
     readonly all: readonly ["workouts"];
     readonly lists: () => readonly ["workouts", "list"];
-    readonly list: (filters?: Record<string, unknown>) => readonly ["workouts", "list", Record<string, unknown>];
+    readonly list: (filters?: Record<string, unknown>) => readonly ["workouts", "list", Record<string, unknown> | undefined];
     readonly details: () => readonly ["workouts", "detail"];
     readonly detail: (id: string) => readonly ["workouts", "detail", string];
     readonly sessions: () => readonly ["workouts", "sessions"];

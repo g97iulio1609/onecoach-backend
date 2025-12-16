@@ -10,7 +10,7 @@ import { type CreateProjectInput } from '../projects';
 export declare const projectsKeys: {
     all: readonly ["projects"];
     lists: () => readonly ["projects", "list"];
-    list: (filters?: Record<string, unknown>) => readonly ["projects", "list", Record<string, unknown>];
+    list: (filters?: Record<string, unknown>) => readonly ["projects", "list", Record<string, unknown> | undefined];
     details: () => readonly ["projects", "detail"];
     detail: (id: string) => readonly ["projects", "detail", string];
 };

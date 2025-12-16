@@ -33,3 +33,4 @@ export declare const analyticsApi: {
         insights: unknown[];
     }>;
 };
+//# sourceMappingURL=analytics.d.ts.map

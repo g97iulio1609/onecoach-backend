@@ -35,13 +35,13 @@ export declare function useDirectMessages(conversationId: string | null, page?: 
  * @returns Mutation function
  */
 export declare function useCreateDirectConversation(): import("@tanstack/react-query").UseMutationResult<{
-    priority: import("@prisma/client").$Enums.ConversationPriority;
     id: string;
+    title: string | null;
     createdAt: Date;
     updatedAt: Date;
-    title: string | null;
-    lastMessageAt: Date | null;
+    priority: import("@prisma/client").$Enums.ConversationPriority;
     coachId: string;
+    lastMessageAt: Date | null;
     athleteId: string;
     isMuted: boolean;
 }, Error, {

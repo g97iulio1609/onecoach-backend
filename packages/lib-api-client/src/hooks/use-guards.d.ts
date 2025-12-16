@@ -25,7 +25,7 @@ export declare function useRequireAuth(redirectTo?: string): {
 export declare function useRequireRole(requiredRole: Role, redirectTo?: string): {
     hasAccess: boolean;
     isLoading: boolean;
-    user: import("@onecoach/lib-stores").User;
+    user: import("@onecoach/lib-stores").User | null;
 };
 /**
  * Hook to guard coach routes
@@ -33,7 +33,7 @@ export declare function useRequireRole(requiredRole: Role, redirectTo?: string):
 export declare function useRequireCoach(redirectTo?: string): {
     hasAccess: boolean;
     isLoading: boolean;
-    user: import("@onecoach/lib-stores").User;
+    user: import("@onecoach/lib-stores").User | null;
 };
 /**
  * Hook to guard admin routes
@@ -41,7 +41,7 @@ export declare function useRequireCoach(redirectTo?: string): {
 export declare function useRequireAdmin(redirectTo?: string): {
     hasAccess: boolean;
     isLoading: boolean;
-    user: import("@onecoach/lib-stores").User;
+    user: import("@onecoach/lib-stores").User | null;
 };
 export {};
 //# sourceMappingURL=use-guards.d.ts.map

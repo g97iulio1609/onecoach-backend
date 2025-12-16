@@ -143,12 +143,12 @@ interface CopilotState {
     isInitialized: boolean;
 }
 export declare const useCopilotStore: import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<CopilotState>, "setState" | "persist"> & {
-    setState(partial: CopilotState | Partial<CopilotState> | ((state: CopilotState) => CopilotState | Partial<CopilotState>), replace?: false): unknown;
+    setState(partial: CopilotState | Partial<CopilotState> | ((state: CopilotState) => CopilotState | Partial<CopilotState>), replace?: false | undefined): unknown;
     setState(state: CopilotState | ((state: CopilotState) => CopilotState), replace: true): unknown;
     persist: {
         setOptions: (options: Partial<import("zustand/middleware").PersistOptions<CopilotState, {
             width: number;
-            selectedModelId: string;
+            selectedModelId: string | null;
             mode: CopilotMode;
         }, unknown>>) => void;
         clearStorage: () => void;
@@ -158,7 +158,7 @@ export declare const useCopilotStore: import("zustand").UseBoundStore<Omit<impor
         onFinishHydration: (fn: (state: CopilotState) => void) => () => void;
         getOptions: () => Partial<import("zustand/middleware").PersistOptions<CopilotState, {
             width: number;
-            selectedModelId: string;
+            selectedModelId: string | null;
             mode: CopilotMode;
         }, unknown>>;
     };
@@ -167,7 +167,7 @@ export declare const selectCopilotIsOpen: (state: CopilotState) => boolean;
 export declare const selectCopilotWidth: (state: CopilotState) => number;
 export declare const selectCopilotFeatures: (state: CopilotState) => CopilotFeatures;
 export declare const selectCopilotModels: (state: CopilotState) => CopilotModel[];
-export declare const selectCopilotSelectedModel: (state: CopilotState) => CopilotModel;
+export declare const selectCopilotSelectedModel: (state: CopilotState) => CopilotModel | null;
 export declare const selectCopilotDisplayMode: (state: CopilotState) => CopilotDisplayMode;
 export declare const selectCopilotIsResizing: (state: CopilotState) => boolean;
 export declare const selectMcpContext: (state: CopilotState) => McpToolContext;
@@ -178,10 +178,10 @@ export declare const selectExerciseContext: (state: CopilotState) => ExerciseCon
 export declare const selectOneAgendaContext: (state: CopilotState) => OneAgendaContext;
 export declare const selectMarketplaceContext: (state: CopilotState) => MarketplaceContext;
 export declare const selectAnalyticsContext: (state: CopilotState) => AnalyticsContext;
-export declare const selectCurrentAthleteId: (state: CopilotState) => string;
+export declare const selectCurrentAthleteId: (state: CopilotState) => string | null;
 /**
  * Get the active context based on current domain
  */
-export declare const selectActiveDomainContext: (state: CopilotState) => NutritionContext | WorkoutContext | ExerciseContext | OneAgendaContext | MarketplaceContext | AnalyticsContext;
+export declare const selectActiveDomainContext: (state: CopilotState) => NutritionContext | WorkoutContext | OneAgendaContext | MarketplaceContext | ExerciseContext | AnalyticsContext | null;
 export {};
 //# sourceMappingURL=copilot.store.d.ts.map

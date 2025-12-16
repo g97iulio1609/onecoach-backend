@@ -115,3 +115,4 @@ export declare function useIsOnboardingCompleted(): boolean;
  * Usa lo Zustand store invece di fare fetch
  */
 export declare function useCurrentOnboardingStep(): number;
+//# sourceMappingURL=use-onboarding.d.ts.map

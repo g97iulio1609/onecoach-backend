@@ -27,3 +27,4 @@ export declare const foodQueries: {
      */
     getById: (id: string) => Promise<FoodResponse>;
 };
+//# sourceMappingURL=food.queries.d.ts.map

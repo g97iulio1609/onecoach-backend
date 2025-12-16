@@ -10,7 +10,7 @@ import type { BodyMeasurement } from '@onecoach/types';
 export declare const bodyMeasurementsKeys: {
     readonly all: readonly ["body-measurements"];
     readonly lists: () => readonly ["body-measurements", "list"];
-    readonly list: (filters?: BodyMeasurementsFilters) => readonly ["body-measurements", "list", BodyMeasurementsFilters];
+    readonly list: (filters?: BodyMeasurementsFilters) => readonly ["body-measurements", "list", BodyMeasurementsFilters | undefined];
     readonly details: () => readonly ["body-measurements", "detail"];
     readonly detail: (id: string) => readonly ["body-measurements", "detail", string];
 };

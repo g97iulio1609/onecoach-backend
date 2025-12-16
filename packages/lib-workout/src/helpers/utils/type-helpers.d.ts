@@ -27,3 +27,4 @@ export declare function parseJsonIfString<T>(value: unknown): T | null;
  * Estrae il primo numero da una stringa o valore
  */
 export declare function parseFirstNumber(value: unknown): number | undefined;
+//# sourceMappingURL=type-helpers.d.ts.map

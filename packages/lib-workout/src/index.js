@@ -20,3 +20,4 @@ export * from './services/workout-statistics.service';
 export * from './services/workout-progression.service';
 export * from './services/progression-template.service';
 export * from './services/granular-session.service';
+export { WorkoutImportService } from './services/workout-import.service';

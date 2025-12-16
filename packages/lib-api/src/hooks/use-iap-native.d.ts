@@ -10,10 +10,10 @@ import type { ProductId } from '@onecoach/lib-stores/iap.store';
  * Replaces IAPProvider context
  */
 export declare function useIAP(): {
-    products: import("@onecoach/lib-stores").IAPProduct[];
-    subscriptionStatus: import("@onecoach/lib-stores").SubscriptionStatus | null;
-    purchaseState: import("@onecoach/lib-stores").PurchaseState;
-    error: import("@onecoach/lib-stores").IAPError | null;
+    products: import("@onecoach/lib-stores/iap.store").IAPProduct[];
+    subscriptionStatus: import("@onecoach/lib-stores/iap.store").SubscriptionStatus | null;
+    purchaseState: import("@onecoach/lib-stores/iap.store").PurchaseState;
+    error: import("@onecoach/lib-stores/iap.store").IAPError | null;
     loadProducts: () => Promise<void>;
     purchaseProduct: (productId: ProductId) => Promise<boolean>;
     restorePurchases: () => Promise<{
@@ -32,3 +32,4 @@ export declare function useIAP(): {
     }>;
     clearError: () => void;
 };
+//# sourceMappingURL=use-iap-native.d.ts.map

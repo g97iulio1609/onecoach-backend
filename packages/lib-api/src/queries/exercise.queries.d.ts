@@ -27,3 +27,4 @@ export declare const exerciseQueries: {
      */
     getById: (id: string) => Promise<ExerciseResponse>;
 };
+//# sourceMappingURL=exercise.queries.d.ts.map

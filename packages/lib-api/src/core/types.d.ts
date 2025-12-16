@@ -33,3 +33,4 @@ export declare class ApiError extends Error {
     config?: RequestConfig | undefined;
     constructor(message: string, status: number, data?: unknown | undefined, config?: RequestConfig | undefined);
 }
+//# sourceMappingURL=types.d.ts.map

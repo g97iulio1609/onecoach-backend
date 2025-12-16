@@ -100,3 +100,4 @@ export declare const parseIntensity: (input: string | number | null | undefined)
 export declare const parseRPE: (input: string | number | null | undefined) => ParsedRange | null;
 export declare const parseRest: (input: string | number | null | undefined) => ParsedRange | null;
 export default parseRange;
+//# sourceMappingURL=range-parser.d.ts.map

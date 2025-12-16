@@ -223,7 +223,8 @@ export class FoodService {
     const locale = options.locale || DEFAULT_LOCALE;
     const limit = options.limit || 20;
 
-    if (!query.trim()) {
+    // Null safety for query parameter
+    if (!query || typeof query !== 'string' || !query.trim()) {
       return [];
     }
 

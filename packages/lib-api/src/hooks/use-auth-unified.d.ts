@@ -40,3 +40,4 @@ export interface UseAuthReturn {
  * ```
  */
 export declare function useAuth(): UseAuthReturn;
+//# sourceMappingURL=use-auth-unified.d.ts.map

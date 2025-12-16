@@ -41,7 +41,7 @@ export declare const healthKeys: {
     all: readonly ["health"];
     summary: () => readonly ["health", "summary"];
     sync: () => readonly ["health", "sync"];
-    data: (dataType?: string, startDate?: string, endDate?: string) => readonly ["health", "data", string, string, string];
+    data: (dataType?: string, startDate?: string, endDate?: string) => readonly ["health", "data", string | undefined, string | undefined, string | undefined];
 };
 /**
  * Health query functions

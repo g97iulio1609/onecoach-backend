@@ -8,3 +8,4 @@ export declare class LoggingInterceptor implements RequestInterceptor, ResponseI
     onRequest(config: RequestConfig): Promise<RequestConfig>;
     onResponse<T>(response: ResponseConfig<T>): Promise<ResponseConfig<T>>;
 }
+//# sourceMappingURL=logging.interceptor.d.ts.map

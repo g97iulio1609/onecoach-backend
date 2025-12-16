@@ -11,3 +11,4 @@ export declare class RetryInterceptor implements ResponseInterceptor {
     onResponse<T>(response: ResponseConfig<T>): Promise<ResponseConfig<T>>;
     onError(error: ApiError): Promise<unknown>;
 }
+//# sourceMappingURL=retry.interceptor.d.ts.map
