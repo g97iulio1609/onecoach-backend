@@ -216,7 +216,12 @@ export class FoodVisionService {
         abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
       });
 
-      // Attendi oggetto completo validato
+      // AI SDK v6: Consume partialOutputStream FIRST to ensure stream completion
+      for await (const _partial of streamResult.partialOutputStream) {
+        // Stream consumed - required before accessing output
+      }
+
+      // Attendi oggetto completo validato - stream is fully consumed
       const validated = await streamResult.output;
       if (!validated) {
         throw new Error('Failed to generate structured output');
@@ -306,7 +311,12 @@ export class FoodVisionService {
         abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
       });
 
-      // Attendi oggetto completo validato
+      // AI SDK v6: Consume partialOutputStream FIRST to ensure stream completion
+      for await (const _partial of streamResult.partialOutputStream) {
+        // Stream consumed - required before accessing output
+      }
+
+      // Attendi oggetto completo validato - stream is fully consumed
       const segmentationResult = await streamResult.output;
       if (!segmentationResult) {
         throw new Error('Failed to generate structured output');

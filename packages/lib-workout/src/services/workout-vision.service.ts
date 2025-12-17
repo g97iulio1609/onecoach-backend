@@ -949,7 +949,12 @@ Parse this data and return ONLY valid JSON.`;
       temperature: 0.3,
     });
 
-    // Attendi l'oggetto completo
+    // AI SDK v6: Consume partialOutputStream FIRST to ensure stream completion
+    for await (const _partial of streamResult.partialOutputStream) {
+      // Stream consumed - required before accessing output
+    }
+
+    // Attendi l'oggetto completo - stream is fully consumed
     const validated = await streamResult.output;
 
     if (!validated) {

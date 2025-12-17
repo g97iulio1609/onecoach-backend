@@ -46,7 +46,12 @@ export async function parseWithVisionAI<T>(params: VisionParseParams<T>): Promis
     // No temperature per modelli reasoning
   });
 
-  // Attendi l'oggetto completo validato
+  // AI SDK v6: Consume partialOutputStream FIRST to ensure stream completion
+  for await (const _partial of streamResult.partialOutputStream) {
+    // Stream consumed - required before accessing output
+  }
+
+  // Attendi l'oggetto completo validato - stream is fully consumed
   const validated = await streamResult.output;
 
   if (!validated) {

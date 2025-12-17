@@ -39,8 +39,8 @@
     "@onecoach/one-agent": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
-    "@prisma/client": "7.1.0",
-    "ai": "6.0.0-beta.124"
+    "@prisma/client": "^7.2.0",
+    "ai": "6.0.0-beta.159"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

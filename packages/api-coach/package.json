@@ -16,11 +16,11 @@
     "@onecoach/lib-registry": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
-    "next": "16.0.8",
-    "zod": "4.1.13"
+    "next": "16.0.10",
+    "zod": "4.2.1"
   },
   "devDependencies": {
-    "@types/node": "^24.10.2",
+    "@types/node": "^25.0.3",
     "typescript": "^5.9.3"
   },
   "sideEffects": false

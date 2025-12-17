@@ -61,10 +61,10 @@
     "@onecoach/lib-stores": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
-    "@prisma/client": "7.1.0",
+    "@prisma/client": "^7.2.0",
     "@tanstack/react-query": "^5.90.12",
-    "react": "^19.2.1",
-    "react-native": "^0.82.1"
+    "react": "19.2.3",
+    "react-native": "^0.83.0"
   },
   "peerDependencies": {
     "react": ">=19.1.0 <20",

@@ -13,12 +13,12 @@
     "type-check": "tsc -b"
   },
   "dependencies": {
+    "@onecoach/constants": "workspace:*",
     "@onecoach/lib-ai": "workspace:*",
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-import-core": "workspace:*",
-    "@onecoach/constants": "workspace:*",
-    "ai": "^4.3.16",
-    "zod": "4.1.13"
+    "ai": "6.0.0-beta.159",
+    "zod": "4.2.1"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

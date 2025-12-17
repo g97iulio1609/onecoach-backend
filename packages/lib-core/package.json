@@ -149,16 +149,16 @@
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
-    "@prisma/adapter-pg": "7.1.0",
-    "@prisma/client": "7.1.0",
+    "@prisma/adapter-pg": "7.2.0",
+    "@prisma/client": "^7.2.0",
     "bcryptjs": "^3.0.3",
-    "next": "16.0.8",
+    "next": "16.0.10",
     "next-auth": "5.0.0-beta.30",
     "pg": "^8.16.3",
-    "stripe": "^20.0.0"
+    "stripe": "^20.1.0"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.6",
+    "@types/pg": "^8.16.0",
     "typescript": "^5.9.3"
   },
   "sideEffects": false
