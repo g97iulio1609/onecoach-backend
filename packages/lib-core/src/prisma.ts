@@ -16,7 +16,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma_updated: PrismaClient | undefined;
   pool: Pool | undefined;
 };
 
@@ -81,7 +81,7 @@ function normalizeDatabaseUrl(url: string): string {
 function getPrismaClient(): PrismaClient {
   ensureDatabaseUrl();
 
-  if (!globalForPrisma.prisma) {
+  if (!globalForPrisma.prisma_updated) {
     // In serverless environments (Vercel), prefer pooled connections
     // Use DATABASE_URL (pooled) instead of DIRECT_URL to avoid connection limits
     const rawDbUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
@@ -125,7 +125,7 @@ function getPrismaClient(): PrismaClient {
     const originalDbUrl = process.env.DATABASE_URL;
     process.env.DATABASE_URL = dbUrl;
 
-    globalForPrisma.prisma = new PrismaClient({
+    globalForPrisma.prisma_updated = new PrismaClient({
       adapter,
     });
 
@@ -135,7 +135,7 @@ function getPrismaClient(): PrismaClient {
     }
   }
 
-  return globalForPrisma.prisma;
+  return globalForPrisma.prisma_updated;
 }
 
 // Export con Proxy per lazy initialization
@@ -151,9 +151,9 @@ export const prisma = new Proxy({} as PrismaClient, {
 });
 
 export async function disconnectPrisma() {
-  if (globalForPrisma.prisma) {
-    await globalForPrisma.prisma.$disconnect();
-    globalForPrisma.prisma = undefined;
+  if (globalForPrisma.prisma_updated) {
+    await globalForPrisma.prisma_updated.$disconnect();
+    globalForPrisma.prisma_updated = undefined;
   }
 
   if (globalForPrisma.pool) {
