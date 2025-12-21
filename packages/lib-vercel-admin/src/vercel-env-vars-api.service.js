@@ -112,13 +112,17 @@ export async function createEnvVar(params) {
             error: 'key e value sono richiesti',
         };
     }
+    // Vercel API restriction: sensitive env vars cannot target 'development'
+    const filteredEnvironments = sensitive
+        ? environments.filter(env => env !== 'development')
+        : environments;
     const result = await vercelApiRequest('/env', {
         method: 'POST',
         body: JSON.stringify({
             key,
             value,
-            type: sensitive ? 'secret' : 'encrypted',
-            target: environments,
+            type: sensitive ? 'sensitive' : 'encrypted',
+            target: filteredEnvironments,
         }),
     });
     if (result.success && result.data) {
@@ -127,6 +131,10 @@ export async function createEnvVar(params) {
     else {
         logError(`[VercelEnvVars] Errore creazione env var: ${key}`, {
             error: result.error,
+            message: result.message,
+            key,
+            environments,
+            sensitive,
         });
     }
     return result;
@@ -179,7 +187,7 @@ export async function updateEnvVar(params) {
     if (environments !== undefined)
         updateData.target = environments;
     if (sensitive !== undefined)
-        updateData.type = sensitive ? 'secret' : 'encrypted';
+        updateData.type = sensitive ? 'sensitive' : 'encrypted';
     const result = await vercelApiRequest(`/env/${envId}`, {
         method: 'PATCH',
         body: JSON.stringify(updateData),

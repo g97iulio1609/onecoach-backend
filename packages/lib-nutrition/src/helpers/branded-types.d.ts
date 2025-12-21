@@ -8,31 +8,31 @@
  * Branded type for NutritionPlan ID
  */
 export type NutritionPlanId = string & {
-  __brand: 'NutritionPlanId';
+    __brand: 'NutritionPlanId';
 };
 /**
  * Branded type for FoodItem ID
  */
 export type FoodItemId = string & {
-  __brand: 'FoodItemId';
+    __brand: 'FoodItemId';
 };
 /**
  * Branded type for Meal ID
  */
 export type MealId = string & {
-  __brand: 'MealId';
+    __brand: 'MealId';
 };
 /**
  * Branded type for NutritionDay ID
  */
 export type NutritionDayId = string & {
-  __brand: 'NutritionDayId';
+    __brand: 'NutritionDayId';
 };
 /**
  * Branded type for NutritionWeek ID
  */
 export type NutritionWeekId = string & {
-  __brand: 'NutritionWeekId';
+    __brand: 'NutritionWeekId';
 };
 /**
  * Type guard to create NutritionPlanId from string

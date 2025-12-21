@@ -90,4 +90,3 @@ export declare const useAuthStore: import("zustand").UseBoundStore<Omit<Omit<imp
         getOptions: () => Partial<import("zustand/middleware").PersistOptions<AuthStore, unknown, unknown>>;
     };
 }>;
-//# sourceMappingURL=auth.store.d.ts.map

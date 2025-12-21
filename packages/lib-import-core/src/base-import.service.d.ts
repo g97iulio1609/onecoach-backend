@@ -88,4 +88,3 @@ export declare abstract class BaseImportService<TParsed, TResult extends BaseImp
      */
     protected abstract createErrorResult(errors: string[]): Partial<TResult>;
 }
-//# sourceMappingURL=base-import.service.d.ts.map

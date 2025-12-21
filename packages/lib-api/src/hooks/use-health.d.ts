@@ -20,4 +20,3 @@ export declare function useSyncHealthData(): import("@tanstack/react-query").Use
  * Hook to check if health sync is in progress
  */
 export declare function useHealthSyncStatus(): import("@onecoach/lib-stores/health.store").SyncStatus;
-//# sourceMappingURL=use-health.d.ts.map

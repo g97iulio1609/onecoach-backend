@@ -38,4 +38,3 @@ interface QueryProviderProps {
  */
 export declare function QueryProvider({ children, client, persist }: QueryProviderProps): import("react/jsx-runtime").JSX.Element;
 export {};
-//# sourceMappingURL=provider.d.ts.map

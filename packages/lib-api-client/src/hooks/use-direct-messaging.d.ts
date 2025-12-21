@@ -36,14 +36,14 @@ export declare function useDirectMessages(conversationId: string | null, page?: 
  */
 export declare function useCreateDirectConversation(): import("@tanstack/react-query").UseMutationResult<{
     id: string;
-    title: string | null;
     createdAt: Date;
     updatedAt: Date;
+    title: string | null;
     priority: import("@prisma/client").$Enums.ConversationPriority;
     coachId: string;
-    lastMessageAt: Date | null;
     athleteId: string;
     isMuted: boolean;
+    lastMessageAt: Date | null;
 }, Error, {
     athleteId: string;
     title?: string;
@@ -114,4 +114,3 @@ export declare function useMarkMessageAsRead(): import("@tanstack/react-query").
     messageId: string;
     conversationId: string;
 }, unknown>;
-//# sourceMappingURL=use-direct-messaging.d.ts.map

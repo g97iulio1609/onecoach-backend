@@ -22,4 +22,3 @@ export declare function usePurchaseProduct(): import("@tanstack/react-query").Us
  * Automatically updates Zustand store and invalidates subscription status
  */
 export declare function useRestorePurchases(): import("@tanstack/react-query").UseMutationResult<import("..").RestorePurchasesResponse, Error, RestorePurchasesRequest, void>;
-//# sourceMappingURL=use-iap.d.ts.map

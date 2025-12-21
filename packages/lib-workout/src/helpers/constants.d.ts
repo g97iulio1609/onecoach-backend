@@ -22,4 +22,3 @@ export declare const ALLOWED_MUSCLE_GROUPS: Set<MuscleGroup>;
  * Consolidato per eliminare duplicazioni (Area 3 refactoring)
  */
 export declare const MUSCLE_GROUP_ALIASES: Record<string, MuscleGroup>;
-//# sourceMappingURL=constants.d.ts.map

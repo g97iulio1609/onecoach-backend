@@ -103,4 +103,3 @@ export declare function isValidSetGroup(setGroup: unknown): setGroup is SetGroup
  * Valida che un esercizio abbia setGroups validi.
  */
 export declare function hasValidSetGroups(exercise: unknown): boolean;
-//# sourceMappingURL=set-group-helpers.d.ts.map

@@ -6,7 +6,7 @@
  */
 import { prisma } from './prisma';
 import { Prisma } from '@prisma/client';
-import { createId } from '@OneCoach/lib-shared/id-generator';
+import { createId } from '@onecoach/lib-shared/id-generator';
 function sanitizeStringArray(values) {
     if (!values || values.length === 0) {
         return [];

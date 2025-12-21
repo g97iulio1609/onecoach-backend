@@ -49,4 +49,3 @@ export declare const marketplaceApi: {
      */
     getById(id: string): Promise<MarketplacePlanResponse>;
 };
-//# sourceMappingURL=marketplace.d.ts.map

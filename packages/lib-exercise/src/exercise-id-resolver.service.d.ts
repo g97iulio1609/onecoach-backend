@@ -31,4 +31,3 @@ export declare function resolveExerciseName(exerciseId: string, locale?: string)
  * @returns Record mapping ID → English name
  */
 export declare function buildExerciseIdMapForAI(ids: string[]): Promise<Record<string, string>>;
-//# sourceMappingURL=exercise-id-resolver.service.d.ts.map

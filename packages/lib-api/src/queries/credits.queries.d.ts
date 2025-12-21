@@ -56,4 +56,3 @@ export declare const creditsQueries: {
      */
     getHistory: (limit?: number) => Promise<CreditHistoryResponse>;
 };
-//# sourceMappingURL=credits.queries.d.ts.map

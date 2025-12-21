@@ -7,8 +7,8 @@
  * Model Configuration
  */
 export const MODEL_CONSTANTS = {
-    /** Default temperature for general chat */
-    DEFAULT_TEMPERATURE: 0.7,
+    /** Default temperature for general chat and generation */
+    DEFAULT_TEMPERATURE: 1,
     /** Temperature for intent detection (lower = more deterministic) */
     INTENT_DETECTION_TEMPERATURE: 0.3,
     /** Max tokens for reasoning mode with extended thinking */

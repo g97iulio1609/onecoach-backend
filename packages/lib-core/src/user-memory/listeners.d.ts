@@ -102,4 +102,3 @@ export declare function handlePreferenceChange(event: ChatEvent): Promise<void>;
  * Unified event handler that routes events to appropriate listeners
  */
 export declare function handleMemoryEvent(event: WorkoutEvent | NutritionEvent | OneAgendaEvent | ChatEvent): Promise<void>;
-//# sourceMappingURL=listeners.d.ts.map

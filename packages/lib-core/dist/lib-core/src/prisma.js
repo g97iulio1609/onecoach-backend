@@ -7,7 +7,8 @@
  * This file is server-only and should never be imported in client components.
  * Use dynamic imports when needed in server-side code that may be bundled with client code.
  */
-import 'server-only';
+// Note: 'server-only' import removed due to Turbopack bundler issues
+// This file is inherently server-only due to Node.js dependencies (pg, @prisma/client)
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -64,7 +65,7 @@ function normalizeDatabaseUrl(url) {
 // Lazy getter per Prisma Client
 function getPrismaClient() {
     ensureDatabaseUrl();
-    if (!globalForPrisma.prisma) {
+    if (!globalForPrisma.prisma_updated) {
         // In serverless environments (Vercel), prefer pooled connections
         // Use DATABASE_URL (pooled) instead of DIRECT_URL to avoid connection limits
         const rawDbUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
@@ -99,7 +100,7 @@ function getPrismaClient() {
         // Assicuriamoci che l'URL normalizzato sia impostato prima di creare il client
         const originalDbUrl = process.env.DATABASE_URL;
         process.env.DATABASE_URL = dbUrl;
-        globalForPrisma.prisma = new PrismaClient({
+        globalForPrisma.prisma_updated = new PrismaClient({
             adapter,
         });
         // Ripristina l'URL originale se era diverso (per compatibilità)
@@ -107,7 +108,7 @@ function getPrismaClient() {
             process.env.DATABASE_URL = originalDbUrl;
         }
     }
-    return globalForPrisma.prisma;
+    return globalForPrisma.prisma_updated;
 }
 // Export con Proxy per lazy initialization
 export const prisma = new Proxy({}, {
@@ -121,9 +122,9 @@ export const prisma = new Proxy({}, {
     },
 });
 export async function disconnectPrisma() {
-    if (globalForPrisma.prisma) {
-        await globalForPrisma.prisma.$disconnect();
-        globalForPrisma.prisma = undefined;
+    if (globalForPrisma.prisma_updated) {
+        await globalForPrisma.prisma_updated.$disconnect();
+        globalForPrisma.prisma_updated = undefined;
     }
     if (globalForPrisma.pool) {
         await globalForPrisma.pool.end();

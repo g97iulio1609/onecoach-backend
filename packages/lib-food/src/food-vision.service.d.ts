@@ -19,4 +19,3 @@ export declare class FoodVisionService {
      */
     static segmentDish(imageBase64: string, userId: string): Promise<DishSegmentationResult>;
 }
-//# sourceMappingURL=food-vision.service.d.ts.map

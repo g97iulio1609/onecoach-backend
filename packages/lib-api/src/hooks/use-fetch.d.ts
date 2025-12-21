@@ -34,4 +34,3 @@ export interface UseFetchReturn<T> {
  * ```
  */
 export declare function useFetch<T = unknown>(options: UseFetchOptions<T>): UseFetchReturn<T>;
-//# sourceMappingURL=use-fetch.d.ts.map

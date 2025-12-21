@@ -20,23 +20,19 @@ export class ConsentService {
             throw new Error(`Policy di tipo ${policyType} non trovata o non pubblicata`);
         }
         // Verifica se esiste già un consenso
-        const existingConsent = await prisma.user_consents.findUnique({
+        const existingConsent = await prisma.user_consents.findFirst({
             where: {
-                userId_policyId: {
-                    userId,
-                    policyId: policy.id,
-                },
+                userId,
+                policyId: policy.id,
             },
         });
         if (existingConsent) {
             // Se esiste e è già stato ritirato, aggiorna per riattivare
             if (!existingConsent.consented) {
-                await prisma.user_consents.update({
+                await prisma.user_consents.updateMany({
                     where: {
-                        userId_policyId: {
-                            userId,
-                            policyId: policy.id,
-                        },
+                        userId,
+                        policyId: policy.id,
                     },
                     data: {
                         consented: true,
@@ -51,12 +47,10 @@ export class ConsentService {
             }
             // Se già consenziente, aggiorna solo la versione se è cambiata
             else if (existingConsent.policyVersion !== policy.version) {
-                await prisma.user_consents.update({
+                await prisma.user_consents.updateMany({
                     where: {
-                        userId_policyId: {
-                            userId,
-                            policyId: policy.id,
-                        },
+                        userId,
+                        policyId: policy.id,
                     },
                     data: {
                         policyVersion: policy.version,
@@ -92,12 +86,10 @@ export class ConsentService {
         if (!policy) {
             throw new Error(`Policy di tipo ${policyType} non trovata`);
         }
-        await prisma.user_consents.update({
+        await prisma.user_consents.updateMany({
             where: {
-                userId_policyId: {
-                    userId,
-                    policyId: policy.id,
-                },
+                userId,
+                policyId: policy.id,
             },
             data: {
                 consented: false,
@@ -114,12 +106,10 @@ export class ConsentService {
         if (!policy) {
             return false;
         }
-        const consent = await prisma.user_consents.findUnique({
+        const consent = await prisma.user_consents.findFirst({
             where: {
-                userId_policyId: {
-                    userId,
-                    policyId: policy.id,
-                },
+                userId,
+                policyId: policy.id,
             },
         });
         return consent?.consented === true && consent.policyVersion === policy.version;

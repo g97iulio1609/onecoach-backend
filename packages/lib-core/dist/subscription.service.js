@@ -9,13 +9,13 @@ import { getStripe } from './stripe';
 import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
 import { creditService } from './credit.service';
 import { SetupIntentService } from './setup-intent.service';
-import { createId } from '@OneCoach/lib-shared/id-generator';
-import { getCreditsFromPriceId } from '@OneCoach/constants/credit-packs';
-import { getSubscriptionPriceId } from '@OneCoach/constants/subscription-prices';
+import { createId } from '@onecoach/lib-shared/id-generator';
+import { getCreditsFromPriceId } from '@onecoach/constants/credit-packs';
+import { getSubscriptionPriceId } from '@onecoach/constants/subscription-prices';
 // TODO: Import these when they are available via interface or shared package
-// import { AffiliateService } from '@OneCoach/lib-marketplace/affiliate.service';
-// import { OpenRouterSubkeyService } from '@OneCoach/lib-ai/openrouter-subkey.service';
-// import { PromotionService } from '@OneCoach/lib-marketplace/promotion.service';
+// import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
+// import { OpenRouterSubkeyService } from '@onecoach/lib-ai/openrouter-subkey.service';
+// import { PromotionService } from '@onecoach/lib-marketplace/promotion.service';
 /**
  * Implementazione Subscription Service
  */
@@ -78,13 +78,6 @@ export class SubscriptionService {
                 default_payment_method: paymentMethodId,
             },
         });
-        // Promotion logic (Placeholder)
-        let couponId;
-        if (promoCode) {
-            // TODO: Implement PromotionService logic
-            // const promoResult = await PromotionService.applyPromotionToCheckout(promoCode, userId);
-            // if (promoResult.success && promoResult.stripeCouponId) couponId = promoResult.stripeCouponId;
-        }
         const priceId = this.getPriceIdForPlan(plan);
         const subscriptionParams = {
             customer: customerId,
@@ -102,9 +95,6 @@ export class SubscriptionService {
                 ...(referralCode && { referralCode }),
             },
         };
-        if (couponId) {
-            subscriptionParams.coupon = couponId;
-        }
         return await stripe.subscriptions.create(subscriptionParams);
     }
     async getSubscription(userId) {
@@ -157,7 +147,10 @@ export class SubscriptionService {
         // TODO: Handle proration logic properly based on plan upgrade/downgrade
         // Get current subscription item
         const currentSub = await stripe.subscriptions.retrieve(dbSub.stripeSubscriptionId);
-        const itemId = currentSub.items.data[0].id;
+        const itemId = currentSub.items.data[0]?.id;
+        if (!itemId) {
+            throw new Error('Subscription item non trovato per aggiornamento');
+        }
         return await stripe.subscriptions.update(dbSub.stripeSubscriptionId, {
             items: [
                 {
@@ -167,6 +160,15 @@ export class SubscriptionService {
             ],
             proration_behavior: 'create_prorations',
         });
+    }
+    async getActiveSubscription(userId) {
+        const dbSub = await prisma.subscriptions.findFirst({
+            where: { userId, status: 'ACTIVE' },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (!dbSub)
+            return null;
+        return dbSub;
     }
     async createPortalSession(userId, returnUrl) {
         const user = await prisma.users.findUnique({
@@ -185,34 +187,41 @@ export class SubscriptionService {
         return session.url;
     }
     async handleWebhook(event) {
-        // Delegating implementation from apps/next
-        console.log(`[SubscriptionService] Handling webhook: ${event.type}`);
-        switch (event.type) {
-            case 'payment_intent.succeeded':
+        console.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
+        const eventType = event.type;
+        switch (eventType) {
+            case 'payment_intent.succeeded': {
                 await this.handlePaymentIntentSucceeded(event.data.object, event.id);
                 break;
+            }
             case 'payment_intent.refunded':
-            // @ts-expect-error - Stripe types might differ slightly
-            case 'charge.refunded':
+            case 'charge.refunded': {
                 await this.handlePaymentRefunded(event.data.object, event.id);
                 break;
-            case 'customer.subscription.created':
+            }
+            case 'customer.subscription.created': {
                 await this.handleSubscriptionCreated(event.data.object);
                 break;
-            case 'customer.subscription.updated':
+            }
+            case 'customer.subscription.updated': {
                 await this.handleSubscriptionUpdate(event.data.object);
                 break;
-            case 'customer.subscription.deleted':
+            }
+            case 'customer.subscription.deleted': {
                 await this.handleSubscriptionDeleted(event.data.object);
                 break;
-            case 'invoice.paid':
+            }
+            case 'invoice.paid': {
                 await this.handleInvoicePaid(event.data.object);
                 break;
-            case 'invoice.payment_failed':
+            }
+            case 'invoice.payment_failed': {
                 await this.handleInvoicePaymentFailed(event.data.object);
                 break;
-            default:
+            }
+            default: {
                 console.warn(`Unhandled event type: ${event.type}`);
+            }
         }
     }
     // ============================================
@@ -234,8 +243,8 @@ export class SubscriptionService {
                 stripeSubscriptionId: subscription.id,
                 stripeCustomerId: subscription.customer,
                 stripePriceId: subscription.items.data[0]?.price.id ?? '',
-                currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                currentPeriodStart: new Date((subscription.current_period_start ?? 0) * 1000),
+                currentPeriodEnd: new Date((subscription.current_period_end ?? 0) * 1000),
                 updatedAt: new Date(),
             },
         });
@@ -260,8 +269,8 @@ export class SubscriptionService {
                 where: { id: dbSubscription.id },
                 data: {
                     status: newStatus,
-                    currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                    currentPeriodStart: new Date((subscription.current_period_start ?? 0) * 1000),
+                    currentPeriodEnd: new Date((subscription.current_period_end ?? 0) * 1000),
                     cancelAtPeriodEnd: subscription.cancel_at_period_end,
                     updatedAt: new Date(),
                 },
@@ -282,10 +291,11 @@ export class SubscriptionService {
         // TODO: Call AffiliateService.handleSubscriptionCancellation for all
     }
     async handleInvoicePaid(invoice) {
-        if (!invoice.subscription)
+        const subscriptionId = invoice.subscription;
+        if (!subscriptionId)
             return;
         const subscription = await prisma.subscriptions.findFirst({
-            where: { stripeSubscriptionId: invoice.subscription },
+            where: { stripeSubscriptionId: subscriptionId },
         });
         if (subscription && subscription.plan === 'PLUS') {
             // Note: CreditService.renewMonthlyCredits might need to be implemented or exposed?
@@ -298,10 +308,11 @@ export class SubscriptionService {
         }
     }
     async handleInvoicePaymentFailed(invoice) {
-        if (!invoice.subscription)
+        const subscriptionId = invoice.subscription;
+        if (!subscriptionId)
             return;
         await prisma.subscriptions.updateMany({
-            where: { stripeSubscriptionId: invoice.subscription },
+            where: { stripeSubscriptionId: subscriptionId },
             data: {
                 status: 'PAST_DUE',
                 updatedAt: new Date(),
@@ -359,6 +370,7 @@ export class SubscriptionService {
     }
     async handlePaymentRefunded(refundData, eventId) {
         // TODO: Implement refund logic
+        console.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
     }
     mapStripeStatus(status) {
         switch (status) {
@@ -374,10 +386,10 @@ export class SubscriptionService {
     }
     getPriceIdForPlan(plan) {
         const priceId = getSubscriptionPriceId(plan);
-        if (!priceId && plan !== 'FREE') {
+        if (!priceId) {
             throw new Error(`Price ID not found for plan: ${plan}`);
         }
-        return priceId || '';
+        return priceId;
     }
 }
 /**

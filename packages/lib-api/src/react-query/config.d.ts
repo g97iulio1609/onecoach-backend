@@ -16,4 +16,3 @@ export declare const defaultQueryOptions: QueryClientConfig['defaultOptions'];
  * @returns QueryClientConfig
  */
 export declare function createQueryClientConfig(options?: Partial<QueryClientConfig>): QueryClientConfig;
-//# sourceMappingURL=config.d.ts.map

@@ -325,4 +325,3 @@ export interface GoalEventData {
     targetDate?: string;
     progress?: number;
 }
-//# sourceMappingURL=types.d.ts.map

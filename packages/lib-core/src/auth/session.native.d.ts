@@ -43,4 +43,3 @@ export declare function updateAccessToken(accessToken: string, expiresAt: number
  * Used to proactively refresh token
  */
 export declare function isSessionExpiringSoon(): Promise<boolean>;
-//# sourceMappingURL=session.native.d.ts.map

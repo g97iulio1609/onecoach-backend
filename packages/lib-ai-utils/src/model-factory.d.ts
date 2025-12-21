@@ -19,4 +19,3 @@ export declare function createModel(modelConfig: ModelConfig, apiKey?: string, t
  * Creates a model instance with reasoning capabilities
  */
 export declare function createReasoningModel(modelConfig: ModelConfig, apiKey?: string, enableReasoning?: boolean): LanguageModel;
-//# sourceMappingURL=model-factory.d.ts.map

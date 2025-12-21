@@ -18,6 +18,7 @@ import {
 } from '@onecoach/schemas';
 import { getModelByTier } from '@onecoach/lib-ai-agents/core/providers';
 import { createCustomModel } from '@onecoach/lib-ai-agents/utils/model-factory';
+import { MODEL_CONSTANTS } from '@onecoach/lib-ai-agents';
 import { AIProviderConfigService } from '@onecoach/lib-ai';
 import { streamText, Output, stepCountIs } from 'ai';
 import { parseJsonResponse } from '@onecoach/lib-ai-agents/utils/json-parser';
@@ -751,7 +752,7 @@ export class ExerciseAdminService {
     // Create AI agent configuration using shared utility
     const agentConfig = await createAIAgentConfig({
       modelTier: 'balanced',
-      temperature: 0.7,
+      temperature: MODEL_CONSTANTS.DEFAULT_TEMPERATURE,
       maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
     });
 
@@ -1120,7 +1121,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
       modelConfig,
       {
         maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
-        temperature: 0.3,
+        temperature: MODEL_CONSTANTS.INTENT_DETECTION_TEMPERATURE,
       },
       apiKey
     );

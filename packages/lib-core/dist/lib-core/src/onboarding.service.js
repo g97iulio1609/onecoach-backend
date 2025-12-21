@@ -5,7 +5,7 @@
  * Implementa IOnboardingService contract
  */
 import { prisma } from './prisma';
-import { createId } from '@OneCoach/lib-shared/id-generator';
+import { createId } from '@onecoach/lib-shared/id-generator';
 /**
  * Onboarding step configuration
  * Definisce i 15 step del wizard
@@ -117,7 +117,9 @@ export class OnboardingService {
                     currentStep: isOnboardingCompleted ? TOTAL_STEPS : nextStep,
                     completedSteps,
                     skippedSteps,
-                    metadata: Object.keys(progressMetadata).length > 0 ? progressMetadata : undefined,
+                    metadata: Object.keys(progressMetadata).length > 0
+                        ? progressMetadata
+                        : undefined,
                     isCompleted: isOnboardingCompleted,
                     completedAt: isOnboardingCompleted ? new Date() : undefined,
                     lastInteraction: new Date(),

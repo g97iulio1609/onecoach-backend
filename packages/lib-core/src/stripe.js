@@ -13,7 +13,7 @@ export function getStripe() {
         throw new Error('STRIPE_SECRET_KEY non configurata');
     }
     return new Stripe(secret, {
-        apiVersion: '2025-11-17.clover',
+        apiVersion: '2025-12-15.clover',
         typescript: true,
         appInfo: {
             name: 'onecoach',

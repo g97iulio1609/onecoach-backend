@@ -17,4 +17,3 @@ export declare class NativeApiClient extends BaseApiClient {
     private refreshAccessToken;
     request<T>(endpoint: string, options?: RequestOptions): Promise<T>;
 }
-//# sourceMappingURL=native-client.d.ts.map

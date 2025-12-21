@@ -16,7 +16,7 @@ export declare function useProfile(): import("@tanstack/react-query").UseQueryRe
  *
  * @returns Mutation result with update function
  */
-export declare function useUpdateProfile(): import("@tanstack/react-query").UseMutationResult<UserProfileData, Error, Partial<Omit<UserProfileData, "userId" | "id">>, {
+export declare function useUpdateProfile(): import("@tanstack/react-query").UseMutationResult<UserProfileData, Error, Partial<Omit<UserProfileData, "id" | "userId">>, {
     previousProfile: UserProfileData | undefined;
 }>;
 /**

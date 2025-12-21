@@ -22,4 +22,3 @@ export type { OneRepMaxResponse } from './profile';
 export type { AnalyticsOverviewParams, AnalyticsOverviewResponse, ChartDataParams, } from './analytics';
 export type { TemplateResponse, TemplatesResponse } from './templates';
 export type { MarketplacePlan, MarketplacePlansResponse, MarketplacePlanResponse, } from './marketplace';
-//# sourceMappingURL=index.d.ts.map

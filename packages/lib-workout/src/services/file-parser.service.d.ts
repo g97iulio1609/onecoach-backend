@@ -80,4 +80,3 @@ export declare class FileParserService {
      */
     static combinePrograms(programs: ImportedWorkoutProgram[]): ImportedWorkoutProgram;
 }
-//# sourceMappingURL=file-parser.service.d.ts.map

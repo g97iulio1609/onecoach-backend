@@ -5,6 +5,7 @@
  * Segue KISS/DRY: espone helper riutilizzabili sia su client che server.
  */
 export type AppUserRole = 'USER' | 'ADMIN' | 'SUPER_ADMIN' | 'COACH';
+export type UserRole = AppUserRole;
 export declare const ADMIN_ROLES: ReadonlyArray<AppUserRole>;
 /**
  * Normalizza qualsiasi input ruolo (enum, stringa, alias) in un valore canonico.

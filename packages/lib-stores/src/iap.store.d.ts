@@ -128,4 +128,3 @@ export declare const useIAPPurchase: () => {
     setError: (error: IAPError | null) => void;
     clearError: () => void;
 };
-//# sourceMappingURL=iap.store.d.ts.map

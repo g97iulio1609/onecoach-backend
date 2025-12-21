@@ -23,11 +23,11 @@ export declare class InvitationService {
      */
     static createInvitation(input: CreateInvitationInput): Promise<{
         id: string;
+        type: import("@prisma/client").$Enums.InvitationType;
         status: import("@prisma/client").$Enums.InvitationStatus;
-        metadata: Prisma.JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
-        type: import("@prisma/client").$Enums.InvitationType;
+        metadata: Prisma.JsonValue | null;
         expiresAt: Date | null;
         createdById: string | null;
         code: string;
@@ -43,11 +43,11 @@ export declare class InvitationService {
      */
     static useInvitation(code: string, userId: string): Promise<{
         id: string;
+        type: import("@prisma/client").$Enums.InvitationType;
         status: import("@prisma/client").$Enums.InvitationStatus;
-        metadata: Prisma.JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
-        type: import("@prisma/client").$Enums.InvitationType;
+        metadata: Prisma.JsonValue | null;
         expiresAt: Date | null;
         createdById: string | null;
         code: string;
@@ -59,11 +59,11 @@ export declare class InvitationService {
      */
     static revokeInvitation(id: string): Promise<{
         id: string;
+        type: import("@prisma/client").$Enums.InvitationType;
         status: import("@prisma/client").$Enums.InvitationStatus;
-        metadata: Prisma.JsonValue | null;
         createdAt: Date;
         updatedAt: Date;
-        type: import("@prisma/client").$Enums.InvitationType;
+        metadata: Prisma.JsonValue | null;
         expiresAt: Date | null;
         createdById: string | null;
         code: string;
@@ -81,20 +81,20 @@ export declare class InvitationService {
         search?: string;
     }): Promise<{
         items: ({
+            _count: {
+                uses: number;
+            };
             createdBy: {
                 name: string | null;
                 email: string;
             } | null;
-            _count: {
-                uses: number;
-            };
         } & {
             id: string;
+            type: import("@prisma/client").$Enums.InvitationType;
             status: import("@prisma/client").$Enums.InvitationStatus;
-            metadata: Prisma.JsonValue | null;
             createdAt: Date;
             updatedAt: Date;
-            type: import("@prisma/client").$Enums.InvitationType;
+            metadata: Prisma.JsonValue | null;
             expiresAt: Date | null;
             createdById: string | null;
             code: string;

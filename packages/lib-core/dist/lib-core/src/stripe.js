@@ -16,7 +16,7 @@ export function getStripe() {
         apiVersion: '2025-11-17.clover',
         typescript: true,
         appInfo: {
-            name: 'OneCoach',
+            name: 'onecoach',
             version: '0.1.0',
         },
     });

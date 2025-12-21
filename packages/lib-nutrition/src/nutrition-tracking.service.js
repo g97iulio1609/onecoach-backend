@@ -10,74 +10,36 @@
  * - Dependency Inversion: Depends on Prisma abstraction
  */
 import { prisma } from '@onecoach/lib-core/prisma';
-import { toMacros, ensureDecimalNumber, toJsonArray } from '@onecoach/lib-shared';
+import { Prisma } from '@prisma/client';
+import { toMacros, ensureDecimalNumber } from '@onecoach/lib-shared';
 const db = prisma;
-/**
- * Helper: Extract day from weeks structure type-safely
- */
-function extractDayFromWeeks(weeks, weekNumber, dayNumber) {
-  // Handle both array and stringified JSON
-  let weeksArray;
-  if (typeof weeks === 'string') {
-    try {
-      weeksArray = JSON.parse(weeks);
-    } catch {
-      console.error('[extractDayFromWeeks] Failed to parse weeks string');
-      return null;
-    }
-  } else {
-    weeksArray = toJsonArray(weeks);
-  }
-  if (!Array.isArray(weeksArray) || weeksArray.length === 0) {
-    console.error('[extractDayFromWeeks] No valid weeks array:', {
-      weeksType: typeof weeks,
-      weeksIsArray: Array.isArray(weeks),
-      parsedIsArray: Array.isArray(weeksArray),
-    });
-    return null;
-  }
-  const week = weeksArray.find(
-    (w) => typeof w === 'object' && w !== null && w.weekNumber === weekNumber
-  );
-  if (!week || !Array.isArray(week.days)) {
-    console.error('[extractDayFromWeeks] Week or days not found:', {
-      weekNumber,
-      weekFound: !!week,
-      hasDays: week ? !!week.days : false,
-      daysIsArray: week ? Array.isArray(week.days) : false,
-    });
-    return null;
-  }
-  const day = week.days.find(
-    (d) => typeof d === 'object' && d !== null && d.dayNumber === dayNumber
-  );
-  return day || null;
-}
 /**
  * Convert database record to domain type
  */
 function toNutritionDayLog(record) {
-  const waterIntakeValue = record.waterIntake;
-  const waterIntake =
-    waterIntakeValue !== null && waterIntakeValue !== undefined
-      ? ensureDecimalNumber(waterIntakeValue)
-      : null;
-  return {
-    id: record.id,
-    userId: record.userId,
-    planId: record.planId,
-    weekNumber: record.weekNumber,
-    dayNumber: record.dayNumber,
-    date: record.date,
-    meals: record.meals,
-    actualDailyMacros: record.actualDailyMacros,
-    waterIntake,
-    notes: record.notes,
-    createdAt: record.createdAt,
-    updatedAt: record.updatedAt,
-  };
+    const waterIntakeValue = record.waterIntake;
+    const waterIntake = waterIntakeValue !== null && waterIntakeValue !== undefined
+        ? ensureDecimalNumber(Number(waterIntakeValue))
+        : null;
+    const actualDailyMacros = record.actualDailyMacros !== null && record.actualDailyMacros !== undefined
+        ? toMacros(record.actualDailyMacros)
+        : null;
+    return {
+        id: record.id,
+        userId: record.userId,
+        planId: record.planId,
+        weekNumber: record.weekNumber,
+        dayNumber: record.dayNumber,
+        date: record.date,
+        meals: record.meals,
+        actualDailyMacros,
+        waterIntake,
+        notes: record.notes,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+    };
 }
-import { normalizeNutritionPlan } from '@onecoach/lib-nutrition/helpers/plan-transform';
+import { normalizeNutritionPlan, } from '@onecoach/lib-nutrition/helpers/plan-transform';
 /**
  * Create a new nutrition day log
  *
@@ -85,91 +47,92 @@ import { normalizeNutritionPlan } from '@onecoach/lib-nutrition/helpers/plan-tra
  * Log starts with all tracking fields empty (to be filled by user).
  */
 export async function createNutritionDayLog(userId, request) {
-  const { planId, weekNumber, dayNumber, date, notes } = request;
-  console.warn('[createNutritionDayLog] Creating log:', {
-    planId,
-    weekNumber,
-    dayNumber,
-    date,
-  });
-  // Fetch the nutrition plan to get the meals for this day
-  const rawPlan = await prisma.nutrition_plans.findUnique({
-    where: { id: planId },
-  });
-  if (!rawPlan) {
-    throw new Error('Piano nutrizionale non trovato');
-  }
-  if (rawPlan.userId !== userId) {
-    throw new Error('Non hai i permessi per accedere a questo piano');
-  }
-  // Normalize plan to ensure structure consistency (fixes empty meals issue)
-  const plan = normalizeNutritionPlan(rawPlan);
-  // Debug: Log plan weeks structure
-  console.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
-    planId: plan.id,
-    weeksCount: plan.weeks.length,
-    firstWeekDays: plan.weeks[0]?.days?.length ?? 0,
-  });
-  // Extract meals from the plan's week/day structure using normalized plan
-  const week = plan.weeks.find((w) => w.weekNumber === weekNumber);
-  const day = week?.days.find((d) => d.dayNumber === dayNumber);
-  if (!day) {
-    console.error('[createNutritionDayLog] Day not found:', {
-      weekNumber,
-      dayNumber,
-      weeksCount: plan.weeks.length,
+    const { planId, weekNumber, dayNumber, date, notes } = request;
+    console.warn('[createNutritionDayLog] Creating log:', {
+        planId,
+        weekNumber,
+        dayNumber,
+        date,
     });
-    throw new Error(`Giorno ${dayNumber} della settimana ${weekNumber} non trovato nel piano`);
-  }
-  console.warn('[createNutritionDayLog] Day found:', {
-    dayNumber: day.dayNumber,
-    dayName: day.dayName,
-    mealsCount: day.meals.length,
-    firstMealFoods: day.meals[0]?.foods?.length ?? 0,
-  });
-  const logDate = date || new Date();
-  // Check if log already exists for this day
-  const existing = await db.nutrition_day_logs.findFirst({
-    where: {
-      userId,
-      planId,
-      weekNumber,
-      dayNumber,
-      date: logDate,
-    },
-  });
-  if (existing) {
-    throw new Error('Esiste già un log per questo giorno');
-  }
-  // Create log with meals (tracking fields will be filled during day)
-  const log = await db.nutrition_day_logs.create({
-    data: {
-      userId,
-      planId,
-      weekNumber,
-      dayNumber,
-      date: logDate,
-      meals: day.meals, // Normalized meals are safe
-      notes,
-    },
-  });
-  return toNutritionDayLog(log);
+    // Fetch the nutrition plan to get the meals for this day
+    const rawPlan = await prisma.nutrition_plans.findUnique({
+        where: { id: planId },
+    });
+    if (!rawPlan) {
+        throw new Error('Piano nutrizionale non trovato');
+    }
+    if (rawPlan.userId !== userId) {
+        throw new Error('Non hai i permessi per accedere a questo piano');
+    }
+    // Normalize plan to ensure structure consistency (fixes empty meals issue)
+    const plan = normalizeNutritionPlan(rawPlan);
+    // Debug: Log plan weeks structure
+    console.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
+        planId: plan.id,
+        weeksCount: plan.weeks.length,
+        firstWeekDays: plan.weeks[0]?.days?.length ?? 0,
+    });
+    // Extract meals from the plan's week/day structure using normalized plan
+    const week = plan.weeks.find((w) => w.weekNumber === weekNumber);
+    const day = week?.days.find((d) => d.dayNumber === dayNumber);
+    if (!day) {
+        console.error('[createNutritionDayLog] Day not found:', {
+            weekNumber,
+            dayNumber,
+            weeksCount: plan.weeks.length,
+        });
+        throw new Error(`Giorno ${dayNumber} della settimana ${weekNumber} non trovato nel piano`);
+    }
+    console.warn('[createNutritionDayLog] Day found:', {
+        dayNumber: day.dayNumber,
+        dayName: day.dayName,
+        mealsCount: day.meals.length,
+        firstMealFoods: day.meals[0]?.foods?.length ?? 0,
+    });
+    const logDate = date || new Date();
+    // Check if log already exists for this day
+    const existing = await db.nutrition_day_logs.findFirst({
+        where: {
+            userId,
+            planId,
+            weekNumber,
+            dayNumber,
+            date: logDate,
+        },
+    });
+    if (existing) {
+        throw new Error('Esiste già un log per questo giorno');
+    }
+    // Create log with meals (tracking fields will be filled during day)
+    const log = await db.nutrition_day_logs.create({
+        data: {
+            userId,
+            planId,
+            weekNumber,
+            dayNumber,
+            date: logDate,
+            meals: day.meals, // Normalized meals are safe
+            actualDailyMacros: Prisma.JsonNull,
+            notes,
+        },
+    });
+    return toNutritionDayLog(log);
 }
 /**
  * Get a nutrition day log by ID
  */
 export async function getNutritionDayLog(logId, userId) {
-  const log = await db.nutrition_day_logs.findUnique({
-    where: { id: logId },
-  });
-  if (!log) {
-    return null;
-  }
-  // Verify ownership
-  if (log.userId !== userId) {
-    throw new Error('Non hai i permessi per accedere a questo log');
-  }
-  return toNutritionDayLog(log);
+    const log = await db.nutrition_day_logs.findUnique({
+        where: { id: logId },
+    });
+    if (!log) {
+        return null;
+    }
+    // Verify ownership
+    if (log.userId !== userId) {
+        throw new Error('Non hai i permessi per accedere a questo log');
+    }
+    return toNutritionDayLog(log);
 }
 /**
  * Get all nutrition day logs for a user
@@ -179,42 +142,42 @@ export async function getNutritionDayLog(logId, userId) {
  * @param limit - Max number of logs to return
  */
 export async function getNutritionDayLogs(userId, planId, limit) {
-  const logs = await db.nutrition_day_logs.findMany({
-    where: {
-      userId,
-      ...(planId && { planId }),
-    },
-    orderBy: {
-      date: 'desc',
-    },
-    ...(limit && { take: limit }),
-  });
-  return logs.map(toNutritionDayLog);
+    const logs = await db.nutrition_day_logs.findMany({
+        where: {
+            userId,
+            ...(planId && { planId }),
+        },
+        orderBy: {
+            date: 'desc',
+        },
+        ...(limit && { take: limit }),
+    });
+    return logs.map(toNutritionDayLog);
 }
 /**
  * Get all logs for a specific nutrition plan
  */
 export async function getPlanLogs(planId, userId) {
-  return getNutritionDayLogs(userId, planId);
+    return getNutritionDayLogs(userId, planId);
 }
 /**
  * Get log for a specific day
  */
 export async function getLogForDay(userId, planId, weekNumber, dayNumber, date) {
-  const queryDate = date || new Date();
-  const log = await db.nutrition_day_logs.findFirst({
-    where: {
-      userId,
-      planId,
-      weekNumber,
-      dayNumber,
-      date: queryDate,
-    },
-  });
-  if (!log) {
-    return null;
-  }
-  return toNutritionDayLog(log);
+    const queryDate = date || new Date();
+    const log = await db.nutrition_day_logs.findFirst({
+        where: {
+            userId,
+            planId,
+            weekNumber,
+            dayNumber,
+            date: queryDate,
+        },
+    });
+    if (!log) {
+        return null;
+    }
+    return toNutritionDayLog(log);
 }
 /**
  * Update a nutrition day log
@@ -222,37 +185,39 @@ export async function getLogForDay(userId, planId, weekNumber, dayNumber, date) 
  * Typically called during or after meals to update tracking data.
  */
 export async function updateNutritionDayLog(logId, userId, updates) {
-  const log = await getNutritionDayLog(logId, userId);
-  if (!log) {
-    throw new Error('Log non trovato');
-  }
-  const updated = await db.nutrition_day_logs.update({
-    where: { id: logId },
-    data: {
-      ...(updates.meals && { meals: updates.meals }),
-      ...(updates.actualDailyMacros !== undefined && {
-        actualDailyMacros: updates.actualDailyMacros,
-      }),
-      ...(updates.waterIntake !== undefined && {
-        waterIntake: updates.waterIntake !== null ? updates.waterIntake : null,
-      }),
-      ...(updates.notes !== undefined && { notes: updates.notes }),
-      updatedAt: new Date(),
-    },
-  });
-  return toNutritionDayLog(updated);
+    const log = await getNutritionDayLog(logId, userId);
+    if (!log) {
+        throw new Error('Log non trovato');
+    }
+    const updated = await db.nutrition_day_logs.update({
+        where: { id: logId },
+        data: {
+            ...(updates.meals && { meals: updates.meals }),
+            ...(updates.actualDailyMacros !== undefined && {
+                actualDailyMacros: updates.actualDailyMacros === null
+                    ? Prisma.JsonNull
+                    : updates.actualDailyMacros,
+            }),
+            ...(updates.waterIntake !== undefined && {
+                waterIntake: updates.waterIntake !== null ? updates.waterIntake : null,
+            }),
+            ...(updates.notes !== undefined && { notes: updates.notes }),
+            updatedAt: new Date(),
+        },
+    });
+    return toNutritionDayLog(updated);
 }
 /**
  * Delete a nutrition day log
  */
 export async function deleteNutritionDayLog(logId, userId) {
-  const log = await getNutritionDayLog(logId, userId);
-  if (!log) {
-    throw new Error('Log non trovato');
-  }
-  await db.nutrition_day_logs.delete({
-    where: { id: logId },
-  });
+    const log = await getNutritionDayLog(logId, userId);
+    if (!log) {
+        throw new Error('Log non trovato');
+    }
+    await db.nutrition_day_logs.delete({
+        where: { id: logId },
+    });
 }
 /**
  * Get nutrition plan statistics
@@ -260,62 +225,57 @@ export async function deleteNutritionDayLog(logId, userId) {
  * Calculates adherence rate, average macros, etc. for a plan.
  */
 export async function getNutritionPlanStats(planId, userId) {
-  const plan = await prisma.nutrition_plans.findUnique({
-    where: { id: planId },
-  });
-  if (!plan) {
-    throw new Error('Piano nutrizionale non trovato');
-  }
-  if (plan.userId !== userId) {
-    throw new Error('Non hai i permessi per accedere a questo piano');
-  }
-  const logs = await db.nutrition_day_logs.findMany({
-    where: {
-      planId,
-      userId,
-    },
-  });
-  // Use helper function for future-proof access to plan structure
-  const { getNutritionPlanTotalDays } =
-    await import('@onecoach/lib-shared/utils/nutrition-plan-helpers');
-  const { normalizeNutritionPlan } = await import('@onecoach/lib-nutrition/helpers/plan-transform');
-  const normalizedPlan = normalizeNutritionPlan(plan);
-  const totalDays = getNutritionPlanTotalDays(normalizedPlan);
-  const loggedDays = logs.length;
-  // Calculate average macros from logs with actualDailyMacros
-  const logsWithMacros = logs.filter((l) => l.actualDailyMacros !== null);
-  const totalMacros = logsWithMacros.reduce(
-    (acc, log) => {
-      const macros = toMacros(log.actualDailyMacros);
-      return {
-        calories: acc.calories + (macros?.calories || 0),
-        protein: acc.protein + (macros?.protein || 0),
-        carbs: acc.carbs + (macros?.carbs || 0),
-        fats: acc.fats + (macros?.fats || 0),
-      };
-    },
-    { calories: 0, protein: 0, carbs: 0, fats: 0 }
-  );
-  const avgCount = logsWithMacros.length || 1;
-  // Calculate average water intake
-  const logsWithWater = logs.filter((l) => l.waterIntake !== null);
-  const totalWater = logsWithWater.reduce((sum, log) => sum + Number(log.waterIntake || 0), 0);
-  const averageWaterIntake =
-    logsWithWater.length > 0 ? totalWater / logsWithWater.length : undefined;
-  const sortedLogs = [...logs].sort((a, b) => b.date.getTime() - a.date.getTime());
-  const lastLog = sortedLogs[0];
-  return {
-    planId,
-    totalDays,
-    loggedDays,
-    adherenceRate: totalDays > 0 ? (loggedDays / totalDays) * 100 : 0,
-    averageCalories: logsWithMacros.length > 0 ? totalMacros.calories / avgCount : undefined,
-    averageProtein: logsWithMacros.length > 0 ? totalMacros.protein / avgCount : undefined,
-    averageCarbs: logsWithMacros.length > 0 ? totalMacros.carbs / avgCount : undefined,
-    averageFats: logsWithMacros.length > 0 ? totalMacros.fats / avgCount : undefined,
-    averageWaterIntake,
-    lastLogDate: lastLog?.date,
-  };
+    const plan = await prisma.nutrition_plans.findUnique({
+        where: { id: planId },
+    });
+    if (!plan) {
+        throw new Error('Piano nutrizionale non trovato');
+    }
+    if (plan.userId !== userId) {
+        throw new Error('Non hai i permessi per accedere a questo piano');
+    }
+    const logs = await db.nutrition_day_logs.findMany({
+        where: {
+            planId,
+            userId,
+        },
+    });
+    // Use helper function for future-proof access to plan structure
+    const { getNutritionPlanTotalDays } = await import('@onecoach/lib-shared/utils/nutrition-plan-helpers');
+    const { normalizeNutritionPlan: normalizePlanDynamic } = await import('@onecoach/lib-nutrition/helpers/plan-transform');
+    const normalizedPlan = normalizePlanDynamic(plan);
+    const totalDays = getNutritionPlanTotalDays(normalizedPlan);
+    const loggedDays = logs.length;
+    // Calculate average macros from logs with actualDailyMacros
+    const logsWithMacros = logs.filter((l) => l.actualDailyMacros !== null);
+    const totalMacros = logsWithMacros.reduce((acc, log) => {
+        const macros = toMacros(log.actualDailyMacros);
+        return {
+            calories: acc.calories + (macros?.calories || 0),
+            protein: acc.protein + (macros?.protein || 0),
+            carbs: acc.carbs + (macros?.carbs || 0),
+            fats: acc.fats + (macros?.fats || 0),
+        };
+    }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+    const avgCount = logsWithMacros.length || 1;
+    // Calculate average water intake
+    const logsWithWater = logs.filter((l) => l.waterIntake !== null);
+    const totalWater = logsWithWater.reduce((sum, log) => sum + Number(log.waterIntake || 0), 0);
+    const averageWaterIntake = logsWithWater.length > 0 ? totalWater / logsWithWater.length : undefined;
+    const sortedLogs = [...logs].sort((a, b) => b.date.getTime() - a.date.getTime());
+    const lastLog = sortedLogs[0];
+    return {
+        planId,
+        totalDays,
+        loggedDays,
+        adherenceRate: totalDays > 0 ? (loggedDays / totalDays) * 100 : 0,
+        averageCalories: logsWithMacros.length > 0 ? totalMacros.calories / avgCount : undefined,
+        averageProtein: logsWithMacros.length > 0 ? totalMacros.protein / avgCount : undefined,
+        averageCarbs: logsWithMacros.length > 0 ? totalMacros.carbs / avgCount : undefined,
+        averageFats: logsWithMacros.length > 0 ? totalMacros.fats / avgCount : undefined,
+        averageWaterIntake,
+        lastLogDate: lastLog?.date,
+    };
 }
 /**
  * Calculate actual daily macros from meals
@@ -324,29 +284,23 @@ export async function getNutritionPlanStats(planId, userId) {
  * Uses actualMacros if present, otherwise uses planned macros.
  */
 export function calculateActualDailyMacros(meals) {
-  return meals.reduce(
-    (dailyTotal, meal) => {
-      const mealMacros = (meal.foods || []).reduce(
-        (mealTotal, food) => {
-          const macros = food.actualMacros || food.macros;
-          return {
-            calories: mealTotal.calories + (macros?.calories || 0),
-            protein: mealTotal.protein + (macros?.protein || 0),
-            carbs: mealTotal.carbs + (macros?.carbs || 0),
-            fats: mealTotal.fats + (macros?.fats || 0),
-            fiber: (mealTotal.fiber || 0) + (macros?.fiber || 0),
-          };
-        },
-        { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }
-      );
-      return {
-        calories: dailyTotal.calories + mealMacros.calories,
-        protein: dailyTotal.protein + mealMacros.protein,
-        carbs: dailyTotal.carbs + mealMacros.carbs,
-        fats: dailyTotal.fats + mealMacros.fats,
-        fiber: (dailyTotal.fiber || 0) + mealMacros.fiber,
-      };
-    },
-    { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }
-  );
+    return meals.reduce((dailyTotal, meal) => {
+        const mealMacros = (meal.foods || []).reduce((mealTotal, food) => {
+            const macros = food.actualMacros || food.macros;
+            return {
+                calories: mealTotal.calories + (macros?.calories || 0),
+                protein: mealTotal.protein + (macros?.protein || 0),
+                carbs: mealTotal.carbs + (macros?.carbs || 0),
+                fats: mealTotal.fats + (macros?.fats || 0),
+                fiber: (mealTotal.fiber || 0) + (macros?.fiber || 0),
+            };
+        }, { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 });
+        return {
+            calories: dailyTotal.calories + mealMacros.calories,
+            protein: dailyTotal.protein + mealMacros.protein,
+            carbs: dailyTotal.carbs + mealMacros.carbs,
+            fats: dailyTotal.fats + mealMacros.fats,
+            fiber: (dailyTotal.fiber || 0) + mealMacros.fiber,
+        };
+    }, { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 });
 }

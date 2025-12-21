@@ -71,4 +71,10 @@ export const foodApi = {
     async updateWithAI(id, data) {
         return apiClient.put(`/api/admin/foods/ai-update/${id}`, data);
     },
+    /**
+     * Batch operations (delete, update)
+     */
+    async batch(action, ids, data) {
+        return apiClient.post('/api/admin/foods/batch', { action, ids, data });
+    },
 };

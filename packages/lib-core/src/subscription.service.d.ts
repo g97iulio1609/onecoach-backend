@@ -23,13 +23,13 @@ export declare class SubscriptionService implements ISubscriptionService {
     cancelSubscription(userId: string): Promise<void>;
     updateSubscription(userId: string, plan: SubscriptionPlan): Promise<Stripe.Subscription>;
     getActiveSubscription(userId: string): Promise<{
-        userId: string | null;
         id: string;
         status: import("@prisma/client").$Enums.SubscriptionStatus;
-        plan: import("@prisma/client").$Enums.SubscriptionPlan;
+        stripeCustomerId: string | null;
         createdAt: Date;
         updatedAt: Date;
-        stripeCustomerId: string | null;
+        userId: string | null;
+        plan: import("@prisma/client").$Enums.SubscriptionPlan;
         stripeSubscriptionId: string | null;
         stripePriceId: string | null;
         currentPeriodStart: Date;
@@ -52,4 +52,3 @@ export declare class SubscriptionService implements ISubscriptionService {
  * Singleton instance
  */
 export declare const subscriptionService: SubscriptionService;
-//# sourceMappingURL=subscription.service.d.ts.map

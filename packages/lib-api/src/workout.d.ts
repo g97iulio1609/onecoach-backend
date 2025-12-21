@@ -53,4 +53,3 @@ export declare const workoutApi: {
         session: unknown;
     }>;
 };
-//# sourceMappingURL=workout.d.ts.map

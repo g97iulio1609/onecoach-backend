@@ -22,4 +22,3 @@ export declare function useHealth(): {
     isAutoSyncEnabled: boolean;
     getHealthData: (_dataType: HealthDataType, _startDate: Date, _endDate: Date) => Promise<unknown[]>;
 };
-//# sourceMappingURL=use-health-native.d.ts.map

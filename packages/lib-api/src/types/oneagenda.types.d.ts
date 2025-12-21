@@ -51,4 +51,3 @@ export type Goal = {
     updatedAt?: string;
     [key: string]: unknown;
 };
-//# sourceMappingURL=oneagenda.types.d.ts.map

@@ -63,4 +63,3 @@ export declare const milestonesApi: {
     }>;
     delete: (id: string) => Promise<void>;
 };
-//# sourceMappingURL=projects.d.ts.map

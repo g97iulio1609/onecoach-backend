@@ -76,4 +76,3 @@ export interface ServiceLogger {
     warn: (step: string, message: string, data?: unknown) => void;
     debug?: (step: string, message: string, data?: unknown) => void;
 }
-//# sourceMappingURL=safe-types.d.ts.map

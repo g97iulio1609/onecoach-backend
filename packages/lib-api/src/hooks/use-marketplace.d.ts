@@ -16,4 +16,3 @@ export declare function useMarketplacePlansInfinite(filters?: MarketplaceFilters
  * Hook to get a marketplace plan by ID
  */
 export declare function useMarketplacePlan(id: string | null | undefined): import("@tanstack/react-query").UseQueryResult<import("../queries/marketplace.queries").MarketplacePlanResponse, Error>;
-//# sourceMappingURL=use-marketplace.d.ts.map

@@ -58,12 +58,11 @@ export declare class PromotionService {
     static getPromotionByCode(code: string): Promise<{
         id: string;
         description: string | null;
-        type: import("@prisma/client").$Enums.PromotionType;
-        code: string;
         createdAt: Date;
         updatedAt: Date;
+        type: import("@prisma/client").$Enums.PromotionType;
         isActive: boolean;
-        createdBy: string;
+        code: string;
         stripeCouponId: string | null;
         discountType: import("@prisma/client").$Enums.DiscountType | null;
         discountValue: Prisma.Decimal | null;
@@ -72,6 +71,7 @@ export declare class PromotionService {
         maxUsesPerUser: number;
         validFrom: Date;
         validUntil: Date | null;
+        createdBy: string;
     } | null>;
     /**
      * Conta usi di una promozione per utente
@@ -97,4 +97,3 @@ export declare class PromotionService {
      */
     static applyPromotionToCheckout(code: string, userId: string): Promise<ApplyPromotionResult>;
 }
-//# sourceMappingURL=promotion.service.d.ts.map

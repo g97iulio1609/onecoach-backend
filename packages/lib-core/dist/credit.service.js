@@ -189,8 +189,13 @@ export class CreditService {
         const activeSubscription = user?.subscriptions?.[0];
         return activeSubscription?.status === 'ACTIVE' && activeSubscription.plan === 'PRO';
     }
+    async getCreditHistory(userId, limit = 100) {
+        const history = await prisma.credit_transactions.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+        });
+        return history;
+    }
 }
-/**
- * Singleton instance
- */
 export const creditService = new CreditService();

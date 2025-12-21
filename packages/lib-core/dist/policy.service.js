@@ -4,8 +4,7 @@
  * Gestione delle policy pages (Privacy, Terms, GDPR, Content Policy)
  */
 import { prisma } from './prisma';
-import { Prisma } from '@prisma/client';
-import { PolicyType, PolicyStatus } from '@prisma/client';
+import { PolicyStatus, PolicyType, Prisma } from '@prisma/client';
 /**
  * Policy Service
  */
@@ -127,8 +126,14 @@ export class PolicyService {
         }
         // Prepara i dati da aggiornare
         const updateData = {
-            updatedById,
             updatedAt: new Date(),
+            ...(updatedById
+                ? {
+                    updatedBy: {
+                        connect: { id: updatedById },
+                    },
+                }
+                : {}),
         };
         if (slug !== undefined)
             updateData.slug = slug;

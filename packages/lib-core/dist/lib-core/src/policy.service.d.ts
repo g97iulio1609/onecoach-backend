@@ -3,8 +3,8 @@
  *
  * Gestione delle policy pages (Privacy, Terms, GDPR, Content Policy)
  */
+import { PolicyStatus, PolicyType } from '@prisma/client';
 import type { policies, policy_history } from '@prisma/client';
-import { PolicyType, PolicyStatus } from '@prisma/client';
 export interface CreatePolicyParams {
     slug: string;
     type: PolicyType;

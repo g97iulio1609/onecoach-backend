@@ -44,8 +44,8 @@ function transformMeasurement(record) {
         bmr: record.bmr ? Number(record.bmr) : undefined,
         notes: record.notes ?? undefined,
         photos: record.photos ?? [],
-        createdAt: record.createdAt ? new Date(record.createdAt) : new Date(),
-        updatedAt: record.updatedAt ? new Date(record.updatedAt) : new Date(),
+        createdAt: record.createdAt ? new Date(record.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: record.updatedAt ? new Date(record.updatedAt).toISOString() : new Date().toISOString(),
     };
 }
 /**

@@ -14,4 +14,3 @@ export declare class UserProfileService implements IUserProfileService {
     update(userId: string, input: UserProfileInput): Promise<user_profiles>;
 }
 export declare const userProfileService: UserProfileService;
-//# sourceMappingURL=user-profile.service.d.ts.map

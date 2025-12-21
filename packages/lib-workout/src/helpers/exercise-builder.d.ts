@@ -13,4 +13,3 @@ import type { LocalizedExercise } from '@onecoach/lib-exercise';
  * Costruisce un Exercise da un LocalizedExercise del catalogo
  */
 export declare function buildWorkoutExerciseFromCatalog(exercise: LocalizedExercise): Exercise;
-//# sourceMappingURL=exercise-builder.d.ts.map

@@ -112,4 +112,3 @@ export declare class ExerciseService {
 }
 export declare const exerciseService: typeof ExerciseService;
 export {};
-//# sourceMappingURL=exercise.service.d.ts.map

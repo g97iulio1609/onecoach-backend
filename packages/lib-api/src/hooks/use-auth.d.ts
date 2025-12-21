@@ -89,4 +89,3 @@ export declare function useIsCoach(): boolean;
  */
 export declare function useIsAthlete(): boolean;
 export {};
-//# sourceMappingURL=use-auth.d.ts.map

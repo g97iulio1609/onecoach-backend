@@ -20,4 +20,3 @@ export declare function mapToWorkoutSession(prismaSession: workout_sessions): Wo
  * @returns Array of properly typed WorkoutSession domain objects
  */
 export declare function mapToWorkoutSessions(prismaSessions: workout_sessions[]): WorkoutSession[];
-//# sourceMappingURL=workout-session.mapper.d.ts.map

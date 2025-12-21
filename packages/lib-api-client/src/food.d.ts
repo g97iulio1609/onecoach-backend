@@ -88,5 +88,18 @@ export declare const foodApi: {
         description: string;
         customPrompt?: string;
     }): Promise<FoodResponse>;
+    /**
+     * Batch operations (delete, update)
+     */
+    batch(action: "delete" | "update", ids: string[], data?: Record<string, unknown>): Promise<{
+        success: boolean;
+        results: Array<{
+            id: string;
+            success: boolean;
+            error?: string;
+        }>;
+        deleted?: number;
+        updated?: number;
+    }>;
 };
 //# sourceMappingURL=food.d.ts.map

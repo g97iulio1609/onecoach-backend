@@ -56,4 +56,3 @@ export declare const dashboardQueries: {
      */
     getActivity: () => Promise<DashboardActivityResponse>;
 };
-//# sourceMappingURL=dashboard.queries.d.ts.map

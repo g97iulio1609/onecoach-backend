@@ -17,4 +17,3 @@ import type { WorkoutProgram } from '@onecoach/types';
  * IMPORTANT: This function is server-only and should only be called from API routes
  */
 export declare function normalizeAgentWorkoutPayload(payload: unknown, base?: Partial<WorkoutProgram>): Promise<WorkoutProgram>;
-//# sourceMappingURL=program-server-transform.d.ts.map

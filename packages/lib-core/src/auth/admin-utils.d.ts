@@ -24,4 +24,3 @@ export declare function getAdminEmail(): string | null;
  * Ottiene email super admin da env vars
  */
 export declare function getSuperAdminEmail(): string | null;
-//# sourceMappingURL=admin-utils.d.ts.map

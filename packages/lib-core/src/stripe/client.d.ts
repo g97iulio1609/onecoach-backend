@@ -9,4 +9,3 @@ import type { Stripe } from '@stripe/stripe-js';
  * Usa lazy loading per evitare di caricare Stripe finché non necessario.
  */
 export declare function getStripeClient(): Promise<Stripe | null>;
-//# sourceMappingURL=client.d.ts.map

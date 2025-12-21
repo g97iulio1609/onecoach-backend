@@ -3,8 +3,8 @@
  *
  * Configurazione piani e prodotti Stripe
  */
-import type { PlanPricing, CreditPackPricing } from '@OneCoach/types';
-import { CREDIT_PACK_OPTIONS, getCreditPackPriceId } from '@OneCoach/constants/credit-packs';
+import type { PlanPricing, CreditPackPricing } from '@onecoach/types';
+import { CREDIT_PACK_OPTIONS, getCreditPackPriceId } from '@onecoach/constants/credit-packs';
 /**
  * Piani abbonamento
  */

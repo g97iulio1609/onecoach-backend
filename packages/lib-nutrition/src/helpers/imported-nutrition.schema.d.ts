@@ -1,384 +1,226 @@
 import { z } from 'zod';
-export declare const ImportedFoodSchema: z.ZodObject<
-  {
+export declare const ImportedFoodSchema: z.ZodObject<{
     id: z.ZodOptional<z.ZodString>;
     foodItemId: z.ZodOptional<z.ZodString>;
     name: z.ZodOptional<z.ZodString>;
     quantity: z.ZodNumber;
     unit: z.ZodDefault<z.ZodString>;
-    macros: z.ZodOptional<
-      z.ZodObject<
-        {
-          calories: z.ZodNumber;
-          protein: z.ZodNumber;
-          carbs: z.ZodNumber;
-          fats: z.ZodNumber;
-          fiber: z.ZodOptional<z.ZodNumber>;
-        },
-        z.core.$strip
-      >
-    >;
-    notes: z.ZodOptional<z.ZodString>;
-  },
-  z.core.$strip
->;
-export type ImportedFood = z.infer<typeof ImportedFoodSchema>;
-export declare const ImportedMealSchema: z.ZodObject<
-  {
-    id: z.ZodOptional<z.ZodString>;
-    name: z.ZodString;
-    type: z.ZodOptional<z.ZodString>;
-    time: z.ZodOptional<z.ZodString>;
-    foods: z.ZodDefault<
-      z.ZodArray<
-        z.ZodObject<
-          {
-            id: z.ZodOptional<z.ZodString>;
-            foodItemId: z.ZodOptional<z.ZodString>;
-            name: z.ZodOptional<z.ZodString>;
-            quantity: z.ZodNumber;
-            unit: z.ZodDefault<z.ZodString>;
-            macros: z.ZodOptional<
-              z.ZodObject<
-                {
-                  calories: z.ZodNumber;
-                  protein: z.ZodNumber;
-                  carbs: z.ZodNumber;
-                  fats: z.ZodNumber;
-                  fiber: z.ZodOptional<z.ZodNumber>;
-                },
-                z.core.$strip
-              >
-            >;
-            notes: z.ZodOptional<z.ZodString>;
-          },
-          z.core.$strip
-        >
-      >
-    >;
-    totalMacros: z.ZodOptional<
-      z.ZodObject<
-        {
-          calories: z.ZodNumber;
-          protein: z.ZodNumber;
-          carbs: z.ZodNumber;
-          fats: z.ZodNumber;
-          fiber: z.ZodOptional<z.ZodNumber>;
-        },
-        z.core.$strip
-      >
-    >;
-    notes: z.ZodOptional<z.ZodString>;
-  },
-  z.core.$strip
->;
-export type ImportedMeal = z.infer<typeof ImportedMealSchema>;
-export declare const ImportedDaySchema: z.ZodObject<
-  {
-    id: z.ZodOptional<z.ZodString>;
-    dayNumber: z.ZodNumber;
-    dayName: z.ZodOptional<z.ZodString>;
-    meals: z.ZodDefault<
-      z.ZodArray<
-        z.ZodObject<
-          {
-            id: z.ZodOptional<z.ZodString>;
-            name: z.ZodString;
-            type: z.ZodOptional<z.ZodString>;
-            time: z.ZodOptional<z.ZodString>;
-            foods: z.ZodDefault<
-              z.ZodArray<
-                z.ZodObject<
-                  {
-                    id: z.ZodOptional<z.ZodString>;
-                    foodItemId: z.ZodOptional<z.ZodString>;
-                    name: z.ZodOptional<z.ZodString>;
-                    quantity: z.ZodNumber;
-                    unit: z.ZodDefault<z.ZodString>;
-                    macros: z.ZodOptional<
-                      z.ZodObject<
-                        {
-                          calories: z.ZodNumber;
-                          protein: z.ZodNumber;
-                          carbs: z.ZodNumber;
-                          fats: z.ZodNumber;
-                          fiber: z.ZodOptional<z.ZodNumber>;
-                        },
-                        z.core.$strip
-                      >
-                    >;
-                    notes: z.ZodOptional<z.ZodString>;
-                  },
-                  z.core.$strip
-                >
-              >
-            >;
-            totalMacros: z.ZodOptional<
-              z.ZodObject<
-                {
-                  calories: z.ZodNumber;
-                  protein: z.ZodNumber;
-                  carbs: z.ZodNumber;
-                  fats: z.ZodNumber;
-                  fiber: z.ZodOptional<z.ZodNumber>;
-                },
-                z.core.$strip
-              >
-            >;
-            notes: z.ZodOptional<z.ZodString>;
-          },
-          z.core.$strip
-        >
-      >
-    >;
-    totalMacros: z.ZodOptional<
-      z.ZodObject<
-        {
-          calories: z.ZodNumber;
-          protein: z.ZodNumber;
-          carbs: z.ZodNumber;
-          fats: z.ZodNumber;
-          fiber: z.ZodOptional<z.ZodNumber>;
-        },
-        z.core.$strip
-      >
-    >;
-    waterIntake: z.ZodOptional<z.ZodNumber>;
-    notes: z.ZodOptional<z.ZodString>;
-  },
-  z.core.$strip
->;
-export type ImportedDay = z.infer<typeof ImportedDaySchema>;
-export declare const ImportedWeekSchema: z.ZodObject<
-  {
-    id: z.ZodOptional<z.ZodString>;
-    weekNumber: z.ZodNumber;
-    days: z.ZodDefault<
-      z.ZodArray<
-        z.ZodObject<
-          {
-            id: z.ZodOptional<z.ZodString>;
-            dayNumber: z.ZodNumber;
-            dayName: z.ZodOptional<z.ZodString>;
-            meals: z.ZodDefault<
-              z.ZodArray<
-                z.ZodObject<
-                  {
-                    id: z.ZodOptional<z.ZodString>;
-                    name: z.ZodString;
-                    type: z.ZodOptional<z.ZodString>;
-                    time: z.ZodOptional<z.ZodString>;
-                    foods: z.ZodDefault<
-                      z.ZodArray<
-                        z.ZodObject<
-                          {
-                            id: z.ZodOptional<z.ZodString>;
-                            foodItemId: z.ZodOptional<z.ZodString>;
-                            name: z.ZodOptional<z.ZodString>;
-                            quantity: z.ZodNumber;
-                            unit: z.ZodDefault<z.ZodString>;
-                            macros: z.ZodOptional<
-                              z.ZodObject<
-                                {
-                                  calories: z.ZodNumber;
-                                  protein: z.ZodNumber;
-                                  carbs: z.ZodNumber;
-                                  fats: z.ZodNumber;
-                                  fiber: z.ZodOptional<z.ZodNumber>;
-                                },
-                                z.core.$strip
-                              >
-                            >;
-                            notes: z.ZodOptional<z.ZodString>;
-                          },
-                          z.core.$strip
-                        >
-                      >
-                    >;
-                    totalMacros: z.ZodOptional<
-                      z.ZodObject<
-                        {
-                          calories: z.ZodNumber;
-                          protein: z.ZodNumber;
-                          carbs: z.ZodNumber;
-                          fats: z.ZodNumber;
-                          fiber: z.ZodOptional<z.ZodNumber>;
-                        },
-                        z.core.$strip
-                      >
-                    >;
-                    notes: z.ZodOptional<z.ZodString>;
-                  },
-                  z.core.$strip
-                >
-              >
-            >;
-            totalMacros: z.ZodOptional<
-              z.ZodObject<
-                {
-                  calories: z.ZodNumber;
-                  protein: z.ZodNumber;
-                  carbs: z.ZodNumber;
-                  fats: z.ZodNumber;
-                  fiber: z.ZodOptional<z.ZodNumber>;
-                },
-                z.core.$strip
-              >
-            >;
-            waterIntake: z.ZodOptional<z.ZodNumber>;
-            notes: z.ZodOptional<z.ZodString>;
-          },
-          z.core.$strip
-        >
-      >
-    >;
-    weeklyAverageMacros: z.ZodOptional<
-      z.ZodObject<
-        {
-          calories: z.ZodNumber;
-          protein: z.ZodNumber;
-          carbs: z.ZodNumber;
-          fats: z.ZodNumber;
-          fiber: z.ZodOptional<z.ZodNumber>;
-        },
-        z.core.$strip
-      >
-    >;
-    notes: z.ZodOptional<z.ZodString>;
-  },
-  z.core.$strip
->;
-export type ImportedWeek = z.infer<typeof ImportedWeekSchema>;
-export declare const ImportedNutritionPlanSchema: z.ZodObject<
-  {
-    id: z.ZodOptional<z.ZodString>;
-    name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    goals: z.ZodDefault<z.ZodArray<z.ZodString>>;
-    durationWeeks: z.ZodDefault<z.ZodNumber>;
-    targetMacros: z.ZodObject<
-      {
+    macros: z.ZodOptional<z.ZodObject<{
         calories: z.ZodNumber;
         protein: z.ZodNumber;
         carbs: z.ZodNumber;
         fats: z.ZodNumber;
         fiber: z.ZodOptional<z.ZodNumber>;
-      },
-      z.core.$strip
-    >;
-    weeks: z.ZodArray<
-      z.ZodObject<
-        {
-          id: z.ZodOptional<z.ZodString>;
-          weekNumber: z.ZodNumber;
-          days: z.ZodDefault<
-            z.ZodArray<
-              z.ZodObject<
-                {
-                  id: z.ZodOptional<z.ZodString>;
-                  dayNumber: z.ZodNumber;
-                  dayName: z.ZodOptional<z.ZodString>;
-                  meals: z.ZodDefault<
-                    z.ZodArray<
-                      z.ZodObject<
-                        {
-                          id: z.ZodOptional<z.ZodString>;
-                          name: z.ZodString;
-                          type: z.ZodOptional<z.ZodString>;
-                          time: z.ZodOptional<z.ZodString>;
-                          foods: z.ZodDefault<
-                            z.ZodArray<
-                              z.ZodObject<
-                                {
-                                  id: z.ZodOptional<z.ZodString>;
-                                  foodItemId: z.ZodOptional<z.ZodString>;
-                                  name: z.ZodOptional<z.ZodString>;
-                                  quantity: z.ZodNumber;
-                                  unit: z.ZodDefault<z.ZodString>;
-                                  macros: z.ZodOptional<
-                                    z.ZodObject<
-                                      {
-                                        calories: z.ZodNumber;
-                                        protein: z.ZodNumber;
-                                        carbs: z.ZodNumber;
-                                        fats: z.ZodNumber;
-                                        fiber: z.ZodOptional<z.ZodNumber>;
-                                      },
-                                      z.core.$strip
-                                    >
-                                  >;
-                                  notes: z.ZodOptional<z.ZodString>;
-                                },
-                                z.core.$strip
-                              >
-                            >
-                          >;
-                          totalMacros: z.ZodOptional<
-                            z.ZodObject<
-                              {
-                                calories: z.ZodNumber;
-                                protein: z.ZodNumber;
-                                carbs: z.ZodNumber;
-                                fats: z.ZodNumber;
-                                fiber: z.ZodOptional<z.ZodNumber>;
-                              },
-                              z.core.$strip
-                            >
-                          >;
-                          notes: z.ZodOptional<z.ZodString>;
-                        },
-                        z.core.$strip
-                      >
-                    >
-                  >;
-                  totalMacros: z.ZodOptional<
-                    z.ZodObject<
-                      {
-                        calories: z.ZodNumber;
-                        protein: z.ZodNumber;
-                        carbs: z.ZodNumber;
-                        fats: z.ZodNumber;
-                        fiber: z.ZodOptional<z.ZodNumber>;
-                      },
-                      z.core.$strip
-                    >
-                  >;
-                  waterIntake: z.ZodOptional<z.ZodNumber>;
-                  notes: z.ZodOptional<z.ZodString>;
-                },
-                z.core.$strip
-              >
-            >
-          >;
-          weeklyAverageMacros: z.ZodOptional<
-            z.ZodObject<
-              {
+    }, z.core.$strip>>;
+    notes: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type ImportedFood = z.infer<typeof ImportedFoodSchema>;
+export declare const ImportedMealSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    type: z.ZodOptional<z.ZodString>;
+    time: z.ZodOptional<z.ZodString>;
+    foods: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        foodItemId: z.ZodOptional<z.ZodString>;
+        name: z.ZodOptional<z.ZodString>;
+        quantity: z.ZodNumber;
+        unit: z.ZodDefault<z.ZodString>;
+        macros: z.ZodOptional<z.ZodObject<{
+            calories: z.ZodNumber;
+            protein: z.ZodNumber;
+            carbs: z.ZodNumber;
+            fats: z.ZodNumber;
+            fiber: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$strip>>;
+        notes: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>>;
+    totalMacros: z.ZodOptional<z.ZodObject<{
+        calories: z.ZodNumber;
+        protein: z.ZodNumber;
+        carbs: z.ZodNumber;
+        fats: z.ZodNumber;
+        fiber: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>>;
+    notes: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type ImportedMeal = z.infer<typeof ImportedMealSchema>;
+export declare const ImportedDaySchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    dayNumber: z.ZodNumber;
+    dayName: z.ZodOptional<z.ZodString>;
+    meals: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        name: z.ZodString;
+        type: z.ZodOptional<z.ZodString>;
+        time: z.ZodOptional<z.ZodString>;
+        foods: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodOptional<z.ZodString>;
+            foodItemId: z.ZodOptional<z.ZodString>;
+            name: z.ZodOptional<z.ZodString>;
+            quantity: z.ZodNumber;
+            unit: z.ZodDefault<z.ZodString>;
+            macros: z.ZodOptional<z.ZodObject<{
                 calories: z.ZodNumber;
                 protein: z.ZodNumber;
                 carbs: z.ZodNumber;
                 fats: z.ZodNumber;
                 fiber: z.ZodOptional<z.ZodNumber>;
-              },
-              z.core.$strip
-            >
-          >;
-          notes: z.ZodOptional<z.ZodString>;
-        },
-        z.core.$strip
-      >
-    >;
+            }, z.core.$strip>>;
+            notes: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>>;
+        totalMacros: z.ZodOptional<z.ZodObject<{
+            calories: z.ZodNumber;
+            protein: z.ZodNumber;
+            carbs: z.ZodNumber;
+            fats: z.ZodNumber;
+            fiber: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$strip>>;
+        notes: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>>;
+    totalMacros: z.ZodOptional<z.ZodObject<{
+        calories: z.ZodNumber;
+        protein: z.ZodNumber;
+        carbs: z.ZodNumber;
+        fats: z.ZodNumber;
+        fiber: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>>;
+    waterIntake: z.ZodOptional<z.ZodNumber>;
+    notes: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type ImportedDay = z.infer<typeof ImportedDaySchema>;
+export declare const ImportedWeekSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    weekNumber: z.ZodNumber;
+    days: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        dayNumber: z.ZodNumber;
+        dayName: z.ZodOptional<z.ZodString>;
+        meals: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodOptional<z.ZodString>;
+            name: z.ZodString;
+            type: z.ZodOptional<z.ZodString>;
+            time: z.ZodOptional<z.ZodString>;
+            foods: z.ZodDefault<z.ZodArray<z.ZodObject<{
+                id: z.ZodOptional<z.ZodString>;
+                foodItemId: z.ZodOptional<z.ZodString>;
+                name: z.ZodOptional<z.ZodString>;
+                quantity: z.ZodNumber;
+                unit: z.ZodDefault<z.ZodString>;
+                macros: z.ZodOptional<z.ZodObject<{
+                    calories: z.ZodNumber;
+                    protein: z.ZodNumber;
+                    carbs: z.ZodNumber;
+                    fats: z.ZodNumber;
+                    fiber: z.ZodOptional<z.ZodNumber>;
+                }, z.core.$strip>>;
+                notes: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>>>;
+            totalMacros: z.ZodOptional<z.ZodObject<{
+                calories: z.ZodNumber;
+                protein: z.ZodNumber;
+                carbs: z.ZodNumber;
+                fats: z.ZodNumber;
+                fiber: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strip>>;
+            notes: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>>;
+        totalMacros: z.ZodOptional<z.ZodObject<{
+            calories: z.ZodNumber;
+            protein: z.ZodNumber;
+            carbs: z.ZodNumber;
+            fats: z.ZodNumber;
+            fiber: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$strip>>;
+        waterIntake: z.ZodOptional<z.ZodNumber>;
+        notes: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>>;
+    weeklyAverageMacros: z.ZodOptional<z.ZodObject<{
+        calories: z.ZodNumber;
+        protein: z.ZodNumber;
+        carbs: z.ZodNumber;
+        fats: z.ZodNumber;
+        fiber: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>>;
+    notes: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type ImportedWeek = z.infer<typeof ImportedWeekSchema>;
+export declare const ImportedNutritionPlanSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    goals: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    durationWeeks: z.ZodDefault<z.ZodNumber>;
+    targetMacros: z.ZodObject<{
+        calories: z.ZodNumber;
+        protein: z.ZodNumber;
+        carbs: z.ZodNumber;
+        fats: z.ZodNumber;
+        fiber: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strip>;
+    weeks: z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        weekNumber: z.ZodNumber;
+        days: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodOptional<z.ZodString>;
+            dayNumber: z.ZodNumber;
+            dayName: z.ZodOptional<z.ZodString>;
+            meals: z.ZodDefault<z.ZodArray<z.ZodObject<{
+                id: z.ZodOptional<z.ZodString>;
+                name: z.ZodString;
+                type: z.ZodOptional<z.ZodString>;
+                time: z.ZodOptional<z.ZodString>;
+                foods: z.ZodDefault<z.ZodArray<z.ZodObject<{
+                    id: z.ZodOptional<z.ZodString>;
+                    foodItemId: z.ZodOptional<z.ZodString>;
+                    name: z.ZodOptional<z.ZodString>;
+                    quantity: z.ZodNumber;
+                    unit: z.ZodDefault<z.ZodString>;
+                    macros: z.ZodOptional<z.ZodObject<{
+                        calories: z.ZodNumber;
+                        protein: z.ZodNumber;
+                        carbs: z.ZodNumber;
+                        fats: z.ZodNumber;
+                        fiber: z.ZodOptional<z.ZodNumber>;
+                    }, z.core.$strip>>;
+                    notes: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>>>;
+                totalMacros: z.ZodOptional<z.ZodObject<{
+                    calories: z.ZodNumber;
+                    protein: z.ZodNumber;
+                    carbs: z.ZodNumber;
+                    fats: z.ZodNumber;
+                    fiber: z.ZodOptional<z.ZodNumber>;
+                }, z.core.$strip>>;
+                notes: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>>>;
+            totalMacros: z.ZodOptional<z.ZodObject<{
+                calories: z.ZodNumber;
+                protein: z.ZodNumber;
+                carbs: z.ZodNumber;
+                fats: z.ZodNumber;
+                fiber: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strip>>;
+            waterIntake: z.ZodOptional<z.ZodNumber>;
+            notes: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>>;
+        weeklyAverageMacros: z.ZodOptional<z.ZodObject<{
+            calories: z.ZodNumber;
+            protein: z.ZodNumber;
+            carbs: z.ZodNumber;
+            fats: z.ZodNumber;
+            fiber: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$strip>>;
+        notes: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
     restrictions: z.ZodDefault<z.ZodArray<z.ZodString>>;
     preferences: z.ZodDefault<z.ZodArray<z.ZodString>>;
-    status: z.ZodDefault<
-      z.ZodEnum<{
-        ACTIVE: 'ACTIVE';
-        COMPLETED: 'COMPLETED';
-        DRAFT: 'DRAFT';
-        ARCHIVED: 'ARCHIVED';
-      }>
-    >;
+    status: z.ZodDefault<z.ZodEnum<{
+        ACTIVE: "ACTIVE";
+        DRAFT: "DRAFT";
+        COMPLETED: "COMPLETED";
+        ARCHIVED: "ARCHIVED";
+    }>>;
     metadata: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
-  },
-  z.core.$strip
->;
+}, z.core.$strip>;
 export type ImportedNutritionPlan = z.infer<typeof ImportedNutritionPlanSchema>;

@@ -16,6 +16,7 @@ import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing'
 import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import type { Macros } from '@onecoach/types';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { MODEL_CONSTANTS } from '@onecoach/lib-ai-utils';
 
 type GeneratedFood = {
   name: string;
@@ -161,7 +162,7 @@ export class FoodAdminService {
     // Create AI agent configuration using shared utility
     const agentConfig = await createAIAgentConfig({
       modelTier: 'balanced',
-      temperature: 0.7,
+      temperature: MODEL_CONSTANTS.DEFAULT_TEMPERATURE,
       maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
     });
 

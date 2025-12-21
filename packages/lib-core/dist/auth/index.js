@@ -5,9 +5,9 @@
  */
 export * from './session';
 export * from './guards';
-export * from './guards-client';
+// export * from './guards-client'; // Moved to lib-api-client
 export * from './config';
-export * from './auth-components';
 export * from './admin-seed';
 export * from './admin-utils';
 export * from './roles';
+export * as NativeSession from './session.native';

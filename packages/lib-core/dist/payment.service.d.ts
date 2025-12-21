@@ -5,7 +5,7 @@
  * Implementa IPaymentService contract
  */
 import type Stripe from 'stripe';
-import type { IPaymentService, CreatePaymentIntentParams, ConfirmPaymentIntentParams } from '@OneCoach/contracts';
+import type { IPaymentService, CreatePaymentIntentParams, ConfirmPaymentIntentParams } from '@onecoach/contracts';
 /**
  * Payment Service
  */

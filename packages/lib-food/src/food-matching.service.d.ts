@@ -40,4 +40,3 @@ export declare class FoodMatchingService {
         quantity: number;
     }>>;
 }
-//# sourceMappingURL=food-matching.service.d.ts.map

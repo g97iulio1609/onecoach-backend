@@ -31,4 +31,3 @@ export declare function useWeightUnit(): WeightUnit;
  * @returns Boolean indicating if profile has all required fields
  */
 export declare function useIsProfileComplete(): boolean;
-//# sourceMappingURL=use-profile.d.ts.map

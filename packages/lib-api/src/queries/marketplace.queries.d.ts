@@ -61,4 +61,3 @@ export declare const marketplaceQueries: {
      */
     getById: (id: string) => Promise<MarketplacePlanResponse>;
 };
-//# sourceMappingURL=marketplace.queries.d.ts.map

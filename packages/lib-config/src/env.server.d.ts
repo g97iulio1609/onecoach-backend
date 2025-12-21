@@ -13,4 +13,3 @@ import 'server-only';
  * provides a simple fallback to static env vars for lib-config usage
  */
 export declare function getDynamicAIProviderKey(provider: string): Promise<string | undefined>;
-//# sourceMappingURL=env.server.d.ts.map

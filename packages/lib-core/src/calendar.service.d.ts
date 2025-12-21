@@ -106,4 +106,3 @@ export declare function deleteAssignmentsByPlanId(userId: string, planType: Cale
  * Delete assignments for a date range
  */
 export declare function deleteAssignmentsInRange(userId: string, startDate: Date | string, endDate: Date | string, planType?: CalendarPlanType): Promise<number>;
-//# sourceMappingURL=calendar.service.d.ts.map

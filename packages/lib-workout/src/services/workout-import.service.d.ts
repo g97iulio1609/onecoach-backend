@@ -58,4 +58,3 @@ export declare class WorkoutImportService extends BaseImportService<ParsedWorkou
     private convertExercise;
 }
 export {};
-//# sourceMappingURL=workout-import.service.d.ts.map

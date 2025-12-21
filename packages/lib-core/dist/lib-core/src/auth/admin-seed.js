@@ -3,7 +3,7 @@
  */
 import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { createId } from '@OneCoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { prisma } from '../prisma';
 export async function ensureAdminUser(email) {
     const existing = await prisma.users.findUnique({ where: { email } });
@@ -93,7 +93,7 @@ async function seedAdminFromEnv(prismaClient, type) {
                     id: createId(),
                     email: email.toLowerCase().trim(),
                     password: hashedPassword,
-                    name: name?.trim() || `${type === 'ADMIN' ? 'Admin' : 'Super Admin'} OneCoach`,
+                    name: name?.trim() || `${type === 'ADMIN' ? 'Admin' : 'Super Admin'} onecoach`,
                     role: type,
                     status: 'ACTIVE',
                     credits: credits,

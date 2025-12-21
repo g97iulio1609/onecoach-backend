@@ -13,4 +13,3 @@ import type { WorkoutProgram } from '@onecoach/types';
  * @returns Normalized workout program with calculated weights
  */
 export declare function normalizeWithWeightCalculation(rawPayload: unknown, userId?: string, baseProgram?: Partial<WorkoutProgram>): Promise<WorkoutProgram>;
-//# sourceMappingURL=workout-normalization.service.d.ts.map

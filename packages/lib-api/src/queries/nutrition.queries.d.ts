@@ -42,4 +42,3 @@ export declare const nutritionQueries: {
         log: unknown;
     }>;
 };
-//# sourceMappingURL=nutrition.queries.d.ts.map

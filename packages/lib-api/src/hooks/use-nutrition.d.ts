@@ -59,4 +59,3 @@ export declare function useUpdateNutritionDayLog(): import("@tanstack/react-quer
     logId: string;
     data: unknown;
 }, unknown>;
-//# sourceMappingURL=use-nutrition.d.ts.map

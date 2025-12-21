@@ -1,0 +1,50 @@
+import { streamText, Output } from 'ai';
+import { createModel } from '@onecoach/lib-ai-utils/model-factory';
+// Configurazione centralizzata per import AI
+const AI_IMPORT_CONFIG = {
+    TIMEOUT_MS: 600000, // 10 minuti
+    MAX_OUTPUT_TOKENS: 65000,
+};
+function base64ToDataUrl(base64, mimeType) {
+    return `data:${mimeType};base64,${base64}`;
+}
+export async function parseWithVisionAI(params) {
+    const { contentBase64, mimeType, prompt, schema, modelId, apiKey } = params;
+    const modelConfig = {
+        provider: 'openrouter',
+        model: modelId ?? 'google/gemini-1.5-flash-002',
+        maxTokens: AI_IMPORT_CONFIG.MAX_OUTPUT_TOKENS,
+        temperature: 0, // Ignorato dai modelli reasoning ma richiesto dal tipo
+        reasoningEnabled: true,
+        creditsPerRequest: 0,
+    };
+    const model = createModel(modelConfig, apiKey ?? process.env.OPENROUTER_API_KEY);
+    const dataUrl = base64ToDataUrl(contentBase64, mimeType);
+    const messages = [
+        {
+            role: 'user',
+            content: [
+                { type: 'text', text: prompt },
+                { type: 'image', image: dataUrl },
+            ],
+        },
+    ];
+    // Usa streamText con Output.object() per output strutturato con validazione Zod
+    const streamResult = streamText({
+        model,
+        output: Output.object({ schema }),
+        messages,
+        abortSignal: AbortSignal.timeout(AI_IMPORT_CONFIG.TIMEOUT_MS),
+        // No temperature per modelli reasoning
+    });
+    // AI SDK v6: Consume partialOutputStream FIRST to ensure stream completion
+    for await (const _partial of streamResult.partialOutputStream) {
+        // Stream consumed - required before accessing output
+    }
+    // Attendi l'oggetto completo validato - stream is fully consumed
+    const validated = await streamResult.output;
+    if (!validated) {
+        throw new Error('AI returned empty response');
+    }
+    return validated;
+}

@@ -23,4 +23,3 @@ export declare function useDashboardData(): {
     error: Error | null;
     refetch: () => void;
 };
-//# sourceMappingURL=use-dashboard.d.ts.map

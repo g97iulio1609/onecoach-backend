@@ -7,7 +7,7 @@
  */
 import { prisma } from './prisma';
 import { Prisma } from '@prisma/client';
-import { createId } from '@OneCoach/lib-shared/id-generator';
+import { createId } from '@onecoach/lib-shared/id-generator';
 /**
  * Default empty memory structure
  */
@@ -313,15 +313,14 @@ export class UserMemoryService {
                 relevantInsights.push(...domainMemory.insights);
                 // Generate recommendations from patterns
                 domainMemory.patterns.forEach((pattern) => {
-                    if (pattern.suggestions) {
-                        pattern.suggestions.forEach((suggestion, index) => {
-                            recommendations.push({
-                                type: pattern.type,
-                                message: suggestion,
-                                priority: 5 - index,
-                            });
+                    const suggestions = pattern.suggestions ?? [];
+                    suggestions.forEach((suggestion, index) => {
+                        recommendations.push({
+                            type: pattern.type,
+                            message: suggestion,
+                            priority: 5 - index,
                         });
-                    }
+                    });
                 });
             }
         }

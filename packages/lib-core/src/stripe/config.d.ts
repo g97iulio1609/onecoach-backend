@@ -30,4 +30,3 @@ export declare const STRIPE_WEBHOOK_EVENTS: {
     readonly PAYMENT_INTENT_SUCCEEDED: "payment_intent.succeeded";
     readonly PAYMENT_INTENT_FAILED: "payment_intent.payment_failed";
 };
-//# sourceMappingURL=config.d.ts.map

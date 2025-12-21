@@ -40,4 +40,3 @@ export declare function selectiveDeepClone<T extends Record<string, unknown>>(ob
  */
 export declare function hasCircularReference(obj: unknown): boolean;
 export default deepClone;
-//# sourceMappingURL=deep-clone.d.ts.map

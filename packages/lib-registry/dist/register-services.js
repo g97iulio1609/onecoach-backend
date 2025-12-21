@@ -8,16 +8,16 @@
  * refactorando i servizi per implementare direttamente i contratti.
  */
 import { registerService } from './index';
-import { nutritionService } from '@OneCoach/lib-nutrition';
-import { workoutService } from '@OneCoach/lib-workout';
-import { exerciseService } from '@OneCoach/lib-exercise';
-import { foodService } from '@OneCoach/lib-food';
-import { analyticsService } from '@OneCoach/lib-analytics';
-import { creditService, subscriptionService, userProfileService, paymentService, onboardingService, } from '@OneCoach/lib-core';
-import { aiConfigService, chatService } from '@onecoach/lib-ai';
-import { marketplaceService } from '@OneCoach/lib-marketplace';
-import { coachService } from '@OneCoach/lib-coach';
-import { getBodyMeasurementHistory, createBodyMeasurement as createBodyMeasurementFn, } from '@OneCoach/lib-analytics/body-measurements.service';
+import { nutritionService } from '@onecoach/lib-nutrition';
+import { workoutService } from '@onecoach/lib-workout';
+import { exerciseService } from '@onecoach/lib-exercise';
+import { foodService } from '@onecoach/lib-food';
+import { analyticsService } from '@onecoach/lib-analytics';
+import { creditService, subscriptionService, userProfileService, paymentService, onboardingService, } from '@onecoach/lib-core';
+import { chatService } from '@onecoach/lib-ai';
+import { marketplaceService } from '@onecoach/lib-marketplace';
+import { coachService } from '@onecoach/lib-coach';
+import { getBodyMeasurementHistory, createBodyMeasurement as createBodyMeasurementFn, } from '@onecoach/lib-analytics/body-measurements.service';
 /**
  * Wrapper per ExerciseService che implementa IExerciseService
  * TODO: Refactor ExerciseService per restituire Exercise invece di LocalizedExercise
@@ -102,7 +102,6 @@ export function registerAllServices() {
     registerService('userProfile', userProfileService);
     registerService('payment', paymentService);
     registerService('onboarding', onboardingService);
-    registerService('aiConfig', aiConfigService);
     registerService('chat', chatService);
     registerService('marketplace', marketplaceService);
     registerService('coach', coachService);

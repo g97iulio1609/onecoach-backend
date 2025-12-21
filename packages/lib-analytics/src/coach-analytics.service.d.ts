@@ -42,4 +42,3 @@ export declare function getRatingTrends(userId: string, period?: Period): Promis
  * Get top plans by sales
  */
 export declare function getTopPlans(userId: string, limit?: number): Promise<TopPlan[]>;
-//# sourceMappingURL=coach-analytics.service.d.ts.map

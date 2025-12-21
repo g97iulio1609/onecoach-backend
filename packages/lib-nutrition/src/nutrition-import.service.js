@@ -1,129 +1,23 @@
 import { z } from 'zod';
 import { prisma } from '@onecoach/lib-core/prisma';
-import { logger } from '@onecoach/lib-shared/utils/logger';
-import { IMPORT_LIMITS, createMimeRouter, parseWithVisionAI } from '@onecoach/lib-import-core';
+import { BaseImportService, parseWithVisionAI, } from '@onecoach/lib-import-core';
 import { normalizeAgentPayload, preparePlanForPersistence } from './helpers/plan-transform';
-import {
-  toPrismaJsonAdaptations,
-  toPrismaJsonCompleteMacros,
-  toPrismaJsonMetadata,
-  toPrismaJsonPersonalizedPlan,
-  toPrismaJsonUserProfile,
-  toPrismaJsonWeeks,
-} from './helpers/prisma-helpers';
+import { toPrismaJsonAdaptations, toPrismaJsonCompleteMacros, toPrismaJsonMetadata, toPrismaJsonPersonalizedPlan, toPrismaJsonUserProfile, toPrismaJsonWeeks, } from './helpers/prisma-helpers';
 import { ImportedNutritionPlanSchema } from './helpers/imported-nutrition.schema';
 const NutritionImportOptionsSchema = z.object({
-  mode: z.enum(['auto', 'review']).default('auto'),
-  locale: z.string().optional(),
+    mode: z.enum(['auto', 'review']).default('auto'),
+    locale: z.string().optional(),
 });
-export class NutritionImportService {
-  params;
-  constructor(params) {
-    this.params = params;
-  }
-  emit(progress) {
-    if (this.params.onProgress) {
-      this.params.onProgress(progress);
+/**
+ * Service for importing nutrition plans.
+ * Extends BaseImportService to use shared orchestration logic.
+ */
+export class NutritionImportService extends BaseImportService {
+    getLoggerName() {
+        return 'NutritionImport';
     }
-  }
-  validateFiles(files) {
-    if (files.length === 0) throw new Error('Almeno un file richiesto');
-    if (files.length > IMPORT_LIMITS.MAX_FILES)
-      throw new Error(`Massimo ${IMPORT_LIMITS.MAX_FILES} file`);
-    for (const file of files) {
-      if (file.size && file.size > IMPORT_LIMITS.MAX_FILE_SIZE) {
-        throw new Error(
-          `File troppo grande: ${file.name} (max ${Math.round(IMPORT_LIMITS.MAX_FILE_SIZE / (1024 * 1024))}MB)`
-        );
-      }
-    }
-  }
-  buildRouter(userId) {
-    const prompt = buildNutritionPrompt();
-    const handler = async (content, mimeType) =>
-      this.params.aiContext.parseWithAI(content, mimeType, prompt);
-    return createMimeRouter({
-      image: handler,
-      pdf: handler,
-      spreadsheet: handler,
-      document: handler,
-      fallback: handler,
-    });
-  }
-  async import(files, userId, options) {
-    this.emit({ step: 'validating', message: 'Validazione file' });
-    this.validateFiles(files);
-    const parsedOptions = NutritionImportOptionsSchema.parse(options ?? {});
-    const router = this.buildRouter(userId);
-    const warnings = [];
-    const errors = [];
-    try {
-      this.emit({ step: 'parsing', message: 'Parsing con AI', progress: 0.25 });
-      const firstFile = files[0];
-      const parseResult = await router(
-        firstFile.content,
-        firstFile.mimeType || 'application/octet-stream'
-      );
-      const normalized = normalizeAgentPayload(parseResult, {
-        userId,
-        status: 'ACTIVE',
-      });
-      const persistenceData = preparePlanForPersistence(normalized);
-      this.emit({ step: 'persisting', message: 'Salvataggio piano', progress: 0.75 });
-      const plan = await prisma.nutrition_plans.create({
-        data: {
-          id: normalized.id,
-          userId,
-          name: persistenceData.name,
-          description: persistenceData.description,
-          goals: persistenceData.goals,
-          durationWeeks: persistenceData.durationWeeks,
-          targetMacros: toPrismaJsonCompleteMacros(persistenceData.targetMacros),
-          userProfile: toPrismaJsonUserProfile(persistenceData.userProfile),
-          personalizedPlan: toPrismaJsonPersonalizedPlan(persistenceData.personalizedPlan),
-          adaptations: toPrismaJsonAdaptations(persistenceData.adaptations),
-          weeks: toPrismaJsonWeeks(persistenceData.weeks),
-          restrictions: persistenceData.restrictions,
-          preferences: persistenceData.preferences,
-          status: persistenceData.status,
-          metadata: toPrismaJsonMetadata(persistenceData.metadata),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
-      this.emit({ step: 'completed', message: 'Import completato', progress: 1 });
-      return {
-        success: true,
-        planId: plan.id,
-        plan,
-        parseResult,
-        warnings,
-      };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Errore sconosciuto';
-      logger.error('Nutrition import failed', {
-        userId,
-        error: message,
-        requestId: this.params.context?.requestId,
-      });
-      errors.push(message);
-      return { success: false, errors };
-    }
-  }
-}
-export function createNutritionAIContext() {
-  return {
-    parseWithAI: (content, mimeType, prompt) =>
-      parseWithVisionAI({
-        contentBase64: content,
-        mimeType,
-        prompt,
-        schema: ImportedNutritionPlanSchema,
-      }),
-  };
-}
-function buildNutritionPrompt() {
-  return `Analizza il file allegato (piano nutrizionale) e restituisci SOLO JSON che rispetti esattamente lo schema seguente, senza testo extra:
+    buildPrompt(_options) {
+        return `Analizza il file allegato (piano nutrizionale) e restituisci SOLO JSON che rispetti esattamente lo schema seguente, senza testo extra:
 {
   "name": string,
   "description": string,
@@ -168,4 +62,61 @@ Regole:
 - Calcola calorie con Atwater: 4*carbs + 4*protein + 9*fats.
 - Mantieni coerenza: somma dei cibi = macros del pasto; somma pasti = macros giorno.
 - Usa solo cibi plausibili; se non trovi un foodItemId lascia name e macros valorizzati.`;
+    }
+    async processParsed(parsed, userId, options) {
+        NutritionImportOptionsSchema.parse(options ?? {});
+        const normalized = normalizeAgentPayload(parsed, {
+            userId,
+            status: 'ACTIVE',
+        });
+        const persistenceData = preparePlanForPersistence(normalized);
+        // Pass both the parsed data and the persistence data to the persist step
+        // The persist step needs userId/id from normalized, and db-ready objects from persistenceData
+        return { normalized, persistenceData, parseResult: parsed };
+    }
+    async persist(processed, userId) {
+        const { normalized, persistenceData, parseResult } = processed;
+        const plan = await prisma.nutrition_plans.create({
+            data: {
+                id: normalized.id,
+                userId,
+                name: persistenceData.name,
+                description: persistenceData.description,
+                goals: persistenceData.goals,
+                durationWeeks: persistenceData.durationWeeks,
+                targetMacros: toPrismaJsonCompleteMacros(persistenceData.targetMacros),
+                userProfile: toPrismaJsonUserProfile(persistenceData.userProfile),
+                personalizedPlan: toPrismaJsonPersonalizedPlan(persistenceData.personalizedPlan),
+                adaptations: toPrismaJsonAdaptations(persistenceData.adaptations),
+                weeks: toPrismaJsonWeeks(persistenceData.weeks),
+                restrictions: persistenceData.restrictions,
+                preferences: persistenceData.preferences,
+                status: persistenceData.status,
+                metadata: toPrismaJsonMetadata(persistenceData.metadata),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        });
+        return {
+            planId: plan.id,
+            plan,
+            parseResult,
+        };
+    }
+    createErrorResult(errors) {
+        return {
+            success: false,
+            errors,
+        };
+    }
+}
+export function createNutritionAIContext() {
+    return {
+        parseWithAI: (content, mimeType, prompt) => parseWithVisionAI({
+            contentBase64: content,
+            mimeType,
+            prompt,
+            schema: ImportedNutritionPlanSchema,
+        }),
+    };
 }

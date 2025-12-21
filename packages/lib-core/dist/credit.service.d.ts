@@ -4,8 +4,9 @@
  * Gestione crediti utente e transazioni
  * Implementa ICreditService contract
  */
+import { Prisma } from '@prisma/client';
 import type { TransactionType } from '@prisma/client';
-import type { ICreditService } from '@OneCoach/contracts';
+import type { ICreditService } from '@onecoach/contracts';
 /**
  * Implementazione Credit Service
  */
@@ -62,8 +63,15 @@ export declare class CreditService implements ICreditService {
         } | null;
     }>;
     private hasUnlimitedCredits;
+    getCreditHistory(userId: string, limit?: number): Promise<{
+        id: string;
+        type: import("@prisma/client").$Enums.TransactionType;
+        userId: string | null;
+        createdAt: Date;
+        metadata: Prisma.JsonValue | null;
+        amount: number;
+        description: string;
+        balanceAfter: number;
+    }[]>;
 }
-/**
- * Singleton instance
- */
-export declare const creditService: ICreditService;
+export declare const creditService: CreditService;

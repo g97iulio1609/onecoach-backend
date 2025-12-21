@@ -48,4 +48,3 @@ export declare class ConsentService {
      */
     static areRequiredPoliciesPublished(): Promise<boolean>;
 }
-//# sourceMappingURL=consent.service.d.ts.map

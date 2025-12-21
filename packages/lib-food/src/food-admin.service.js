@@ -13,6 +13,7 @@ import { FoodGenerationAgent, createAIAgentConfig, createAgentInstance } from '@
 import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing';
 import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { MODEL_CONSTANTS } from '@onecoach/lib-ai-utils';
 /**
  * Schema per import payload (estende createFoodSchema)
  * IMPORTANTE: name, description, macrosPer100g, servingSize sono OBBLIGATORI
@@ -95,7 +96,7 @@ export class FoodAdminService {
         // Create AI agent configuration using shared utility
         const agentConfig = await createAIAgentConfig({
             modelTier: 'balanced',
-            temperature: 0.7,
+            temperature: MODEL_CONSTANTS.DEFAULT_TEMPERATURE,
             maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
         });
         // Create FoodGenerationAgent using shared utility

@@ -10,4 +10,3 @@ export { apiClient };
 export { WebApiClient, NativeApiClient } from './core';
 export * from './core/types';
 export * from './interceptors';
-//# sourceMappingURL=client.d.ts.map

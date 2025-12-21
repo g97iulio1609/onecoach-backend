@@ -115,4 +115,3 @@ export declare class FoodService {
 }
 export declare const foodService: typeof FoodService;
 export {};
-//# sourceMappingURL=food.service.d.ts.map

@@ -9,10 +9,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createAgentCoordinator } from '@onecoach/lib-ai/agents';
-import { createAIModel } from '../../../lib/services/ai/model-factory';
+import { createAgentCoordinator, createAIModel } from '@onecoach/lib-ai-agents';
 import { auth } from '@onecoach/lib-core/auth';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { MODEL_CONSTANTS } from '@onecoach/lib-ai-utils';
 
 /**
  * Request schema validation
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       domain: type === 'combined' ? 'analytics' : type,
       operation: 'execution',
       tier: 'balanced',
-      temperature: 0.7,
+      temperature: MODEL_CONSTANTS.DEFAULT_TEMPERATURE,
       maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
     });
 

@@ -35,4 +35,3 @@ export declare const workoutQueries: {
         session: unknown;
     }>;
 };
-//# sourceMappingURL=workout.queries.d.ts.map

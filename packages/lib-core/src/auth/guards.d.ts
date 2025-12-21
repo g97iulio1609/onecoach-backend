@@ -48,4 +48,3 @@ export declare function withAdmin(handler: (req: Request, user: unknown) => Prom
  * Wrapper per API route con super admin guard
  */
 export declare function withSuperAdmin(handler: (req: Request, user: unknown) => Promise<Response>): (req: Request) => Promise<Response>;
-//# sourceMappingURL=guards.d.ts.map

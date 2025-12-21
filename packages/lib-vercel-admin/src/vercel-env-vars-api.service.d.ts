@@ -64,4 +64,3 @@ export declare function deleteEnvVar(envId: string): Promise<VercelApiResult<voi
  * Restituisce false se Vercel non è configurato (per permettere operazioni opzionali)
  */
 export declare function envVarExists(key: string): Promise<boolean>;
-//# sourceMappingURL=vercel-env-vars-api.service.d.ts.map

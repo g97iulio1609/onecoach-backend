@@ -8,4 +8,3 @@ import Stripe from 'stripe';
  * Restituisce un'istanza Stripe inizializzata
  */
 export declare function getStripe(): Stripe;
-//# sourceMappingURL=stripe.d.ts.map

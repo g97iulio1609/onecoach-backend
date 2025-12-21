@@ -6,7 +6,7 @@
 import { auth } from './config';
 // TODO: Spostare logError in lib-shared o creare utility per errori
 // Per ora manteniamo import da lib/utils/logger per evitare dipendenze extra
-import { logError } from '@OneCoach/lib-shared/utils/logger';
+import { logError } from '@onecoach/lib-shared/utils/logger';
 import { normalizeRole, roleSatisfies } from './roles';
 /**
  * Verifica se un errore è un errore di decryption JWT

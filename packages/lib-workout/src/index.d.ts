@@ -21,4 +21,3 @@ export * from './services/progression-template.service';
 export * from './services/granular-session.service';
 export type { ImportProgress } from '@onecoach/lib-import-core';
 export { WorkoutImportService, type WorkoutImportResult, type WorkoutImportResult as ImportResult } from './services/workout-import.service';
-//# sourceMappingURL=index.d.ts.map

@@ -4,8 +4,7 @@
  * Gestione delle policy pages (Privacy, Terms, GDPR, Content Policy)
  */
 import { prisma } from './prisma';
-import { Prisma } from '@prisma/client';
-import { PolicyType, PolicyStatus } from '@prisma/client';
+import { PolicyStatus, PolicyType, Prisma } from '@prisma/client';
 /**
  * Policy Service
  */

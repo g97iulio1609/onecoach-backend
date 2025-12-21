@@ -7,8 +7,8 @@
  * Model Configuration
  */
 export declare const MODEL_CONSTANTS: {
-    /** Default temperature for general chat */
-    readonly DEFAULT_TEMPERATURE: 0.7;
+    /** Default temperature for general chat and generation */
+    readonly DEFAULT_TEMPERATURE: 1;
     /** Temperature for intent detection (lower = more deterministic) */
     readonly INTENT_DETECTION_TEMPERATURE: 0.3;
     /** Max tokens for reasoning mode with extended thinking */
@@ -31,4 +31,3 @@ export interface ModelConfig {
     reasoningEnabled?: boolean;
     creditsPerRequest?: number;
 }
-//# sourceMappingURL=constants.d.ts.map

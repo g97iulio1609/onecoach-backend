@@ -4,7 +4,7 @@
  * CRUD operations for direct messaging between coach and athlete
  * Implements SOLID principles (SRP, DIP)
  */
-import { prisma } from '@OneCoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
 import { createId } from '@paralleldrive/cuid2';
 /**

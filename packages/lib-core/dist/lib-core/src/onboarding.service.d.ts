@@ -4,8 +4,8 @@
  * Gestisce lo stato e il progresso dell'onboarding wizard
  * Implementa IOnboardingService contract
  */
-import type { IOnboardingService } from '@OneCoach/contracts';
-import type { OnboardingProgress, StepCompletionInput } from '@OneCoach/types';
+import type { IOnboardingService } from '@onecoach/contracts';
+import type { OnboardingProgress, StepCompletionInput } from '@onecoach/types';
 /**
  * Onboarding step configuration
  * Definisce i 15 step del wizard

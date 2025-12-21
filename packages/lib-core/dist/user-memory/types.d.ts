@@ -1,3 +1,4 @@
+export type MemoryDomain = 'workout' | 'nutrition' | 'oneagenda' | 'projects' | 'tasks' | 'habits' | 'general';
 /**
  * User Memory Types
  *
@@ -196,15 +197,7 @@ export interface GeneralMemory extends DomainMemory {
 /**
  * Complete user memory structure
  */
-export interface UserMemory {
-    workout?: WorkoutMemory;
-    nutrition?: NutritionMemory;
-    oneagenda?: OneAgendaMemory;
-    projects?: ProjectsMemory;
-    tasks?: TasksMemory;
-    habits?: HabitsMemory;
-    general?: GeneralMemory;
-}
+export type UserMemory = Partial<Record<MemoryDomain, DomainMemory>>;
 /**
  * Memory update payload for a specific domain
  */
@@ -234,7 +227,6 @@ export interface MemoryContext {
 /**
  * Domain names for type safety
  */
-export type MemoryDomain = keyof UserMemory;
 /**
  * Options for memory retrieval
  */

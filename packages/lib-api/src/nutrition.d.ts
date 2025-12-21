@@ -59,4 +59,3 @@ export declare const nutritionApi: {
         log: unknown;
     }>;
 };
-//# sourceMappingURL=nutrition.d.ts.map

@@ -8,19 +8,19 @@ export declare class ProgressionTemplateService {
      * Create a new progression template
      */
     static create(userId: string, data: ProgressionTemplateData): Promise<{
-        name: string;
-        userId: string | null;
         id: string;
         description: string | null;
-        type: import("@prisma/client").$Enums.WorkoutTemplateType;
         createdAt: Date;
         updatedAt: Date;
-        category: string | null;
+        name: string;
         data: import("@prisma/client/runtime/client").JsonValue;
+        type: import("@prisma/client").$Enums.WorkoutTemplateType;
+        userId: string | null;
+        category: string | null;
         tags: string[];
-        isPublic: boolean;
-        usageCount: number;
         lastUsedAt: Date | null;
+        usageCount: number;
+        isPublic: boolean;
     }>;
     /**
      * List progression templates for a user
@@ -35,19 +35,19 @@ export declare class ProgressionTemplateService {
      * Delete a progression template
      */
     static delete(userId: string, templateId: string): Promise<{
-        name: string;
-        userId: string | null;
         id: string;
         description: string | null;
-        type: import("@prisma/client").$Enums.WorkoutTemplateType;
         createdAt: Date;
         updatedAt: Date;
-        category: string | null;
+        name: string;
         data: import("@prisma/client/runtime/client").JsonValue;
+        type: import("@prisma/client").$Enums.WorkoutTemplateType;
+        userId: string | null;
+        category: string | null;
         tags: string[];
-        isPublic: boolean;
-        usageCount: number;
         lastUsedAt: Date | null;
+        usageCount: number;
+        isPublic: boolean;
     }>;
     /**
      * Get a specific template
@@ -59,4 +59,3 @@ export declare class ProgressionTemplateService {
         params: ProgressionParams;
     } | null>;
 }
-//# sourceMappingURL=progression-template.service.d.ts.map

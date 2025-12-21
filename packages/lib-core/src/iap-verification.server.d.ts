@@ -25,4 +25,3 @@ export declare function verifyAppleReceipt(receiptData: string): Promise<Verific
  * Uses Google Play Developer API
  */
 export declare function verifyGoogleReceipt(productId: string, purchaseToken: string): Promise<VerificationResult>;
-//# sourceMappingURL=iap-verification.server.d.ts.map

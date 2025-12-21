@@ -1,5 +1,5 @@
 /**
- * @OneCoach/lib-registry
+ * @onecoach/lib-registry
  *
  * Service registry per dependency injection
  * Permette swap di implementazioni (test, mock, alternative)

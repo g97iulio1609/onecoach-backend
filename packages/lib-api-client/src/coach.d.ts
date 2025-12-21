@@ -1,8 +1,65 @@
-/**
- * Coach API Client
- *
- * API client for coach-related operations
- */
+import type { MarketplacePlanType } from '@onecoach/types';
+export interface MarketplacePlanCardProps {
+    id: string;
+    title: string;
+    description: string;
+    planType: MarketplacePlanType;
+    coverImage?: string | null;
+    price: number;
+    currency: string;
+    isPublished: boolean;
+    totalPurchases: number;
+    averageRating: number | null;
+    totalReviews: number;
+    createdAt: Date | string;
+}
+export interface CoachDashboardPlansFilters {
+    planType?: MarketplacePlanType;
+    isPublished?: boolean;
+    page?: number;
+    limit?: number;
+}
+export interface CoachDashboardPlansResponse {
+    plans: MarketplacePlanCardProps[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+}
+export interface CoachClient {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+    programsPurchased: number;
+    lastActive: Date | null;
+    totalSpent: number;
+    purchases: Array<{
+        id: string;
+        planTitle: string;
+        planType: string;
+        purchasedAt: Date;
+        price: number;
+    }>;
+}
+export interface CoachClientsResponse {
+    clients: CoachClient[];
+    total: number;
+}
+export interface CoachClientsFilters {
+    search?: string;
+    sortBy?: 'name' | 'totalSpent' | 'programsPurchased' | 'lastActive';
+    sortOrder?: 'asc' | 'desc';
+}
+export interface CoachDashboardStats {
+    totalSales: number;
+    totalRevenue: number;
+    averageRating: number | null;
+    totalReviews: number;
+    totalPlans: number;
+    publishedPlans: number;
+    draftPlans: number;
+}
 export interface CoachProfile {
     id: string;
     userId: string;
@@ -49,5 +106,17 @@ export declare const coachApi: {
      * Update coach profile
      */
     updateProfile(data: Partial<CoachProfile>): Promise<CoachProfileResponse>;
+    /**
+     * Get coach dashboard stats
+     */
+    getDashboardStats(): Promise<CoachDashboardStats>;
+    /**
+     * Get coach dashboard plans with filters
+     */
+    getDashboardPlans(filters?: CoachDashboardPlansFilters): Promise<CoachDashboardPlansResponse>;
+    /**
+     * Get coach's clients
+     */
+    getClients(filters?: CoachClientsFilters): Promise<CoachClientsResponse>;
 };
 //# sourceMappingURL=coach.d.ts.map

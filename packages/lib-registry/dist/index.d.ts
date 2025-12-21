@@ -1,14 +1,14 @@
 /**
- * @OneCoach/lib-registry
+ * @onecoach/lib-registry
  *
  * Service registry per dependency injection
  * Permette swap di implementazioni (test, mock, alternative)
  */
-import type { INutritionService, IWorkoutService, IExerciseService, IFoodService, IAnalyticsService, ICreditService, ISubscriptionService, IUserProfileService, IPaymentService, IOnboardingService, IAIConfigService, IChatService, IMarketplaceService, ICoachService } from '@OneCoach/contracts';
+import type { INutritionService, IWorkoutService, IExerciseService, IFoodService, IAnalyticsService, ICreditService, ISubscriptionService, IUserProfileService, IPaymentService, IOnboardingService, IChatService, IMarketplaceService, ICoachService } from '@onecoach/contracts';
 /**
  * Service registry type
  */
-type ServiceKey = 'nutrition' | 'workout' | 'exercise' | 'food' | 'analytics' | 'credit' | 'subscription' | 'userProfile' | 'payment' | 'onboarding' | 'aiConfig' | 'chat' | 'marketplace' | 'coach';
+type ServiceKey = 'nutrition' | 'workout' | 'exercise' | 'food' | 'analytics' | 'credit' | 'subscription' | 'userProfile' | 'payment' | 'onboarding' | 'chat' | 'marketplace' | 'coach';
 type ServiceMap = {
     nutrition: INutritionService;
     workout: IWorkoutService;
@@ -20,7 +20,6 @@ type ServiceMap = {
     userProfile: IUserProfileService;
     payment: IPaymentService;
     onboarding: IOnboardingService;
-    aiConfig: IAIConfigService;
     chat: IChatService;
     marketplace: IMarketplaceService;
     coach: ICoachService;

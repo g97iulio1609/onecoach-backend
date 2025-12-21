@@ -6,13 +6,13 @@
  */
 import { prisma } from './prisma';
 import { Prisma } from '@prisma/client';
-import { createId } from '@OneCoach/lib-shared/id-generator';
+import { createId } from '@onecoach/lib-shared/id-generator';
 function sanitizeStringArray(values) {
     if (!values || values.length === 0) {
         return [];
     }
     return Array.from(new Set(values
-        .map((value) => value?.trim())
+        .map((value) => (typeof value === 'string' ? value.trim() : ''))
         .filter((entry) => Boolean(entry))));
 }
 // Helper per serializzare il profilo convertendo Decimal a numero

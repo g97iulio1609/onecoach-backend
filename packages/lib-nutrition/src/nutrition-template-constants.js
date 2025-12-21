@@ -8,20 +8,20 @@
  * Ottiene categorie disponibili per template nutrizionali
  */
 export function getAvailableCategories() {
-  return [
-    'colazione',
-    'pranzo',
-    'cena',
-    'snack',
-    'pre-workout',
-    'post-workout',
-    'cut',
-    'bulk',
-    'maintenance',
-    'vegetariano',
-    'vegano',
-    'keto',
-    'low-carb',
-    'high-protein',
-  ];
+    return [
+        'colazione',
+        'pranzo',
+        'cena',
+        'snack',
+        'pre-workout',
+        'post-workout',
+        'cut',
+        'bulk',
+        'maintenance',
+        'vegetariano',
+        'vegano',
+        'keto',
+        'low-carb',
+        'high-protein',
+    ];
 }

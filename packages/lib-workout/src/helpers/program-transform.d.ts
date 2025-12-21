@@ -89,4 +89,3 @@ export declare function prepareProgramForPersistence(program: WorkoutProgram): {
  * The backend will handle the ID conversion when saving
  */
 export declare function normalizeAgentWorkoutPayloadSync(payload: unknown, base?: Partial<WorkoutProgram>): WorkoutProgram;
-//# sourceMappingURL=program-transform.d.ts.map

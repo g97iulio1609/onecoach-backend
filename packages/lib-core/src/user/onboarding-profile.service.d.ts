@@ -7,4 +7,3 @@ type OnboardingProfileInput = {
 };
 export declare function saveOnboardingProfile(userId: string, profileData: OnboardingProfileInput): Promise<void>;
 export {};
-//# sourceMappingURL=onboarding-profile.service.d.ts.map

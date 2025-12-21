@@ -48,4 +48,3 @@ export declare function getBodyMeasurementStats(userId: string, startDate: Date,
     };
     latest: BodyMeasurement;
 } | null>;
-//# sourceMappingURL=body-measurements.service.d.ts.map
