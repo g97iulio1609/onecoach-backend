@@ -14,3 +14,4 @@ export * from './plan-sync';
 export * from './prisma-helpers';
 export * from './template-helpers';
 export * from './type-guards';
+export * from './normalizers/nutrition-summary-normalizer';
