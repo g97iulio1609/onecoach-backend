@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PolicyStatus, PrismaClient } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 
 export async function seedPolicies(prisma: PrismaClient, adminUserId: string) {
@@ -39,13 +39,13 @@ export async function seedPolicies(prisma: PrismaClient, adminUserId: string) {
 
   for (const p of basePolicies) {
     const policy = await prisma.policies.upsert({
-      where: { type: p.type as any },
+      where: { type: p.type },
       update: {
         slug: p.slug,
         title: p.title,
         content: p.content,
         metaDescription: p.metaDescription,
-        status: p.status as any,
+        status: p.status as PolicyStatus,
         updatedAt: new Date(),
         updatedById: adminUserId,
         publishedAt: new Date(),
@@ -53,11 +53,11 @@ export async function seedPolicies(prisma: PrismaClient, adminUserId: string) {
       create: {
         id: createId(),
         slug: p.slug,
-        type: p.type as any,
+        type: p.type,
         title: p.title,
         content: p.content,
         metaDescription: p.metaDescription,
-        status: p.status as any,
+        status: p.status as PolicyStatus,
         version: 1,
         createdById: adminUserId,
         updatedById: adminUserId,
@@ -72,7 +72,7 @@ export async function seedPolicies(prisma: PrismaClient, adminUserId: string) {
       update: {
         title: policy.title,
         content: policy.content,
-        status: policy.status as any,
+        status: policy.status,
         changeReason: 'Creazione iniziale',
       },
       create: {
@@ -80,11 +80,11 @@ export async function seedPolicies(prisma: PrismaClient, adminUserId: string) {
         policyId: policy.id,
         version: 1,
         slug: policy.slug,
-        type: policy.type as any,
+        type: policy.type,
         title: policy.title,
         content: policy.content,
         metaDescription: policy.metaDescription ?? undefined,
-        status: policy.status as any,
+        status: policy.status,
         changedBy: adminUserId,
         changeReason: 'Creazione iniziale',
         createdAt: new Date(),

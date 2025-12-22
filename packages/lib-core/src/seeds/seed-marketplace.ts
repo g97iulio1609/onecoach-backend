@@ -63,7 +63,7 @@ export async function seedMarketplace(prisma: PrismaClient) {
       where: { id: p.id },
       update: {
         coachId: coach.id,
-        planType: p.planType as any,
+        planType: p.planType,
         title: p.title,
         description: p.description,
         price: p.price,
@@ -75,7 +75,7 @@ export async function seedMarketplace(prisma: PrismaClient) {
       create: {
         id: p.id,
         coachId: coach.id,
-        planType: p.planType as any,
+        planType: p.planType,
         title: p.title,
         description: p.description,
         price: p.price,

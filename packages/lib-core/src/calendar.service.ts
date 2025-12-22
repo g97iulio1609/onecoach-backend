@@ -211,7 +211,7 @@ export async function createCalendarAssignmentRange(
 
     // Then create all new assignments in a single batch
     await tx.calendar_assignments.createMany({
-      data: dates.map((date: any) => ({
+      data: dates.map((date: Date) => ({
         userId,
         date,
         planType,

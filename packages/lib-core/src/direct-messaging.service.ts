@@ -202,15 +202,15 @@ class DirectMessagingService implements IDirectMessagingService {
     });
 
     // Batch calculate unread counts in a single query
-    const conversationIds = conversations.map((c: any) => c.id);
+    const conversationIds = conversations.map((c) => c.id);
     const unreadCounts = await this.batchGetUnreadCounts(conversationIds, userId);
 
     // Map unread counts to conversations
-    return conversations.map((conv: any) => ({
+    return conversations.map((conv) => ({
       ...conv,
       unreadCount: unreadCounts.get(conv.id) ?? 0,
       lastMessage: conv.messages[0] || null,
-    }));
+    })) as DirectConversationWithUser[];
   }
 
   /**
@@ -341,10 +341,10 @@ class DirectMessagingService implements IDirectMessagingService {
     });
 
     // Map to include isRead flag
-    return messages.map((msg: any) => ({
+    return messages.map((msg) => ({
       ...msg,
       isRead: msg.reads.length > 0,
-    }));
+    })) as DirectMessageWithSender[];
   }
 
   /**

@@ -299,8 +299,8 @@ export class SubscriptionService implements ISubscriptionService {
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0]?.price.id ?? '',
-        currentPeriodStart: new Date(((subscription as any).current_period_start ?? 0) * 1000),
-        currentPeriodEnd: new Date(((subscription as any).current_period_end ?? 0) * 1000),
+        currentPeriodStart: new Date(((subscription as unknown as Record<string, number>).current_period_start ?? 0) * 1000),
+        currentPeriodEnd: new Date(((subscription as unknown as Record<string, number>).current_period_end ?? 0) * 1000),
         updatedAt: new Date(),
       },
     });
@@ -330,8 +330,8 @@ export class SubscriptionService implements ISubscriptionService {
         where: { id: dbSubscription.id },
         data: {
           status: newStatus,
-          currentPeriodStart: new Date(((subscription as any).current_period_start ?? 0) * 1000),
-          currentPeriodEnd: new Date(((subscription as any).current_period_end ?? 0) * 1000),
+          currentPeriodStart: new Date(((subscription as unknown as Record<string, number>).current_period_start ?? 0) * 1000),
+          currentPeriodEnd: new Date(((subscription as unknown as Record<string, number>).current_period_end ?? 0) * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           updatedAt: new Date(),
         },
@@ -356,7 +356,7 @@ export class SubscriptionService implements ISubscriptionService {
   }
 
   private async handleInvoicePaid(invoice: Stripe.Invoice) {
-    const subscriptionId = (invoice as any).subscription as string | null;
+    const subscriptionId = (invoice as unknown as { subscription: string | null }).subscription;
     if (!subscriptionId) return;
     const subscription = await prisma.subscriptions.findFirst({
       where: { stripeSubscriptionId: subscriptionId },
