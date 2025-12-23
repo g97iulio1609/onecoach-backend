@@ -16,6 +16,7 @@ export interface UserProfileData {
   sex: Sex | null;
   heightCm: number | null;
   weightKg: number | null;
+  weightIncrement?: number | null;
   weightUnit: WeightUnit;
   activityLevel: ActivityLevel | null;
   trainingFrequency: number | null;
