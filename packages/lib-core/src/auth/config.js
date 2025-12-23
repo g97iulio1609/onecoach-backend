@@ -10,7 +10,7 @@ import Google from 'next-auth/providers/google';
 import Apple from 'next-auth/providers/apple';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../prisma';
-import { generateId, generateUUID } from '@onecoach/lib-shared/id-generator';
+import {  createId, generateUUID  } from '@onecoach/lib-shared/id-generator';
 // Production-safe: require explicit env vars, no hardcoded defaults
 const isProduction = process.env.NODE_ENV === 'production';
 // Admin config (priorità: SUPER_ADMIN > ADMIN) - DEVE essere definito PRIMA di ENABLE_AUTO_PROVISION
@@ -82,7 +82,7 @@ async function provisionAdmin(email, password, name, role, credits) {
             updatedAt: new Date(),
         },
         create: {
-            id: generateId('user_profile'),
+            id: createId(),
             userId: user.id,
             createdAt: new Date(),
             updatedAt: new Date(),

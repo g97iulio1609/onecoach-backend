@@ -4,7 +4,7 @@
  * CRUD operations per nutrition plans
  * Implementa INutritionService contract
  */
-import { generateId, getCurrentTimestamp, storageService } from '@onecoach/lib-shared';
+import {  createId, getCurrentTimestamp, storageService  } from '@onecoach/lib-shared';
 /**
  * Storage key per nutrition plans
  */
@@ -25,7 +25,7 @@ export class NutritionService {
             const now = getCurrentTimestamp();
             const newPlan = {
                 ...plan,
-                id: generateId('nutrition'),
+                id: createId(),
                 createdAt: now,
                 updatedAt: now,
                 status: plan.status ?? 'DRAFT',

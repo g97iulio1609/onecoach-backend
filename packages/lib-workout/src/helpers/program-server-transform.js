@@ -10,7 +10,7 @@
  * server-side when called.
  */
 import { DifficultyLevel, WorkoutStatus } from '@onecoach/types/client';
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { ensureArrayOfStrings, ensureNumber, ensureString, } from '@onecoach/lib-workout/utils/type-helpers';
 import { convertWorkoutGoalNamesToIds } from '@onecoach/lib-metadata/metadata-translation.service';
 import { normalizeDifficulty, normalizeStatus, normalizeWeek, normalizeMetadata, } from '@onecoach/lib-workout/normalizers/workout-normalizer';
@@ -68,7 +68,7 @@ export async function normalizeAgentWorkoutPayload(payload, base) {
     // Converti goal names → IDs se necessario
     const goalIds = await convertWorkoutGoalNamesToIds(normalizedGoals);
     return {
-        id: base?.id ?? generateId('workout_agent'),
+        id: base?.id ?? createId(),
         name: ensureString(raw.name ?? base?.name ?? 'Workout Program'),
         description: ensureString(raw.description ?? base?.description ?? ''),
         difficulty: raw.difficulty

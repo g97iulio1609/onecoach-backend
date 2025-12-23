@@ -16,7 +16,7 @@
 import { calculateWeightFromIntensity, calculateIntensityFromWeight, kgToLbs, lbsToKg, } from '../helpers/intensity-calculator';
 import { generateSetsFromGroup } from '../helpers/utils/progression-calculator';
 import { deepClone } from '../helpers/utils';
-import { generateId } from '@onecoach/lib-shared/id-generator';
+import {  createId  } from '@onecoach/lib-shared/id-generator';
 // =====================================================
 // Utility Functions
 // =====================================================
@@ -246,7 +246,7 @@ export class GranularSessionService {
             return { success: false, error: 'Exercise not found' };
         // Create default setGroup if not provided
         const newSetGroup = {
-            id: setGroup.id || generateId('setgroup'),
+            id: setGroup.id || createId(),
             count: setGroup.count || 3,
             baseSet: setGroup.baseSet || {
                 reps: 10,
@@ -310,7 +310,7 @@ export class GranularSessionService {
         if (!setGroup)
             return { success: false, error: 'SetGroup not found' };
         const newSetGroup = deepClone(setGroup);
-        newSetGroup.id = generateId('setgroup');
+        newSetGroup.id = createId();
         return this.addSetGroup(program, target, newSetGroup);
     }
     /**

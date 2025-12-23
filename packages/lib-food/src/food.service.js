@@ -12,7 +12,7 @@
  */
 import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
-import { generateId } from '@onecoach/lib-shared/id-generator';
+import {  createId  } from '@onecoach/lib-shared/id-generator';
 import { SUPPORTED_FOOD_LOCALES } from '@onecoach/constants/supported-locales';
 const DEFAULT_LOCALE = 'it';
 // Cache per average document length (BM25)
@@ -202,13 +202,13 @@ export class FoodService {
             const existing = await prisma.food_brands.findFirst({ where: { nameNormalized: nameNorm } });
             const brand = existing ||
                 (await prisma.food_brands.create({
-                    data: { id: generateId('brand'), name: data.brandName, nameNormalized: nameNorm },
+                    data: { id: createId(), name: data.brandName, nameNormalized: nameNorm },
                 }));
             resolvedBrandId = brand.id;
         }
         const food = await prisma.food_items.create({
             data: {
-                id: generateId('food'),
+                id: createId(),
                 name: data.name,
                 nameNormalized,
                 barcode: data.barcode,
@@ -224,7 +224,7 @@ export class FoodService {
                 fatPct,
                 food_item_translations: {
                     create: SUPPORTED_FOOD_LOCALES.map((locale) => ({
-                        id: generateId('food_trans'),
+                        id: createId(),
                         locale,
                         name: data.name, // Same name for all locales
                         description: data.description, // Same description for all locales (can be enhanced later with AI translation)
@@ -291,7 +291,7 @@ export class FoodService {
                 });
                 const brand = existing ||
                     (await prisma.food_brands.create({
-                        data: { id: generateId('brand'), name: data.brandName, nameNormalized: nameNorm },
+                        data: { id: createId(), name: data.brandName, nameNormalized: nameNorm },
                     }));
                 resolvedBrandId = brand.id;
             }

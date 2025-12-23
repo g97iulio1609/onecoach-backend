@@ -4,7 +4,7 @@
  * CRUD operations per workout programs
  * Implementa IWorkoutService contract
  */
-import { generateId, getCurrentTimestamp, storageService } from '@onecoach/lib-shared';
+import {  createId, getCurrentTimestamp, storageService  } from '@onecoach/lib-shared';
 /**
  * Storage key per workouts
  */
@@ -22,7 +22,7 @@ export class WorkoutService {
             const now = getCurrentTimestamp();
             const newWorkout = {
                 ...workout,
-                id: generateId('workout'),
+                id: createId(),
                 createdAt: now,
                 updatedAt: now,
             };

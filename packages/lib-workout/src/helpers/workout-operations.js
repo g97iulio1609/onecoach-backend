@@ -5,7 +5,7 @@
  * Segue il pattern di lib/nutrition/plan-operations.ts
  */
 import { createEmptyWeek, createEmptyDay, createEmptyExercise } from './program-transform';
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { DEFAULT_SET } from './constants';
 import { kgToLbs } from './intensity-calculator';
 import { getWorkoutProgramWeek, getWorkoutProgramDayByWeek, } from '@onecoach/lib-shared/utils/workout-program-helpers';
@@ -177,7 +177,7 @@ export function updateWeek(program, weekNumber, updates) {
  */
 export function addSetGroupToExercise(program, weekNumber, dayNumber, exerciseId, baseSet, count) {
     const newGroup = {
-        id: generateId('setgroup'),
+        id: createId(),
         count,
         baseSet,
         sets: Array.from({ length: count }, () => ({ ...baseSet })),
@@ -236,7 +236,7 @@ export function groupSelectedSets(program, weekNumber, dayNumber, exerciseId, se
         rest: Math.round(avgRest) || DEFAULT_SET.rest,
     };
     const newGroup = {
-        id: generateId('setgroup'),
+        id: createId(),
         count: setIndices.length,
         baseSet,
         sets: selectedSets,
@@ -248,7 +248,7 @@ export function groupSelectedSets(program, weekNumber, dayNumber, exerciseId, se
     if (remainingSets.length > 0) {
         // Crea un gruppo per le serie rimanenti
         updatedSetGroups.push({
-            id: generateId('setgroup'),
+            id: createId(),
             count: remainingSets.length,
             baseSet: remainingSets[0] || DEFAULT_SET,
             sets: remainingSets,
@@ -280,7 +280,7 @@ export function splitSetGroup(program, weekNumber, dayNumber, exerciseId, groupI
     let newGroups;
     if (freedSets.length > 0) {
         const freedGroup = {
-            id: generateId('setgroup'),
+            id: createId(),
             count: freedSets.length,
             baseSet: freedSets[0] || DEFAULT_SET,
             sets: freedSets,
@@ -323,7 +323,7 @@ export function duplicateSetGroup(program, weekNumber, dayNumber, exerciseId, gr
     }
     const duplicatedGroup = {
         ...group,
-        id: generateId('setgroup'),
+        id: createId(),
         sets: group.sets.map((s) => ({ ...s })),
     };
     if (duplicatedGroup.progression) {

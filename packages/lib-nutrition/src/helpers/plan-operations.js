@@ -7,7 +7,7 @@
 import { createEmptyDay, createEmptyWeek } from './plan-transform';
 import { getNutritionPlanTotalDays } from '@onecoach/lib-shared/utils/nutrition-plan-helpers';
 import { calculateMacros, recalculateDay } from '@onecoach/lib-shared/utils/macro-calculations';
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 /**
  * Aggiunge una nuova settimana al piano
  */
@@ -16,7 +16,7 @@ export function addNutritionWeek(plan) {
     const nextWeekNumber = (plan.weeks?.length || 0) + 1;
     const nextDayNumber = totalDays + 1;
     const newWeek = {
-        id: generateId(`week_${nextWeekNumber}`),
+        id: createId(),
         weekNumber: nextWeekNumber,
         days: [createEmptyDay(nextDayNumber)],
         weeklyAverageMacros: { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 },

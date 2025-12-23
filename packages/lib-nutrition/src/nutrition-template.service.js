@@ -6,7 +6,7 @@
  */
 import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
-import { generateId } from '@onecoach/lib-shared/id-generator';
+import {  createId  } from '@onecoach/lib-shared/id-generator';
 /**
  * Validazione template data in base al tipo
  */
@@ -55,7 +55,7 @@ export class NutritionTemplateService {
         }
         const template = await prisma.nutrition_templates.create({
             data: {
-                id: generateId('nutrition_template'),
+                id: createId(),
                 userId,
                 type: data.type,
                 name: data.name.trim(),

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store/update subscription in database
-    const { generateId } = await import('@onecoach/lib-shared/id-generator');
+    const { createId } = await import('@onecoach/lib-shared/id-generator');
     const existingSubscription = await db.subscriptions.findFirst({
       where: { userId: session.user.id },
     });

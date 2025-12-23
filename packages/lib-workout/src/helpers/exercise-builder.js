@@ -7,7 +7,7 @@
  * - catalogExerciseId: ID dell'esercizio nel catalogo database (unico standard)
  * - id: ID temporaneo dell'istanza dell'esercizio nel workout
  */
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { getMuscleGroupFromName } from './utils/muscle-group';
 import { DEFAULT_SET } from './constants';
 /**
@@ -22,13 +22,13 @@ export function buildWorkoutExerciseFromCatalog(exercise) {
         .find((group) => group !== null) ?? 'full-body';
     // Crea un setGroup di default
     const defaultSetGroup = {
-        id: generateId('setgroup'),
+        id: createId(),
         count: 3,
         baseSet: { ...DEFAULT_SET },
         sets: [{ ...DEFAULT_SET }, { ...DEFAULT_SET }, { ...DEFAULT_SET }],
     };
     return {
-        id: generateId('exercise_catalog'),
+        id: createId(),
         name: exercise.translation?.name ?? exercise.slug,
         description: exercise.translation?.description ?? exercise.overview ?? '',
         category: 'strength',

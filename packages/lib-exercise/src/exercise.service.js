@@ -1,5 +1,5 @@
 import { prisma } from '@onecoach/lib-core/prisma';
-import { generateId, toSlug } from '@onecoach/lib-shared/utils';
+import {  createId, toSlug  } from '@onecoach/lib-shared/utils';
 import { ExerciseApprovalStatus, ExerciseRelationType, MuscleRole, Prisma } from '@prisma/client';
 import { compare } from 'fast-json-patch';
 import { SimpleCache } from '@onecoach/lib-shared';
@@ -305,7 +305,7 @@ export class ExerciseService {
                         },
                     },
                     create: {
-                        id: generateId('ext'),
+                        id: createId(),
                         exerciseId: id,
                         ...translation,
                         updatedAt: new Date(),
@@ -836,7 +836,7 @@ export class ExerciseService {
             throw new Error('È richiesta una traduzione in inglese');
         }
         const slug = payload.slug?.trim() || toSlug(englishTranslation.name);
-        const exerciseId = generateId('exr');
+        const exerciseId = createId();
         const approvalStatus = options.autoApprove
             ? ExerciseApprovalStatus.APPROVED
             : ExerciseApprovalStatus.PENDING;
@@ -863,7 +863,7 @@ export class ExerciseService {
                 updatedAt: new Date(),
             },
             translations: translations.map((translation) => ({
-                id: generateId('ext'),
+                id: createId(),
                 locale: translation.locale,
                 name: translation.name,
                 shortName: translation.shortName ?? null,
@@ -967,7 +967,7 @@ export class ExerciseService {
             return [];
         }
         const normalizedRelations = relations.map((relation) => ({
-            id: generateId('exr'),
+            id: createId(),
             fromId: exerciseId,
             toId: relation.id,
             relation: relation.relation,

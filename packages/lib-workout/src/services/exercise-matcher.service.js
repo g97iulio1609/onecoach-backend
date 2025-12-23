@@ -15,7 +15,7 @@
  */
 import { prisma } from '@onecoach/lib-core/prisma';
 import { SimpleCache } from '@onecoach/lib-shared';
-import { generateId } from '@onecoach/lib-shared/utils';
+import {  createId  } from '@onecoach/lib-shared/utils';
 // ==================== CACHES ====================
 /**
  * Cache per gli esercizi dal database (30 min TTL)
@@ -611,7 +611,7 @@ export class ExerciseMatcherService {
             return existing.matchedId;
         }
         // Crea l'esercizio con flag isImported
-        const exerciseId = generateId('exr');
+        const exerciseId = createId();
         const slug = name
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
@@ -627,7 +627,7 @@ export class ExerciseMatcherService {
                 updatedAt: new Date(),
                 exercise_translations: {
                     create: {
-                        id: generateId('ext'),
+                        id: createId(),
                         locale: locale,
                         name: name,
                         searchTerms: [name.toLowerCase()],

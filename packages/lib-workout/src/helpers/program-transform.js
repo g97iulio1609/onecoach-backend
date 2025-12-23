@@ -1,12 +1,12 @@
 import { DifficultyLevel, WorkoutStatus } from '@onecoach/types/client';
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { DEFAULT_SET } from './constants';
 import { ensureArrayOfStrings, ensureNumber, ensureString } from './utils/type-helpers';
 import { syncWeightUnits } from '@onecoach/lib-shared/utils/weight-converter';
 import { normalizeDifficulty, normalizeStatus, normalizeWeek, normalizeMetadata, } from './normalizers/workout-normalizer';
 export function createEmptyExercise() {
     return {
-        id: generateId('exercise'),
+        id: createId(),
         catalogExerciseId: '', // Will be set when selecting from catalog
         name: 'Nuovo esercizio',
         description: '',
@@ -14,7 +14,7 @@ export function createEmptyExercise() {
         muscleGroups: [],
         setGroups: [
             {
-                id: generateId('setgroup'),
+                id: createId(),
                 count: 1,
                 baseSet: { ...DEFAULT_SET },
                 sets: [{ ...DEFAULT_SET }],
@@ -76,7 +76,7 @@ export function reconstructSetGroups(exercise) {
 export function createEmptyProgram() {
     const now = new Date().toISOString();
     return {
-        id: generateId('workout_temp'),
+        id: createId(),
         name: 'Nuovo programma di allenamento',
         description: '',
         difficulty: DifficultyLevel.BEGINNER,
@@ -116,7 +116,7 @@ export function prepareProgramForPersistence(program) {
                 cooldown: day.cooldown,
                 exercises: day.exercises.map((exercise, exerciseIndex) => ({
                     id: exercise.id ||
-                        generateId(`exercise_${weekIndex + 1}_${dayIndex + 1}_${exerciseIndex + 1}`),
+                        createId(),
                     name: exercise.name,
                     description: exercise.description,
                     category: exercise.category,
@@ -237,7 +237,7 @@ export function normalizeAgentWorkoutPayloadSync(payload, base) {
         rawGoals = base.goals;
     }
     return {
-        id: base?.id ?? generateId('workout_agent'),
+        id: base?.id ?? createId(),
         name: ensureString(raw.name ?? base?.name ?? 'Workout Program'),
         description: ensureString(raw.description ?? base?.description ?? ''),
         difficulty: raw.difficulty

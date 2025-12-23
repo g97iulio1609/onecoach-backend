@@ -6,7 +6,7 @@
 import { DEFAULT_SET, ALLOWED_CATEGORIES } from '../constants';
 import { ensureArray, ensureArrayOfStrings, ensureNumber, ensureString, parseFirstNumber, } from '../utils/type-helpers';
 import { getMuscleGroupFromName } from '../utils/muscle-group';
-import { generateId } from '@onecoach/lib-shared/utils/id-generator';
+import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { kgToLbs, lbsToKg } from '@onecoach/lib-workout/intensity-calculator';
 /**
  * Normalizza i gruppi muscolari da un valore sconosciuto
@@ -137,7 +137,7 @@ export function normalizeSetGroup(raw) {
     if (!raw || typeof raw !== 'object')
         return null;
     const group = raw;
-    const id = typeof group.id === 'string' ? group.id : generateId('setgroup');
+    const id = typeof group.id === 'string' ? group.id : createId();
     const count = ensureNumber(group.count, 1);
     const baseSet = normalizeExerciseSets([group.baseSet])[0] || { ...DEFAULT_SET };
     const progression = normalizeSetProgression(group.progression);
@@ -325,7 +325,7 @@ export function normalizeExercise(rawExercise, dayNumber, index) {
                 };
                 return [
                     {
-                        id: generateId('setgroup'),
+                        id: createId(),
                         count: sets.length,
                         baseSet: cleanBaseSet,
                         sets: sets,
