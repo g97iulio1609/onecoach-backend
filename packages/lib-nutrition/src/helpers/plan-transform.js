@@ -10,6 +10,7 @@ import { NutritionWeekSchema, NutritionDaySchema, MealSchema, FoodSchema, Person
 import {  createId  } from '@onecoach/lib-shared/utils/id-generator';
 import { calculateMacros, aggregateMealMacros, normalizeMacros, normalizeMacroValue, } from '@onecoach/lib-shared/utils/macro-calculations';
 import { parseCompleteMacrosSafe, isNutritionWeek, isNutritionDay, isMeal, isFood, isPersonalizedPlan, isAdaptations, isMetadata, } from './type-guards';
+import { logger } from '@onecoach/lib-core';
 const DEFAULT_MACROS = {
     calories: 0,
     protein: 0,
@@ -181,7 +182,7 @@ export function parseNutritionStatus(value) {
 export function normalizeNutritionPlan(plan) {
     try {
         if (IS_DEV) {
-            console.warn('[normalizeNutritionPlan] Starting normalization for plan:', plan.id);
+            logger.warn('[normalizeNutritionPlan] Starting normalization for plan:', plan.id);
         }
         const weeks = Array.isArray(plan.weeks) ? plan.weeks : [];
         const normalized = {
@@ -205,7 +206,7 @@ export function normalizeNutritionPlan(plan) {
             userId: plan.userId,
         };
         if (IS_DEV) {
-            console.warn('[normalizeNutritionPlan] Normalization complete:', {
+            logger.warn('[normalizeNutritionPlan] Normalization complete:', {
                 planId: normalized.id,
                 weeksCount: normalized.weeks.length,
             });
@@ -213,7 +214,7 @@ export function normalizeNutritionPlan(plan) {
         return normalized;
     }
     catch (error) {
-        console.error('[normalizeNutritionPlan] Error:', error);
+        logger.error('[normalizeNutritionPlan] Error:', error);
         throw error;
     }
 }
@@ -341,7 +342,7 @@ function normalizeFood(food, fallbackId) {
         !rawFood.foodId &&
         !rawFood.id &&
         IS_DEV) {
-        console.warn('[normalizeFood] Food without foodItemId, using fallback:', {
+        logger.warn('[normalizeFood] Food without foodItemId, using fallback:', {
             foodData: JSON.stringify(food).substring(0, 100),
             fallbackId,
             resolvedName: name,
@@ -396,7 +397,7 @@ export function preparePlanForPersistence(plan) {
                     foods: meal.foods.map((food) => {
                         // SCHEMA VERIFICATION: Log food before persistence
                         if (!food.foodItemId) {
-                            console.warn('[SCHEMA_VERIFY] Food without foodItemId in preparePlanForPersistence:', {
+                            logger.warn('[SCHEMA_VERIFY] Food without foodItemId in preparePlanForPersistence:', {
                                 foodId: food.id,
                                 foodName: food.name,
                                 hasFoodItemId: !!food.foodItemId,
@@ -549,7 +550,7 @@ export function normalizeAgentPayload(payload, base) {
     // Validate the final plan with Zod schema for type safety
     const validationResult = NutritionPlanBaseSchema.safeParse(planData);
     if (!validationResult.success) {
-        console.error('[normalizeAgentPayload] Validation errors:', validationResult.error.issues);
+        logger.error('[normalizeAgentPayload] Validation errors:', validationResult.error.issues);
         throw new Error(`Invalid agent payload structure: ${validationResult.error.issues.map((i) => i.message).join(', ')}`);
     }
     return {

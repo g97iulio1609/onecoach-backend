@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { ExerciseService } from '@onecoach/lib-exercise.service';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 /**
@@ -66,9 +67,9 @@ export async function GET(_req: Request) {
       locale,
     });
   } catch (error: unknown) {
-    console.error('[API] exercises/autocomplete GET error:', error);
+    logger.error('[API] exercises/autocomplete GET error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[API] exercises/autocomplete error details:', {
+    logger.error('[API] exercises/autocomplete error details:', {
       message: errorMessage,
       query: new URL(_req.url).searchParams.get('q'),
       locale: new URL(_req.url).searchParams.get('locale'),

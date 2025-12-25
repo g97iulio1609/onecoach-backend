@@ -14,6 +14,7 @@ import { auth } from '@onecoach/lib-core/auth';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 import { MODEL_CONSTANTS } from '@onecoach/lib-ai-agents/constants';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Request schema validation
  */
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
       { status: result.success ? 200 : 500 }
     );
   } catch (error: unknown) {
-    console.error('[Agents API] Error:', error);
+    logger.error('[Agents API] Error:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',
@@ -169,7 +170,7 @@ export async function GET() {
       observabilityEnabled: true,
     });
   } catch (error: unknown) {
-    console.error('[Agents API] Error:', error);
+    logger.error('[Agents API] Error:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',

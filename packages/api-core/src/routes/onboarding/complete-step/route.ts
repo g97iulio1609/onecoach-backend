@@ -11,6 +11,7 @@ import { saveOnboardingProfile } from '@onecoach/lib-core/user/onboarding-profil
 import { z } from 'zod';
 import { logError, getErrorMessage } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 const completeStepSchema = z.object({
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
 
     if (!userOrError.id || typeof userOrError.id !== 'string') {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[ONBOARDING COMPLETE-STEP] User ID non valido:', userOrError);
+        logger.error('[ONBOARDING COMPLETE-STEP] User ID non valido:', userOrError);
       }
       return NextResponse.json(
         { error: 'Errore di autenticazione: ID utente non valido' },
@@ -69,8 +70,8 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     if (process.env.NODE_ENV === 'development') {
       if (error instanceof Error) {
-        console.error('[ONBOARDING COMPLETE-STEP] Error message:', error.message);
-        console.error('[ONBOARDING COMPLETE-STEP] Error stack:', error.stack);
+        logger.error('[ONBOARDING COMPLETE-STEP] Error message:', error.message);
+        logger.error('[ONBOARDING COMPLETE-STEP] Error stack:', error.stack);
       }
       logError('Errore completamento step onboarding', error);
     }

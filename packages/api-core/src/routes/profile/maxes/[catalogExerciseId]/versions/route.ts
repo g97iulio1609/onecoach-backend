@@ -9,6 +9,7 @@ import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { OneRepMaxService } from '@onecoach/lib-exercise/one-rep-max.service';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 /**
@@ -27,7 +28,7 @@ export async function GET(
 
   // Verifica che userOrError abbia un id valido
   if (!('id' in userOrError) || typeof userOrError.id !== 'string') {
-    console.error(
+    logger.error(
       '[API] GET /api/profile/maxes/[catalogExerciseId]/versions: User ID non valido',
       userOrError
     );

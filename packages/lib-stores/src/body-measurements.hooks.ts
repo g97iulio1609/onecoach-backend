@@ -14,6 +14,7 @@ import { useRealtimeSubscription } from '@onecoach/lib-stores';
 import { useBodyMeasurementsStore } from '@onecoach/lib-stores';
 import type { BodyMeasurement } from '@onecoach/types';
 
+import { logger } from '@onecoach/lib-core';
 // Query keys for body measurements
 export const bodyMeasurementsKeys = {
   all: ['body-measurements'] as const,
@@ -142,7 +143,7 @@ export function useBodyMeasurementsRealtime({
       });
     },
     onError: (error) => {
-      console.error('[BodyMeasurements Realtime] Error:', error);
+      logger.error('[BodyMeasurements Realtime] Error:', error);
     },
   });
 }

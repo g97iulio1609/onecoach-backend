@@ -19,6 +19,7 @@
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // Types
 // ============================================================================
@@ -304,7 +305,7 @@ export const useChatStore = create<ChatStore>()(
             set({ conversations });
           }
         } catch (error) {
-          console.error('[ChatStore] Error fetching conversations:', error);
+          logger.error('[ChatStore] Error fetching conversations:', error);
           set({ lastError: 'Errore nel caricamento delle conversazioni' });
         }
       },
@@ -328,7 +329,7 @@ export const useChatStore = create<ChatStore>()(
             });
           }
         } catch (error) {
-          console.error('[ChatStore] Error loading conversation:', error);
+          logger.error('[ChatStore] Error loading conversation:', error);
           set({ lastError: 'Errore nel caricamento della conversazione' });
         }
       },
@@ -345,7 +346,7 @@ export const useChatStore = create<ChatStore>()(
             set({ lastError: 'Errore nella cancellazione della conversazione' });
           }
         } catch (error) {
-          console.error('[ChatStore] Error deleting conversation:', error);
+          logger.error('[ChatStore] Error deleting conversation:', error);
           set({ lastError: 'Errore nella cancellazione della conversazione' });
         } finally {
           set({ isDeleting: false });
@@ -368,7 +369,7 @@ export const useChatStore = create<ChatStore>()(
             set({ lastError: 'Errore nella cancellazione delle conversazioni' });
           }
         } catch (error) {
-          console.error('[ChatStore] Error deleting conversations:', error);
+          logger.error('[ChatStore] Error deleting conversations:', error);
           set({ lastError: 'Errore nella cancellazione delle conversazioni' });
         } finally {
           set({ isDeleting: false });
@@ -389,7 +390,7 @@ export const useChatStore = create<ChatStore>()(
             set({ lastError: 'Errore nella cancellazione di tutte le conversazioni' });
           }
         } catch (error) {
-          console.error('[ChatStore] Error deleting all conversations:', error);
+          logger.error('[ChatStore] Error deleting all conversations:', error);
           set({ lastError: 'Errore nella cancellazione di tutte le conversazioni' });
         } finally {
           set({ isDeleting: false });
@@ -416,7 +417,7 @@ export const useChatStore = create<ChatStore>()(
             set({ lastError: 'Errore nel rinominare la conversazione' });
           }
         } catch (error) {
-          console.error('[ChatStore] Error renaming conversation:', error);
+          logger.error('[ChatStore] Error renaming conversation:', error);
           set({ lastError: 'Errore nel rinominare la conversazione' });
         } finally {
           set({ isLoading: false });

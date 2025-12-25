@@ -2,7 +2,8 @@
  * Type Helpers
  *
  * Utility functions per type conversion e validation
- */
+ */import { logger } from '@onecoach/lib-core';
+
 /**
  * Converte un valore sconosciuto in numero, con fallback
  */
@@ -61,7 +62,7 @@ export function parseJsonIfString(value) {
             return JSON.parse(value);
         }
         catch (_error) {
-            console.warn('Failed to parse JSON string value', _error);
+            logger.warn('Failed to parse JSON string value', _error);
             return null;
         }
     }

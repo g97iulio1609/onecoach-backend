@@ -8,6 +8,7 @@
 import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/id-generator';
+import { logger } from '@onecoach/lib-core';
 import type {
   WorkoutTemplate,
   WorkoutTemplateType,
@@ -190,10 +191,10 @@ export class WorkoutTemplateService {
         this.mapToWorkoutTemplate(t)
       );
     } catch (error: unknown) {
-      console.error('[WorkoutTemplateService] Error listing templates:', error);
-      console.error('[WorkoutTemplateService] where clause:', JSON.stringify(where, null, 2));
-      console.error('[WorkoutTemplateService] orderBy:', JSON.stringify(orderBy, null, 2));
-      console.error('[WorkoutTemplateService] options:', JSON.stringify(options, null, 2));
+      logger.error('[WorkoutTemplateService] Error listing templates:', error);
+      logger.error('[WorkoutTemplateService] where clause:', JSON.stringify(where, null, 2));
+      logger.error('[WorkoutTemplateService] orderBy:', JSON.stringify(orderBy, null, 2));
+      logger.error('[WorkoutTemplateService] options:', JSON.stringify(options, null, 2));
       throw error;
     }
   }

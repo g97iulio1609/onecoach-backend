@@ -3,7 +3,8 @@
  *
  * SSOT for type-safe alternatives to `any` across the codebase.
  * Following SOLID principles: Single Responsibility for type safety.
- */
+ */import { logger } from '@onecoach/lib-core';
+
 
 /**
  * Safe JSON value type for unknown JSON data.
@@ -28,7 +29,7 @@ export type UnknownRecord = Record<string, unknown>;
  *
  * @example
  * if (hasProperty(obj, 'id')) {
- *   console.warn(obj.id); // Type-safe access
+ *   logger.warn(obj.id); // Type-safe access
  * }
  */
 export function hasProperty<K extends string>(obj: unknown, key: K): obj is Record<K, unknown> {
@@ -56,7 +57,7 @@ export function isError(value: unknown): value is Error {
  * @example
  * const user = safeCast(data, isUser);
  * if (user) { // Type is User
- *   console.warn(user.name);
+ *   logger.warn(user.name);
  * }
  */
 export function safeCast<T>(value: unknown, validator: (v: unknown) => v is T): T | undefined {
@@ -71,7 +72,7 @@ export function safeCast<T>(value: unknown, validator: (v: unknown) => v is T): 
  * try {
  *   // ...
  * } catch (error) {
- *   console.error(getErrorMessage(error));
+ *   logger.error(getErrorMessage(error));
  * }
  */
 export function getErrorMessage(error: unknown): string {

@@ -10,6 +10,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn('✅ Password reset successful for user:', resetToken.user?.email ?? userId);
+      logger.warn('✅ Password reset successful for user:', resetToken.user?.email ?? userId);
     }
 
     return NextResponse.json({

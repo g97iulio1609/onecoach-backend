@@ -17,6 +17,7 @@
 import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
 import type { $Enums } from '@prisma/client';
+import { logger } from '@onecoach/lib-core';
 import type {
   PlanningPlan,
   PlanningTask,
@@ -297,7 +298,7 @@ export class PlanningServiceV2 {
 
       return true;
     } catch (error: unknown) {
-      console.error('[PlanningService] updateTaskStatus error:', error);
+      logger.error('[PlanningService] updateTaskStatus error:', error);
       return false;
     }
   }
@@ -388,7 +389,7 @@ export class PlanningServiceV2 {
 
       return true;
     } catch (error: unknown) {
-      console.error('[PlanningService] updateSubTaskStatus error:', error);
+      logger.error('[PlanningService] updateSubTaskStatus error:', error);
       return false;
     }
   }
@@ -516,7 +517,7 @@ export class PlanningServiceV2 {
       });
       return true;
     } catch (error: unknown) {
-      console.error('[PlanningService] patchMetadata error:', error);
+      logger.error('[PlanningService] patchMetadata error:', error);
       return false;
     }
   }
@@ -834,7 +835,7 @@ export class PlanningServiceV2 {
 
       return true;
     } catch (error: unknown) {
-      console.error('[PlanningService] updateSubSubTaskStatus error:', error);
+      logger.error('[PlanningService] updateSubSubTaskStatus error:', error);
       return false;
     }
   }

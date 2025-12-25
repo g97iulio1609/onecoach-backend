@@ -19,6 +19,7 @@ import { useChatCore } from './use-chat-core';
 import { useUnifiedChatContextSafe } from '../providers/unified-chat-provider';
 import type { UseUnifiedChatOptions, UseUnifiedChatResult, QueuedMessage } from '../types/unified-chat';
 import { DEFAULT_CHAT_FEATURES } from '../types/unified-chat';
+import { logger } from '@onecoach/lib-core';
 import {
   useAIModelsStore,
   selectSelectedModelName,
@@ -158,7 +159,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     // Use selectedModelName from Zustand store (already the API model name)
     if (selectedModelName) {
       body.model = selectedModelName;
-      console.warn(`🎯 [useUnifiedChat] Sending model from store: ${selectedModelName}`);
+      logger.warn(`🎯 [useUnifiedChat] Sending model from store: ${selectedModelName}`);
     }
 
     // Add full MCP context from CopilotStore (includes planId, programId, taskId, etc.)
@@ -244,7 +245,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       isProcessingQueueRef.current = false;
     },
     onError: (err) => {
-      console.error('Chat error:', err);
+      logger.error('Chat error:', err);
       pendingNewConversationRef.current = false;
     },
   });
@@ -349,7 +350,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       try {
         await coreSendMessage({ text: messageText });
       } catch (err) {
-        console.error('Error sending message:', err);
+        logger.error('Error sending message:', err);
         pendingNewConversationRef.current = false;
         setInput(messageText);
       }
@@ -392,7 +393,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
           chatStoreSetCurrentConversation(conversationId);
         }
       } catch (err) {
-        console.error('Error loading conversation:', err);
+        logger.error('Error loading conversation:', err);
       }
     },
     [setCoreMessages, chatStoreSetCurrentConversation]
@@ -417,7 +418,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
           resetCore();
         }
       } catch (err) {
-        console.error('Error deleting conversation:', err);
+        logger.error('Error deleting conversation:', err);
       }
     },
     [currentConversation, resetCore, chatStoreDeleteConversation, chatStoreSetCurrentConversation]
@@ -428,7 +429,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       try {
         await chatStoreRenameConversation(id, title);
       } catch (err) {
-        console.error('Error renaming conversation:', err);
+        logger.error('Error renaming conversation:', err);
       }
     },
     [chatStoreRenameConversation]
@@ -444,7 +445,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
           resetCore();
         }
       } catch (err) {
-        console.error('Error deleting conversations:', err);
+        logger.error('Error deleting conversations:', err);
       }
     },
     [currentConversation, resetCore, chatStoreDeleteConversations, chatStoreSetCurrentConversation]
@@ -456,7 +457,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       chatStoreSetCurrentConversation(null);
       resetCore();
     } catch (err) {
-      console.error('Error deleting all conversations:', err);
+      logger.error('Error deleting all conversations:', err);
     }
   }, [resetCore, chatStoreDeleteAllConversations, chatStoreSetCurrentConversation]);
 
@@ -513,7 +514,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
         }
         await coreSendMessage({ text: nextMessage.text });
       } catch (err) {
-        console.error('Error sending queued message:', err);
+        logger.error('Error sending queued message:', err);
         isProcessingQueueRef.current = false;
       }
     };

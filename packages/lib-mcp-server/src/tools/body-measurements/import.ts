@@ -24,6 +24,7 @@ import {
 import { ImportedBodyMeasurements } from '@onecoach/lib-body-measurements';
 import { randomUUID } from 'crypto';
 
+import { logger } from '@onecoach/lib-core';
 // Re-export constants for UI/Client usage
 export const supportedFormats = {
   spreadsheets: ['csv', 'xlsx', 'xls', 'ods'],
@@ -92,7 +93,7 @@ Uses AI to extract date, weight, body composition, and circumferences.`,
     const importService = new BodyMeasurementsImportService({
       aiContext: createAIContext(context.userId),
       onProgress: (progress: ImportProgress) => {
-        console.warn(`[BodyMeasurementsImport][${requestId}] ${progress.step}: ${progress.message}`);
+        logger.warn(`[BodyMeasurementsImport][${requestId}] ${progress.step}: ${progress.message}`);
       },
       context: { requestId, userId: context.userId },
     });

@@ -21,6 +21,7 @@ import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing'
 import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import { getAllMetadataForLocale, validateExerciseTypeByName } from '@onecoach/lib-metadata';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { logger } from '@onecoach/lib-core';
 const DEFAULT_LOCALE = 'en';
 const DEFAULT_APPROVED_STATUS = 'APPROVED';
 const DEFAULT_PENDING_STATUS = 'PENDING';
@@ -485,7 +486,7 @@ export class ExerciseAdminService {
                 }
                 return `${name} (${slug})`;
             }));
-            console.warn(`[ExerciseAdminService] Loaded ${existingNames.length} existing exercises for duplicate prevention`);
+            logger.warn(`[ExerciseAdminService] Loaded ${existingNames.length} existing exercises for duplicate prevention`);
         }
         // Create AI agent configuration using shared utility
         const agentConfig = await createAIAgentConfig({
@@ -574,7 +575,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
         const importStartProgress = 75;
         const importEndProgress = 95;
         onProgress?.(generationStartProgress, `Iniziando generazione di ${count} esercizi in ${batches} batch...`);
-        console.warn(`[ExerciseAdminService] Starting generation: ${count} exercises in ${batches} batches`);
+        logger.warn(`[ExerciseAdminService] Starting generation: ${count} exercises in ${batches} batches`);
         let generatedCount = 0;
         const allExercises = await processBatchesInParallel({
             items: batchIndices,
@@ -590,7 +591,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
                 try {
                     onProgress?.(generationStartProgress +
                         (batchIdx / batches) * (generationEndProgress - generationStartProgress), `Generando batch ${batchIdx + 1}/${batches} (${batchCount} esercizi)...`);
-                    console.warn(`[ExerciseAdminService] Processing batch ${batchIdx + 1}/${batches} (${batchCount} exercises)`);
+                    logger.warn(`[ExerciseAdminService] Processing batch ${batchIdx + 1}/${batches} (${batchCount} exercises)`);
                     // Use the same shared context for all batches
                     const result = await agent.execute({
                         count: batchCount,
@@ -607,11 +608,11 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
                     generatedCount += exercises.length;
                     onProgress?.(generationStartProgress +
                         ((batchIdx + 1) / batches) * (generationEndProgress - generationStartProgress), `Batch ${batchIdx + 1}/${batches} completato. Generati ${generatedCount}/${count} esercizi finora...`);
-                    console.warn(`[ExerciseAdminService] Batch ${batchIdx + 1} completed: ${exercises.length} exercises generated`);
+                    logger.warn(`[ExerciseAdminService] Batch ${batchIdx + 1} completed: ${exercises.length} exercises generated`);
                     return exercises;
                 }
                 catch (error) {
-                    console.error(`[ExerciseAdminService] Error in batch ${batchIdx + 1}:`, error);
+                    logger.error(`[ExerciseAdminService] Error in batch ${batchIdx + 1}:`, error);
                     throw error; // Re-throw to see the error instead of silently catching it
                 }
             },
@@ -621,11 +622,11 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
                     .map((e) => e.translations.find((t) => t.locale === 'en')?.name || e.slug || '')
                     .filter(Boolean);
                 existingNames.push(...newNames);
-                console.warn(`[ExerciseAdminService] Group complete: ${newNames.length} new exercise names added`);
+                logger.warn(`[ExerciseAdminService] Group complete: ${newNames.length} new exercise names added`);
             },
             initialState: existingNames,
         });
-        console.warn(`[ExerciseAdminService] Generation complete: ${allExercises.length} total exercises`);
+        logger.warn(`[ExerciseAdminService] Generation complete: ${allExercises.length} total exercises`);
         if (allExercises.length === 0) {
             throw new Error('Failed to generate any exercises');
         }
@@ -656,7 +657,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
                 const locale = (t.locale || '').toLowerCase();
                 if (!locale || seenLocales.has(locale)) {
                     if (seenLocales.has(locale)) {
-                        console.warn(`[ExerciseAdminService] Duplicate translation locale "${locale}" removed for exercise "${exercise.slug}"`);
+                        logger.warn(`[ExerciseAdminService] Duplicate translation locale "${locale}" removed for exercise "${exercise.slug}"`);
                     }
                     return false;
                 }
@@ -664,7 +665,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
                 return true;
             });
             if (uniqueTranslations.length === 0) {
-                console.error(`[ExerciseAdminService] No valid translations after deduplication for exercise "${exercise.slug}"`);
+                logger.error(`[ExerciseAdminService] No valid translations after deduplication for exercise "${exercise.slug}"`);
                 return null;
             }
             // Normalize imageUrl and videoUrl using shared utility
@@ -704,7 +705,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
             throw new Error('No valid exercises generated (missing required fields: translations, muscles, or bodyPartIds)');
         }
         onProgress?.(validationEndProgress, `${importRecords.length} esercizi validati. Iniziando import nel database...`);
-        console.warn(`[ExerciseAdminService] Starting import of ${importRecords.length} exercises`);
+        logger.warn(`[ExerciseAdminService] Starting import of ${importRecords.length} exercises`);
         // Import exercises with shared context to avoid duplicate metadata creation
         const importResult = await this.import(importRecords, {
             userId,
@@ -721,7 +722,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
             },
         });
         onProgress?.(importEndProgress, `Completato! ${importResult.created} creati, ${importResult.updatedItems.length} aggiornati, ${importResult.skippedSlugs.length} saltati.`);
-        console.warn(`[ExerciseAdminService] Import complete: ${importResult.created} created, ${importResult.updated} updated, ${importResult.skipped} skipped`);
+        logger.warn(`[ExerciseAdminService] Import complete: ${importResult.created} created, ${importResult.updated} updated, ${importResult.skipped} skipped`);
         return importResult;
     }
     /**

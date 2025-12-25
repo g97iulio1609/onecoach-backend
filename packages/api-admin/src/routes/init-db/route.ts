@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@onecoach/lib-core/prisma';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
@@ -62,7 +63,7 @@ export async function GET(_request: Request) {
       status: essentialData,
     });
   } catch (error: unknown) {
-    console.error('❌ Database status check error:', error);
+    logger.error('❌ Database status check error:', error);
     return NextResponse.json(
       {
         success: false,

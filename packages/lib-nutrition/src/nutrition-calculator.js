@@ -9,7 +9,8 @@
  * - Validazione range sicuri
  *
  * NON DUPLICARE queste formule altrove!
- */
+ */import { logger } from '@onecoach/lib-core';
+
 // ============================================
 // CONSTANTS
 // ============================================
@@ -96,7 +97,7 @@ export function calculateBMR(weightKg, heightCm, age, gender) {
     const bmr = baseBMR + genderOffset;
     // Sanity check
     if (bmr < SAFETY_RANGES.bmr.min || bmr > SAFETY_RANGES.bmr.max) {
-        console.warn(`[NutritionCalculator] BMR ${bmr} fuori range normale, controllare input`);
+        logger.warn(`[NutritionCalculator] BMR ${bmr} fuori range normale, controllare input`);
     }
     return Math.round(bmr);
 }
@@ -109,7 +110,7 @@ export function calculateTDEE(bmr, activityLevel) {
     const tdee = bmr * multiplier;
     // Sanity check
     if (tdee < SAFETY_RANGES.tdee.min || tdee > SAFETY_RANGES.tdee.max) {
-        console.warn(`[NutritionCalculator] TDEE ${tdee} fuori range normale, controllare input`);
+        logger.warn(`[NutritionCalculator] TDEE ${tdee} fuori range normale, controllare input`);
     }
     return Math.round(tdee);
 }
@@ -176,7 +177,7 @@ export function calculateMacrosByDietType(targetCalories, dietType, weightKg, go
         const adjustedCarbsCalories = remainingCalories - minFatCalories;
         macros.fat = minFatGrams;
         macros.carbs = Math.round(adjustedCarbsCalories / KCAL_PER_GRAM.carbs);
-        console.warn(`[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% < 15%, adjusted to minimum`);
+        logger.warn(`[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% < 15%, adjusted to minimum`);
     }
     else if (fatRatio > SAFETY_RANGES.fat.max && dietType !== 'keto') {
         // Grassi troppo alti (eccetto keto)
@@ -185,7 +186,7 @@ export function calculateMacrosByDietType(targetCalories, dietType, weightKg, go
         const adjustedCarbsCalories = remainingCalories - maxFatCalories;
         macros.fat = maxFatGrams;
         macros.carbs = Math.round(adjustedCarbsCalories / KCAL_PER_GRAM.carbs);
-        console.warn(`[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% > 45%, adjusted to maximum`);
+        logger.warn(`[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% > 45%, adjusted to maximum`);
     }
     return macros;
 }

@@ -7,6 +7,7 @@
 
 import type { PrismaClient } from '@prisma/client';
 
+import { logger } from '@onecoach/lib-core';
 export async function seedFeatureFlags(prisma: PrismaClient, adminUserId: string) {
   // Feature flag per abilitare/disabilitare registrazioni tramite invito
   const invitationRegistrationFlag = await prisma.feature_flags.upsert({
@@ -24,7 +25,7 @@ export async function seedFeatureFlags(prisma: PrismaClient, adminUserId: string
     },
   });
 
-  console.warn(`  ✓ Feature flag: ${invitationRegistrationFlag.key}`);
+  logger.warn(`  ✓ Feature flag: ${invitationRegistrationFlag.key}`);
 
   return {
     invitationRegistrationFlag,

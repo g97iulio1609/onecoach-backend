@@ -17,6 +17,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import type { Max, MaxVersion } from '@onecoach/types';
 
+import { logger } from '@onecoach/lib-core';
 // Re-export types for backward compatibility
 export type { Max, MaxVersion, CreateMaxInput, UpdateMaxInput } from '@onecoach/types';
 
@@ -178,7 +179,7 @@ export const useMaxesStore = create<MaxesStore>()(
         addMax(record);
 
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[MaxesStore] Realtime INSERT:', record.exerciseName);
+          logger.warn('[MaxesStore] Realtime INSERT:', record.exerciseName);
         }
       },
 
@@ -187,7 +188,7 @@ export const useMaxesStore = create<MaxesStore>()(
         updateMax(record.exerciseId, record);
 
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[MaxesStore] Realtime UPDATE:', record.exerciseName);
+          logger.warn('[MaxesStore] Realtime UPDATE:', record.exerciseName);
         }
       },
 
@@ -196,7 +197,7 @@ export const useMaxesStore = create<MaxesStore>()(
         removeMax(record.exerciseId);
 
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[MaxesStore] Realtime DELETE:', record.exerciseId);
+          logger.warn('[MaxesStore] Realtime DELETE:', record.exerciseId);
         }
       },
 

@@ -13,6 +13,7 @@
 'use client';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // Initial State
 // ============================================================================
@@ -97,21 +98,21 @@ export const useMaxesStore = create()(devtools((set, get) => ({
         const { addMax } = get();
         addMax(record);
         if (process.env.NODE_ENV === 'development') {
-            console.warn('[MaxesStore] Realtime INSERT:', record.exerciseName);
+            logger.warn('[MaxesStore] Realtime INSERT:', record.exerciseName);
         }
     },
     handleRealtimeUpdate: (record) => {
         const { updateMax } = get();
         updateMax(record.exerciseId, record);
         if (process.env.NODE_ENV === 'development') {
-            console.warn('[MaxesStore] Realtime UPDATE:', record.exerciseName);
+            logger.warn('[MaxesStore] Realtime UPDATE:', record.exerciseName);
         }
     },
     handleRealtimeDelete: (record) => {
         const { removeMax } = get();
         removeMax(record.exerciseId);
         if (process.env.NODE_ENV === 'development') {
-            console.warn('[MaxesStore] Realtime DELETE:', record.exerciseId);
+            logger.warn('[MaxesStore] Realtime DELETE:', record.exerciseId);
         }
     },
     // Reset

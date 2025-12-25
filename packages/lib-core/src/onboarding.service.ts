@@ -11,6 +11,7 @@ import type { IOnboardingService } from '@onecoach/contracts';
 import type { OnboardingProgress, StepCompletionInput } from '@onecoach/types';
 import type { Prisma } from '@prisma/client';
 
+import { logger } from '@onecoach/lib-core';
 type DbOnboardingProgress = Prisma.user_onboarding_progressGetPayload<object>;
 
 /**
@@ -72,7 +73,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(newProgress);
     } catch (error: unknown) {
-      console.error('[OnboardingService.getOrCreate]', error);
+      logger.error('[OnboardingService.getOrCreate]', error);
       throw error;
     }
   }
@@ -92,7 +93,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(progress);
     } catch (error: unknown) {
-      console.error('[OnboardingService.getProgress]', error);
+      logger.error('[OnboardingService.getProgress]', error);
       throw error;
     }
   }
@@ -151,7 +152,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(updated);
     } catch (error: unknown) {
-      console.error('[OnboardingService.completeStep]', error);
+      logger.error('[OnboardingService.completeStep]', error);
       throw error;
     }
   }
@@ -180,7 +181,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(updated);
     } catch (error: unknown) {
-      console.error('[OnboardingService.goToStep]', error);
+      logger.error('[OnboardingService.goToStep]', error);
       throw error;
     }
   }
@@ -205,7 +206,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(updated);
     } catch (error: unknown) {
-      console.error('[OnboardingService.reset]', error);
+      logger.error('[OnboardingService.reset]', error);
       throw error;
     }
   }
@@ -234,7 +235,7 @@ export class OnboardingService implements IOnboardingService {
 
       return this.deserializeProgress(updated);
     } catch (error: unknown) {
-      console.error('[OnboardingService.completeAll]', error);
+      logger.error('[OnboardingService.completeAll]', error);
       throw error;
     }
   }
@@ -247,7 +248,7 @@ export class OnboardingService implements IOnboardingService {
       const progress = await this.getProgress(userId);
       return progress?.isCompleted ?? false;
     } catch (error: unknown) {
-      console.error('[OnboardingService.isCompleted]', error);
+      logger.error('[OnboardingService.isCompleted]', error);
       return false;
     }
   }

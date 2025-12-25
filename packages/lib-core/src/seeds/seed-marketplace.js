@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { logger } from '@onecoach/lib-core';
 // Stable UUIDs for seed data (idempotent)
 // Generated once and kept constant to allow repeated seeding
 const SEED_PLAN_WORKOUT_ID = '00000000-0000-4000-8000-000000000001';
@@ -81,5 +82,5 @@ export async function seedMarketplace(prisma) {
       },
     });
   }
-  console.warn(`✅ Marketplace coach and plans seeded: ${plans.length} plans`);
+  logger.warn(`✅ Marketplace coach and plans seeded: ${plans.length} plans`);
 }

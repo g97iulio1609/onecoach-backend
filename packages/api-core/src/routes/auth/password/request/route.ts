@@ -10,6 +10,7 @@ import { createId } from '@onecoach/lib-shared/id-generator';
 import crypto from 'crypto';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 // Rate limiting: In-memory implementation for simplicity
@@ -106,8 +107,8 @@ export async function POST(request: NextRequest) {
     const resetLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password/${token}`;
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn('🔑 Password reset link:', resetLink);
-      console.warn('🔑 Raw token:', token);
+      logger.warn('🔑 Password reset link:', resetLink);
+      logger.warn('🔑 Raw token:', token);
     }
 
     return NextResponse.json({

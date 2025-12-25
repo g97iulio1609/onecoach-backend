@@ -21,6 +21,7 @@ import type {
 import { Prisma, type nutrition_day_logs } from '@prisma/client';
 import { toMacros, ensureDecimalNumber } from '@onecoach/lib-shared';
 
+import { logger } from '@onecoach/lib-core';
 type NutritionDayLogRecord = nutrition_day_logs;
 
 const db = prisma;
@@ -72,7 +73,7 @@ export async function createNutritionDayLog(
 ): Promise<NutritionDayLog> {
   const { planId, weekNumber, dayNumber, date, notes } = request;
 
-  console.warn('[createNutritionDayLog] Creating log:', {
+  logger.warn('[createNutritionDayLog] Creating log:', {
     planId,
     weekNumber,
     dayNumber,
@@ -96,7 +97,7 @@ export async function createNutritionDayLog(
   const plan = normalizeNutritionPlan(rawPlan as unknown as PrismaNutritionPlan);
 
   // Debug: Log plan weeks structure
-  console.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
+  logger.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
     planId: plan.id,
     weeksCount: plan.weeks.length,
     firstWeekDays: plan.weeks[0]?.days?.length ?? 0,
@@ -107,7 +108,7 @@ export async function createNutritionDayLog(
   const day = week?.days.find((d: any) => d.dayNumber === dayNumber);
 
   if (!day) {
-    console.error('[createNutritionDayLog] Day not found:', {
+    logger.error('[createNutritionDayLog] Day not found:', {
       weekNumber,
       dayNumber,
       weeksCount: plan.weeks.length,
@@ -115,7 +116,7 @@ export async function createNutritionDayLog(
     throw new Error(`Giorno ${dayNumber} della settimana ${weekNumber} non trovato nel piano`);
   }
 
-  console.warn('[createNutritionDayLog] Day found:', {
+  logger.warn('[createNutritionDayLog] Day found:', {
     dayNumber: day.dayNumber,
     dayName: day.dayName,
     mealsCount: day.meals.length,

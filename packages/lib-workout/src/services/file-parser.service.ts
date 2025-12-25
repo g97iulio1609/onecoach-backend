@@ -5,7 +5,8 @@
  * Converte il contenuto in ImportedWorkoutProgram standardizzato.
  *
  * @module lib-workout/services/file-parser
- */
+ */import { logger } from '@onecoach/lib-core';
+
 
 import {
   ImportedWorkoutProgramSchema,
@@ -663,7 +664,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
       }
 
       try {
-        console.warn(`[FileParser] Parsing CSV via AI: ${file.name}`);
+        logger.warn(`[FileParser] Parsing CSV via AI: ${file.name}`);
         const program = await aiContext.parseWithAI(
           file.content,
           file.mimeType || 'text/csv',
@@ -682,7 +683,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
         };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`[FileParser] AI CSV parsing failed: ${errorMsg}`);
+        logger.error(`[FileParser] AI CSV parsing failed: ${errorMsg}`);
         return {
           success: false,
           error: `Parsing AI fallito: ${errorMsg}`,
@@ -711,7 +712,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
       }
 
       try {
-        console.warn(`[FileParser] Parsing XLSX via AI: ${file.name}`);
+        logger.warn(`[FileParser] Parsing XLSX via AI: ${file.name}`);
         const program = await aiContext.parseWithAI(
           file.content,
           mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -730,7 +731,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
         };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`[FileParser] AI XLSX parsing failed: ${errorMsg}`);
+        logger.error(`[FileParser] AI XLSX parsing failed: ${errorMsg}`);
         return {
           success: false,
           error: `Parsing AI fallito: ${errorMsg}`,
@@ -767,7 +768,7 @@ IMPORTANTE: Rispondi SOLO con un JSON valido nel formato ImportedWorkoutProgram,
     // FALLBACK: Prova tramite AI come CSV
     if (aiContext) {
       try {
-        console.warn(`[FileParser] Tentativo fallback AI per file: ${file.name}`);
+        logger.warn(`[FileParser] Tentativo fallback AI per file: ${file.name}`);
         const program = await aiContext.parseWithAI(file.content, mimeType || 'text/plain', '');
         const parsedProgram = ImportedWorkoutProgramSchema.parse({
           ...program,

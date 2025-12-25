@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectsApi, type CreateProjectInput } from '../projects';
 import { getErrorMessage } from '../utils/error';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Query keys for projects
  */
@@ -63,7 +64,7 @@ export function useCreateProject() {
       queryClient.invalidateQueries({ queryKey: projectsKeys.lists() });
     },
     onError: (error) => {
-      console.error('Failed to create project:', getErrorMessage(error));
+      logger.error('Failed to create project:', getErrorMessage(error));
     },
   });
 }
@@ -82,7 +83,7 @@ export function useUpdateProject() {
       queryClient.invalidateQueries({ queryKey: projectsKeys.detail(variables.id) });
     },
     onError: (error) => {
-      console.error('Failed to update project:', getErrorMessage(error));
+      logger.error('Failed to update project:', getErrorMessage(error));
     },
   });
 }
@@ -99,7 +100,7 @@ export function useDeleteProject() {
       queryClient.invalidateQueries({ queryKey: projectsKeys.lists() });
     },
     onError: (error) => {
-      console.error('Failed to delete project:', getErrorMessage(error));
+      logger.error('Failed to delete project:', getErrorMessage(error));
     },
   });
 }

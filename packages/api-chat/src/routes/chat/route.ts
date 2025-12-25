@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 import { AI_REASONING_CONFIG, TOKEN_LIMITS } from '@onecoach/constants/models';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 const chatStreamRequestSchema = z.object({
@@ -104,7 +105,7 @@ export async function POST(_req: Request) {
         activityLevel: profile.activityLevel ? profile.activityLevel.toLowerCase() : null,
       };
     } catch (error: unknown) {
-      console.warn('Error loading user profile for chat:', error);
+      logger.warn('Error loading user profile for chat:', error);
       // Continua senza profilo se non disponibile
       userProfile = undefined;
     }

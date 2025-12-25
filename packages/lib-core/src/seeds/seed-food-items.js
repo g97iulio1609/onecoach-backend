@@ -3,6 +3,7 @@
  * Catalogo alimenti comuni italiani con traduzioni
  */
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { logger } from '@onecoach/lib-core';
 /**
  * Calculate main macro from macros
  */
@@ -62,7 +63,7 @@ function calculateMacroPercentages(macros) {
   };
 }
 export async function seedFoodItems(prisma) {
-  console.warn('\n🍎 Seeding food items catalog...');
+  logger.warn('\n🍎 Seeding food items catalog...');
   const defaultBrandId = 'brand_generic_default';
   await prisma.food_brands.upsert({
     where: { id: defaultBrandId },
@@ -768,5 +769,5 @@ export async function seedFoodItems(prisma) {
       });
     }
   }
-  console.warn(`✅ Food items catalog seeded: ${foodItems.length} items`);
+  logger.warn(`✅ Food items catalog seeded: ${foodItems.length} items`);
 }

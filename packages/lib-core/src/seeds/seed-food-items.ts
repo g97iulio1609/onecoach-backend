@@ -7,6 +7,7 @@ import type { PrismaClient } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import type { Macros } from '@onecoach/types';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Calculate main macro from macros
  */
@@ -82,7 +83,7 @@ function calculateMacroPercentages(macros: Macros): {
 }
 
 export async function seedFoodItems(prisma: PrismaClient) {
-  console.warn('\n🍎 Seeding food items catalog...');
+  logger.warn('\n🍎 Seeding food items catalog...');
 
   const defaultBrandId = 'brand_generic_default';
   await prisma.food_brands.upsert({
@@ -799,5 +800,5 @@ export async function seedFoodItems(prisma: PrismaClient) {
     }
   }
 
-  console.warn(`✅ Food items catalog seeded: ${foodItems.length} items`);
+  logger.warn(`✅ Food items catalog seeded: ${foodItems.length} items`);
 }

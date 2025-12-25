@@ -2,18 +2,30 @@
  * Workout Builder Store
  *
  * Gestisce lo stato del builder workout con UI state locale e
- * placeholder per integrazione Supabase Realtime.
- *
- * TODO: Refactor per dependency injection di supabase client e workout API
+ * integrazione Supabase Realtime.
  */
 
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { WorkoutProgram } from '@onecoach/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { logger } from '@onecoach/lib-core';
+// Dependencies interface
+interface WorkoutBuilderDependencies {
+  workoutApi: {
+    getById: (id: string) => Promise<{ program: WorkoutProgram }>;
+    update: (id: string, data: unknown) => Promise<{ program: WorkoutProgram }>;
+  };
+  supabase?: SupabaseClient;
+}
 
 // SSOT Types
 interface WorkoutBuilderState {
+  // Dependencies (injected)
+  dependencies: WorkoutBuilderDependencies | null;
+
   // State
   activeProgram: WorkoutProgram | null;
   isLoading: boolean;
@@ -26,6 +38,7 @@ interface WorkoutBuilderState {
   viewMode: 'editor' | 'statistics' | 'progression';
 
   // Actions
+  configure: (dependencies: WorkoutBuilderDependencies) => void;
   init: (programId: string) => Promise<void>;
   setProgram: (program: WorkoutProgram) => void;
   updateProgram: (updates: Partial<WorkoutProgram>) => void;
@@ -42,6 +55,7 @@ export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>
     persist(
       immer((set, get) => ({
         // Initial State
+        dependencies: null,
         activeProgram: null,
         isLoading: false,
         isSaving: false,
@@ -50,16 +64,61 @@ export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>
         selectedDayIndex: 0,
         viewMode: 'editor',
 
-        // Actions - TODO: Implement with proper dependency injection
-        init: async (_programId: string) => {
+        // Configure dependencies
+        configure: (dependencies: WorkoutBuilderDependencies) => {
+          set({ dependencies });
+        },
+
+        // Actions
+        init: async (programId: string) => {
+          const { dependencies } = get();
+          if (!dependencies) {
+            logger.error('WorkoutBuilderStore: Dependencies not configured. Call configure() first.');
+            return;
+          }
+
           set({ isLoading: true });
-          // TODO: Inject workoutApi and supabase client
-          console.warn('WorkoutBuilderStore.init: Not implemented - needs dependency injection');
-          set({ isLoading: false });
+          try {
+            const response = await dependencies.workoutApi.getById(programId);
+            set({ activeProgram: response.program });
+
+            // Initialize Supabase Realtime subscription if available
+            if (dependencies.supabase) {
+              const channel = dependencies.supabase
+                .channel(`workout-program:${programId}`)
+                .on(
+                  'postgres_changes',
+                  {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'workout_programs',
+                    filter: `id=eq.${programId}`,
+                  },
+                  (payload) => {
+                    // Update program when changed externally
+                    const currentProgram = get().activeProgram;
+                    if (currentProgram && currentProgram.id === programId) {
+                      set({ activeProgram: { ...currentProgram, ...payload.new } });
+                    }
+                  }
+                )
+                .subscribe();
+
+              set({ isRealtimeConnected: true });
+            }
+          } catch (error) {
+            logger.error('WorkoutBuilderStore.init error:', error);
+          } finally {
+            set({ isLoading: false });
+          }
         },
 
         cleanup: () => {
-          // TODO: Implement cleanup with injected supabase client
+          const { dependencies } = get();
+          if (dependencies?.supabase) {
+            // Unsubscribe from all channels
+            dependencies.supabase.removeAllChannels();
+          }
           set({ activeProgram: null, isRealtimeConnected: false });
         },
 
@@ -67,21 +126,33 @@ export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>
           set({ activeProgram: program });
         },
 
-        updateProgram: (updates: Partial<WorkoutProgram>) => {
+        updateProgram: async (updates: Partial<WorkoutProgram>) => {
           const currentProgram = get().activeProgram;
           if (!currentProgram) return;
+
+          const { dependencies } = get();
+          if (!dependencies) {
+            logger.error('WorkoutBuilderStore: Dependencies not configured. Call configure() first.');
+            return;
+          }
 
           // Optimistic Update
           set((state) => {
             if (state.activeProgram) {
               Object.assign(state.activeProgram, updates);
             }
+            state.isSaving = true;
           });
 
-          // TODO: Implement autosave with injected workoutApi
-          console.warn(
-            'WorkoutBuilderStore.updateProgram: Autosave not implemented - needs dependency injection'
-          );
+          // Autosave with debouncing would be handled by the caller
+          try {
+            const response = await dependencies.workoutApi.update(currentProgram.id, updates);
+            set({ activeProgram: response.program, isSaving: false });
+          } catch (error) {
+            logger.error('WorkoutBuilderStore.updateProgram error:', error);
+            // Revert optimistic update on error
+            set({ activeProgram: currentProgram, isSaving: false });
+          }
         },
 
         // UI Actions

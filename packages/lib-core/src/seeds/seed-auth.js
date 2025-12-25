@@ -1,18 +1,19 @@
 import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { seedAdminsFromEnv } from '../auth/admin-seed';
+import { logger } from '@onecoach/lib-core';
 // Stable UUID for seed data (idempotent)
 const SEED_DEMO_CREDITS_ID = '00000000-0000-4000-8000-000000000100';
 export async function seedAuth(prisma) {
   const isProduction = process.env.NODE_ENV === 'production';
   // PRIORITÀ 1: Crea admin e super admin da env vars (funziona in production E development)
   // Questo garantisce sincronizzazione con Vercel env vars
-  console.warn('🔐 Checking for admin/super admin env vars...');
+  logger.warn('🔐 Checking for admin/super admin env vars...');
   const { admin: adminSeedResult, superAdmin: superAdminSeedResult } =
     await seedAdminsFromEnv(prisma);
   let admin = null;
   if (superAdminSeedResult?.admin) {
-    console.warn(
+    logger.warn(
       `✅ Super Admin ${superAdminSeedResult.created ? 'created' : 'updated'}: ${superAdminSeedResult.admin.email}`
     );
     admin = await prisma.users.findUnique({
@@ -20,7 +21,7 @@ export async function seedAuth(prisma) {
     });
   }
   if (adminSeedResult?.admin) {
-    console.warn(
+    logger.warn(
       `✅ Admin ${adminSeedResult.created ? 'created' : 'updated'}: ${adminSeedResult.admin.email}`
     );
     // Se non abbiamo un super admin, usa l'admin per i seed
@@ -32,7 +33,7 @@ export async function seedAuth(prisma) {
   }
   // FALLBACK: Cerca admin esistente se non creato da env vars
   if (!admin) {
-    console.warn('⚠️ No admin env vars found. Searching for existing admin...');
+    logger.warn('⚠️ No admin env vars found. Searching for existing admin...');
     admin = await prisma.users.findFirst({
       where: {
         OR: [
@@ -47,7 +48,7 @@ export async function seedAuth(prisma) {
   }
   // DEVELOPMENT ONLY: Crea default admin per seed dati demo
   if (!admin && !isProduction) {
-    console.warn('⚠️ No admin found. Creating default development admin...');
+    logger.warn('⚠️ No admin found. Creating default development admin...');
     const defaultEmail = 'admin@onecoach.com';
     const defaultPassword = 'Admin123!';
     const defaultName = 'Admin onecoach';
@@ -73,12 +74,12 @@ export async function seedAuth(prisma) {
         updatedAt: new Date(),
       },
     });
-    console.warn('✅ Default development admin created');
+    logger.warn('✅ Default development admin created');
   }
   // Se non c'è admin, alcuni seed potrebbero fallire (non critico)
   if (!admin) {
-    console.warn('⚠️ No admin found. Some seeds may be skipped.');
-    console.warn('ℹ️ Set ADMIN_EMAIL/SUPER_ADMIN_EMAIL env vars to create admin during seed.');
+    logger.warn('⚠️ No admin found. Some seeds may be skipped.');
+    logger.warn('ℹ️ Set ADMIN_EMAIL/SUPER_ADMIN_EMAIL env vars to create admin during seed.');
   }
   // Demo user (only in development, skip in production)
   let demoUser;

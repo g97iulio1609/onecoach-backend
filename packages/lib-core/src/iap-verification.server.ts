@@ -1,7 +1,8 @@
 /**
  * In-App Purchase Receipt Verification
  * Handles verification for both iOS (Apple) and Android (Google Play)
- */
+ */import { logger } from '@onecoach/lib-core';
+
 
 interface AppleVerificationResponse {
   status: number;
@@ -105,7 +106,7 @@ export async function verifyAppleReceipt(receiptData: string): Promise<Verificat
       },
     };
   } catch (error: unknown) {
-    console.error('IAP verification error', error);
+    logger.error('IAP verification error', error);
     return {
       valid: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -191,7 +192,7 @@ export async function verifyGoogleReceipt(
       },
     };
   } catch (error: unknown) {
-    console.error('IAP verification error', error);
+    logger.error('IAP verification error', error);
     return {
       valid: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -239,7 +240,7 @@ async function getGoogleAccessToken(): Promise<string> {
     const data = await response.json();
     return data.access_token;
   } catch (error: unknown) {
-    console.error('IAP verification error', error);
+    logger.error('IAP verification error', error);
     throw error;
   }
 }

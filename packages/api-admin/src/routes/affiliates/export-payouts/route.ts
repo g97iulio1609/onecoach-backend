@@ -9,6 +9,7 @@ import { requireAdmin } from '@onecoach/lib-core/auth/guards';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { AffiliateRewardStatus, Prisma } from '@onecoach/types';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 /**
@@ -143,7 +144,7 @@ export async function GET(_req: Request) {
       },
     });
   } catch (error: unknown) {
-    console.error("Errore nell'esportazione dei payout:", error);
+    logger.error("Errore nell'esportazione dei payout:", error);
     return NextResponse.json({ error: "Errore nell'esportazione dei payout" }, { status: 500 });
   }
 }

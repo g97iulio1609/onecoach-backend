@@ -22,6 +22,7 @@ import {
 } from '@onecoach/lib-workout';
 import { randomUUID } from 'crypto';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Schema per i parametri del tool
  */
@@ -69,7 +70,7 @@ function createAIContext(userId: string): AIParseContext {
       }
 
       // Fallback per tipi sconosciuti - prova come documento
-      console.warn(`[WorkoutImport] Unknown MIME type ${mimeType}, trying document parser`);
+      logger.warn(`[WorkoutImport] Unknown MIME type ${mimeType}, trying document parser`);
       return WorkoutVisionService.parseDocument(content, mimeType, userId);
     },
   };
@@ -118,7 +119,7 @@ Cost: ${IMPORT_LIMITS.DEFAULT_CREDIT_COST} credits per import (configurable by a
       aiContext: createAIContext(context.userId),
       onProgress: (progress: ImportProgress) => {
         // Log progress for debugging
-        console.warn(`[WorkoutImport][${requestId}] ${progress.step}: ${progress.message}`);
+        logger.warn(`[WorkoutImport][${requestId}] ${progress.step}: ${progress.message}`);
       },
       context: { requestId, userId: context.userId },
     });

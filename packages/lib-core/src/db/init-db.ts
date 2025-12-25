@@ -7,6 +7,7 @@
 
 import { PrismaClient } from '@prisma/client';
 
+import { logger } from '@onecoach/lib-core';
 interface InitResult {
   success: boolean;
   initialized: string[];
@@ -124,12 +125,12 @@ export async function initializeDatabase(
       return result;
     }
 
-    console.warn('🌱 Initializing database with required data...');
+    logger.warn('🌱 Initializing database with required data...');
 
     // Usa import dinamici per evitare che i file di seed vengano inclusi nel bundle di Next.js
     // 1. Seed Auth (Admin e Demo users) - sempre necessario
     try {
-      console.warn('👤 Seeding auth users...');
+      logger.warn('👤 Seeding auth users...');
       const { seedAuth } = await import('../seeds/seed-auth');
       const { admin } = await seedAuth(prisma);
       if (admin) {
@@ -145,7 +146,7 @@ export async function initializeDatabase(
     // 2. Seed Translations and Goals - sempre necessario
     try {
       if (!essentialData.hasWorkoutGoals || !essentialData.hasNutritionGoals) {
-        console.warn('🌐 Seeding translations and goals...');
+        logger.warn('🌐 Seeding translations and goals...');
         const { seedTranslationsAndGoals } = await import('../seeds/seed-translations-and-goals');
         await seedTranslationsAndGoals(prisma);
         result.initialized.push('Translations and goals');
@@ -160,7 +161,7 @@ export async function initializeDatabase(
     // 3. Seed Exercise Catalog - necessario se non esiste
     try {
       if (!essentialData.hasExerciseTypes) {
-        console.warn('🏋️ Seeding exercise catalog...');
+        logger.warn('🏋️ Seeding exercise catalog...');
         const admin = await prisma.users.findFirst({
           where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
         });
@@ -182,7 +183,7 @@ export async function initializeDatabase(
     // 4. Seed Policies - necessario se non esistono
     try {
       if (!essentialData.hasPolicies) {
-        console.warn('📜 Seeding policies...');
+        logger.warn('📜 Seeding policies...');
         const admin = await prisma.users.findFirst({
           where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
         });
@@ -242,7 +243,7 @@ export async function initializeDatabase(
       result.success = false;
     }
 
-    console.warn('✅ Database initialization completed');
+    logger.warn('✅ Database initialization completed');
     return result;
   } catch (error: unknown) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';

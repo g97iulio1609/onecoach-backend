@@ -129,7 +129,7 @@ export async function GET(_req: Request) {
       totalAmount: payouts.reduce((sum: number, p) => sum + p.totalAmount, 0),
     });
   } catch (error: unknown) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return NextResponse.json({ error: 'Errore nel recupero dei payout' }, { status: 500 });
   }
 }
@@ -261,7 +261,7 @@ export async function POST(_req: Request) {
       totalRewards: targetRewards.length,
     });
   } catch (error: unknown) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return NextResponse.json({ error: 'Errore nella creazione del payout' }, { status: 500 });
   }
 }
@@ -382,7 +382,7 @@ export async function PUT(_req: Request) {
       settledAt: now.toISOString(),
     });
   } catch (error: unknown) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return NextResponse.json({ error: "Errore nell'approvazione del payout" }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { requireAdmin } from '@onecoach/lib-core/auth/guards';
 import type { Prisma as PrismaTypes } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 function sanitizeNumber(value: unknown, fallback = 0) {
@@ -32,7 +33,7 @@ export async function GET() {
 
     return NextResponse.json({ program });
   } catch (error: unknown) {
-    console.error('Get affiliate program error:', error);
+    logger.error('Get affiliate program error:', error);
     return NextResponse.json(
       { error: 'Errore nel recupero del programma affiliati' },
       { status: 500 }
@@ -195,7 +196,7 @@ export async function PUT(_req: Request) {
 
     return NextResponse.json({ success: true, program: updatedProgram });
   } catch (error: unknown) {
-    console.error('Update affiliate program error:', error);
+    logger.error('Update affiliate program error:', error);
     return NextResponse.json(
       {
         error:

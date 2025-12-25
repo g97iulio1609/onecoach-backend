@@ -13,6 +13,7 @@ import { InvitationService } from '@onecoach/lib-core/invitation.service';
 import { ConsentService } from '@onecoach/lib-core/consent.service';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 export async function POST(_req: Request) {
@@ -154,7 +155,7 @@ export async function POST(_req: Request) {
         userAgent,
       });
     } catch (consentError: unknown) {
-      console.error('Consent error:', consentError);
+      logger.error('Consent error:', consentError);
       // Rimuovi utente se il consenso non può essere salvato
       await prisma.users.delete({ where: { id: user.id } });
       return NextResponse.json(
@@ -185,7 +186,7 @@ export async function POST(_req: Request) {
         }
       }
     } catch (affiliateError: unknown) {
-      console.error('Affiliate post-registration error:', affiliateError);
+      logger.error('Affiliate post-registration error:', affiliateError);
       await prisma.users.delete({ where: { id: user.id } });
 
       const message =
@@ -202,7 +203,7 @@ export async function POST(_req: Request) {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         await InvitationService.useInvitation(invitationCode, user.id);
       } catch (invitationError: unknown) {
-        console.error('Error using invitation:', invitationError);
+        logger.error('Error using invitation:', invitationError);
         // Non blocchiamo la registrazione se l'uso dell'invito fallisce dopo la creazione utente,
         // ma logghiamo l'errore. Potremmo voler notificare l'admin.
       }

@@ -20,6 +20,7 @@ import {
 } from '@onecoach/lib-shared/utils/error';
 import { convertDecimalToNumber } from '@onecoach/lib-shared/prisma-type-guards';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 // Prisma richiede il runtime Node.js
@@ -55,7 +56,7 @@ export async function GET() {
     // Verifica che userOrError abbia un id valido
     if (!userOrError.id || typeof userOrError.id !== 'string') {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[PROFILE GET] User ID non valido:', userOrError);
+        logger.error('[PROFILE GET] User ID non valido:', userOrError);
       }
       return NextResponse.json(
         { error: 'Errore di autenticazione: ID utente non valido' },
@@ -71,7 +72,7 @@ export async function GET() {
 
     if (!userExists) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[PROFILE GET] User not found in database:', userOrError.id);
+        logger.error('[PROFILE GET] User not found in database:', userOrError.id);
       }
       return NextResponse.json(
         { error: 'Utente non trovato nel database. Effettua il login di nuovo.' },
@@ -81,7 +82,7 @@ export async function GET() {
 
     if (userExists.status !== 'ACTIVE') {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[PROFILE GET] User is not ACTIVE:', userOrError.id, userExists.status);
+        logger.error('[PROFILE GET] User is not ACTIVE:', userOrError.id, userExists.status);
       }
       return NextResponse.json(
         { error: 'Account non attivo. Contatta il supporto.' },
@@ -117,14 +118,14 @@ export async function GET() {
 
       if (process.env.NODE_ENV === 'development') {
         if (isError(err)) {
-          console.error('[PROFILE GET] Error name:', err.name);
-          console.error('[PROFILE GET] Error message:', err.message);
-          console.error('[PROFILE GET] Error stack:', err.stack);
+          logger.error('[PROFILE GET] Error name:', err.name);
+          logger.error('[PROFILE GET] Error message:', err.message);
+          logger.error('[PROFILE GET] Error stack:', err.stack);
         }
       }
       if (isPrismaError(err)) {
-        console.error('[PROFILE GET] Prisma error code:', err.code);
-        console.error('[PROFILE GET] Prisma error meta:', err.meta);
+        logger.error('[PROFILE GET] Prisma error code:', err.code);
+        logger.error('[PROFILE GET] Prisma error meta:', err.meta);
       }
     }
 
@@ -143,7 +144,7 @@ export async function PUT(_req: Request) {
   // Verifica che userOrError abbia un id valido
   if (!userOrError.id || typeof userOrError.id !== 'string') {
     if (process.env.NODE_ENV === 'development') {
-      console.error('[PROFILE PUT] User ID non valido:', userOrError);
+      logger.error('[PROFILE PUT] User ID non valido:', userOrError);
     }
     return NextResponse.json(
       { error: 'Errore di autenticazione: ID utente non valido' },
@@ -159,7 +160,7 @@ export async function PUT(_req: Request) {
 
   if (!userExists) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('[PROFILE PUT] User not found in database:', userOrError.id);
+      logger.error('[PROFILE PUT] User not found in database:', userOrError.id);
     }
     return NextResponse.json(
       { error: 'Utente non trovato nel database. Effettua il login di nuovo.' },
@@ -169,7 +170,7 @@ export async function PUT(_req: Request) {
 
   if (userExists.status !== 'ACTIVE') {
     if (process.env.NODE_ENV === 'development') {
-      console.error('[PROFILE PUT] User is not ACTIVE:', userOrError.id, userExists.status);
+      logger.error('[PROFILE PUT] User is not ACTIVE:', userOrError.id, userExists.status);
     }
     return NextResponse.json(
       { error: 'Account non attivo. Contatta il supporto.' },
@@ -207,7 +208,7 @@ export async function PUT(_req: Request) {
       }
       // Se non è un enum valido, ritorna null invece di fallire
       if (process.env.NODE_ENV === 'development') {
-        console.warn(`Invalid enum value: ${str}, expected one of: ${validValues.join(', ')}`);
+        logger.warn(`Invalid enum value: ${str}, expected one of: ${validValues.join(', ')}`);
       }
       return null;
     };
@@ -343,16 +344,16 @@ export async function PUT(_req: Request) {
 
       if (process.env.NODE_ENV === 'development') {
         if (isError(error)) {
-          console.error('Error message:', error.message);
-          console.error('Error stack:', error.stack);
+          logger.error('Error message:', error.message);
+          logger.error('Error stack:', error.stack);
         }
       }
       if (isZodError(error)) {
-        console.error('Zod validation errors:', JSON.stringify(error.issues, null, 2));
+        logger.error('Zod validation errors:', JSON.stringify(error.issues, null, 2));
       }
       if (isPrismaError(error)) {
-        console.error('Prisma error code:', error.code);
-        console.error('Prisma error meta:', error.meta);
+        logger.error('Prisma error code:', error.code);
+        logger.error('Prisma error meta:', error.meta);
       }
     }
 

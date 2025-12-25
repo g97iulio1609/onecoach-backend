@@ -3,13 +3,14 @@
  *
  * SSOT for type-safe alternatives to `any` across the codebase.
  * Following SOLID principles: Single Responsibility for type safety.
- */
+ */import { logger } from '@onecoach/lib-core';
+
 /**
  * Type guard for object with specific property.
  *
  * @example
  * if (hasProperty(obj, 'id')) {
- *   console.warn(obj.id); // Type-safe access
+ *   logger.warn(obj.id); // Type-safe access
  * }
  */
 export function hasProperty(obj, key) {
@@ -34,7 +35,7 @@ export function isError(value) {
  * @example
  * const user = safeCast(data, isUser);
  * if (user) { // Type is User
- *   console.warn(user.name);
+ *   logger.warn(user.name);
  * }
  */
 export function safeCast(value, validator) {
@@ -48,7 +49,7 @@ export function safeCast(value, validator) {
  * try {
  *   // ...
  * } catch (error) {
- *   console.error(getErrorMessage(error));
+ *   logger.error(getErrorMessage(error));
  * }
  */
 export function getErrorMessage(error) {

@@ -9,7 +9,8 @@
  * - Validazione range sicuri
  *
  * NON DUPLICARE queste formule altrove!
- */
+ */import { logger } from '@onecoach/lib-core';
+
 
 // ============================================
 // TYPES
@@ -175,7 +176,7 @@ export function calculateBMR(
 
   // Sanity check
   if (bmr < SAFETY_RANGES.bmr.min || bmr > SAFETY_RANGES.bmr.max) {
-    console.warn(`[NutritionCalculator] BMR ${bmr} fuori range normale, controllare input`);
+    logger.warn(`[NutritionCalculator] BMR ${bmr} fuori range normale, controllare input`);
   }
 
   return Math.round(bmr);
@@ -191,7 +192,7 @@ export function calculateTDEE(bmr: number, activityLevel: ActivityLevel): number
 
   // Sanity check
   if (tdee < SAFETY_RANGES.tdee.min || tdee > SAFETY_RANGES.tdee.max) {
-    console.warn(`[NutritionCalculator] TDEE ${tdee} fuori range normale, controllare input`);
+    logger.warn(`[NutritionCalculator] TDEE ${tdee} fuori range normale, controllare input`);
   }
 
   return Math.round(tdee);
@@ -281,7 +282,7 @@ export function calculateMacrosByDietType(
     macros.fat = minFatGrams;
     macros.carbs = Math.round(adjustedCarbsCalories / KCAL_PER_GRAM.carbs);
 
-    console.warn(
+    logger.warn(
       `[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% < 15%, adjusted to minimum`
     );
   } else if (fatRatio > SAFETY_RANGES.fat.max && dietType !== 'keto') {
@@ -293,7 +294,7 @@ export function calculateMacrosByDietType(
     macros.fat = maxFatGrams;
     macros.carbs = Math.round(adjustedCarbsCalories / KCAL_PER_GRAM.carbs);
 
-    console.warn(
+    logger.warn(
       `[NutritionCalculator] Fat ratio ${(fatRatio * 100).toFixed(1)}% > 45%, adjusted to maximum`
     );
   }

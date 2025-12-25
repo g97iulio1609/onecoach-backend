@@ -35,6 +35,7 @@ import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 import { getAllMetadataForLocale, validateExerciseTypeByName } from '@onecoach/lib-metadata';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
+import { logger } from '@onecoach/lib-core';
 type ExerciseApprovalStatus = 'APPROVED' | 'PENDING';
 type ExerciseRelationType = NonNullable<ExerciseRelationInput['relation']>;
 type MuscleRole = NonNullable<CreateExerciseInput['muscles']>[number]['role'];
@@ -744,7 +745,7 @@ export class ExerciseAdminService {
         )
       );
 
-      console.warn(
+      logger.warn(
         `[ExerciseAdminService] Loaded ${existingNames.length} existing exercises for duplicate prevention`
       );
     }
@@ -854,7 +855,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
       `Iniziando generazione di ${count} esercizi in ${batches} batch...`
     );
 
-    console.warn(
+    logger.warn(
       `[ExerciseAdminService] Starting generation: ${count} exercises in ${batches} batches`
     );
 
@@ -876,7 +877,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
             `Generando batch ${batchIdx + 1}/${batches} (${batchCount} esercizi)...`
           );
 
-          console.warn(
+          logger.warn(
             `[ExerciseAdminService] Processing batch ${batchIdx + 1}/${batches} (${batchCount} exercises)`
           );
 
@@ -904,12 +905,12 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
             `Batch ${batchIdx + 1}/${batches} completato. Generati ${generatedCount}/${count} esercizi finora...`
           );
 
-          console.warn(
+          logger.warn(
             `[ExerciseAdminService] Batch ${batchIdx + 1} completed: ${exercises.length} exercises generated`
           );
           return exercises;
         } catch (error: unknown) {
-          console.error(`[ExerciseAdminService] Error in batch ${batchIdx + 1}:`, error);
+          logger.error(`[ExerciseAdminService] Error in batch ${batchIdx + 1}:`, error);
           throw error; // Re-throw to see the error instead of silently catching it
         }
       },
@@ -919,14 +920,14 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
           .map((e: any) => e.translations.find((t: any) => t.locale === 'en')?.name || e.slug || '')
           .filter(Boolean);
         existingNames.push(...newNames);
-        console.warn(
+        logger.warn(
           `[ExerciseAdminService] Group complete: ${newNames.length} new exercise names added`
         );
       },
       initialState: existingNames,
     });
 
-    console.warn(
+    logger.warn(
       `[ExerciseAdminService] Generation complete: ${allExercises.length} total exercises`
     );
 
@@ -974,7 +975,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
             const locale = (t.locale || '').toLowerCase();
             if (!locale || seenLocales.has(locale)) {
               if (seenLocales.has(locale)) {
-                console.warn(
+                logger.warn(
                   `[ExerciseAdminService] Duplicate translation locale "${locale}" removed for exercise "${exercise.slug}"`
                 );
               }
@@ -985,7 +986,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
           });
 
           if (uniqueTranslations.length === 0) {
-            console.error(
+            logger.error(
               `[ExerciseAdminService] No valid translations after deduplication for exercise "${exercise.slug}"`
             );
             return null;
@@ -1042,7 +1043,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
       `${importRecords.length} esercizi validati. Iniziando import nel database...`
     );
 
-    console.warn(`[ExerciseAdminService] Starting import of ${importRecords.length} exercises`);
+    logger.warn(`[ExerciseAdminService] Starting import of ${importRecords.length} exercises`);
 
     // Import exercises with shared context to avoid duplicate metadata creation
     const importResult = await this.import(importRecords, {
@@ -1069,7 +1070,7 @@ CRITICAL: Use ONLY the IDs listed above. Do NOT invent IDs or use names.`;
       `Completato! ${importResult.created} creati, ${importResult.updatedItems.length} aggiornati, ${importResult.skippedSlugs.length} saltati.`
     );
 
-    console.warn(
+    logger.warn(
       `[ExerciseAdminService] Import complete: ${importResult.created} created, ${importResult.updated} updated, ${importResult.skipped} skipped`
     );
 

@@ -23,6 +23,7 @@ import { SUPPORTED_FOOD_LOCALES } from '@onecoach/constants';
 import { Prisma } from '@prisma/client';
 import { safeValidateAIGeneratedFood, aiGeneratedFoodToFoodToCreate, AI_FOOD_DEFAULTS, } from '@onecoach/schemas';
 import { calculateMainMacro, } from '@onecoach/lib-shared/utils/main-macro-calculator';
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -75,7 +76,7 @@ export class FoodAutoCreationService {
             }
         }
         if (IS_DEV) {
-            console.warn(`[FoodAutoCreation] Processing ${uniqueFoods.size} unique foods from ${foods.length} total`);
+            logger.warn(`[FoodAutoCreation] Processing ${uniqueFoods.size} unique foods from ${foods.length} total`);
         }
         // Processa in parallelo per performance
         const processingPromises = Array.from(uniqueFoods.entries()).map(async ([normalizedName, food]) => {
@@ -85,7 +86,7 @@ export class FoodAutoCreationService {
             }
             catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                console.error(`[FoodAutoCreation] Error processing "${food.name}":`, errorMessage);
+                logger.error(`[FoodAutoCreation] Error processing "${food.name}":`, errorMessage);
                 return {
                     normalizedName,
                     resolution: null,
@@ -111,7 +112,7 @@ export class FoodAutoCreationService {
                 }
             }
         }
-        console.warn(`[FoodAutoCreation] Batch complete: ${result.created} created, ${result.matched} matched, ${result.existing} existing, ${result.errors.length} errors`);
+        logger.warn(`[FoodAutoCreation] Batch complete: ${result.created} created, ${result.matched} matched, ${result.existing} existing, ${result.errors.length} errors`);
         return result;
     }
     // ==========================================================================
@@ -145,7 +146,7 @@ export class FoodAutoCreationService {
         if (searchResults.length > 0) {
             const bestMatch = this.findBestMatch(food.name, food.macrosPer100g, searchResults);
             if (bestMatch) {
-                console.warn(`[FoodAutoCreation] Fuzzy match for "${food.name}": "${bestMatch.match.name}" (${(bestMatch.score * 100).toFixed(1)}%)`);
+                logger.warn(`[FoodAutoCreation] Fuzzy match for "${food.name}": "${bestMatch.match.name}" (${(bestMatch.score * 100).toFixed(1)}%)`);
                 return {
                     id: bestMatch.match.id,
                     name: bestMatch.match.name,
@@ -157,7 +158,7 @@ export class FoodAutoCreationService {
             }
         }
         // 3. Nessun match trovato - crea nuovo alimento
-        console.warn(`[FoodAutoCreation] Creating new food: "${food.name}"`);
+        logger.warn(`[FoodAutoCreation] Creating new food: "${food.name}"`);
         const newFood = await this.createFoodInDatabase(food);
         return {
             id: newFood.id,
@@ -226,7 +227,7 @@ export class FoodAutoCreationService {
             // Handle Unique Constraint Violation (P2002)
             // This happens if the food was created by another process/thread between our check and creation
             if (error.code === 'P2002') {
-                console.warn(`[FoodAutoCreation] Food "${food.name}" already exists (race condition). Fetching existing...`);
+                logger.warn(`[FoodAutoCreation] Food "${food.name}" already exists (race condition). Fetching existing...`);
                 const existing = await prisma.food_items.findFirst({
                     where: { nameNormalized },
                 });
@@ -259,7 +260,7 @@ export class FoodAutoCreationService {
             return newBrand.id;
         }
         catch (error) {
-            console.error('[FoodAutoCreation] Error creating brand:', error);
+            logger.error('[FoodAutoCreation] Error creating brand:', error);
             return undefined;
         }
     }
@@ -494,7 +495,7 @@ export class FoodAutoCreationService {
             }
             else {
                 // Log warning ma processa comunque con defaults
-                console.warn(`[FoodAutoCreation] AIFood validation failed for "${aiFood.name}":`, validation.error.issues.map((i) => i.message).join(', '));
+                logger.warn(`[FoodAutoCreation] AIFood validation failed for "${aiFood.name}":`, validation.error.issues.map((i) => i.message).join(', '));
                 // Processa con defaults
                 if (aiFood.name && aiFood.macros) {
                     result.push({

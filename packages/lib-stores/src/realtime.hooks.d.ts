@@ -3,7 +3,8 @@
  *
  * Hook React per interagire con lo store Realtime in modo pulito e type-safe.
  * Seguono i principi KISS e DRY, wrappando la logica comune.
- */
+ */import { logger } from '@onecoach/lib-core';
+
 export type MagicAnimationType = 'glow' | 'shimmer' | 'pulse' | 'border' | 'ripple' | 'update';
 export interface UseMagicAnimationOptions {
     /** Durata dell'animazione in ms (default: 1500) */
@@ -71,8 +72,8 @@ export interface UseMagicAnimationResult {
  * const { animationClass, trigger } = useMagicAnimation({
  *   type: 'glow',
  *   duration: 2000,
- *   onStart: () => console.warn('Animation started'),
- *   onEnd: () => console.warn('Animation ended'),
+ *   onStart: () => logger.warn('Animation started'),
+ *   onEnd: () => logger.warn('Animation ended'),
  * });
  * ```
  */
@@ -127,7 +128,7 @@ export interface UseRealtimeSubscriptionOptions<T = Record<string, unknown>> {
  *   table: 'users',
  *   filter: userId ? `id=eq.${userId}` : undefined,
  *   enabled: !!userId,
- *   onUpdate: (user) => console.warn('User updated:', user),
+ *   onUpdate: (user) => logger.warn('User updated:', user),
  * });
  * ```
  */
@@ -319,7 +320,7 @@ export declare function useRealtimeStatus(): {
  * @example
  * ```tsx
  * const debug = useRealtimeDebug();
- * console.warn(debug);
+ * logger.warn(debug);
  * // { status: 'connected', subscriptionCount: 2, subscriptions: {...} }
  * ```
  */

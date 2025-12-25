@@ -6,6 +6,7 @@
 
 import type { User } from '@onecoach/lib-stores/auth.store';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Login credentials
  */
@@ -147,7 +148,7 @@ export const authQueries = {
       });
     } catch (error: unknown) {
       // Ignore errors, we'll clear local session anyway
-      console.warn('Logout API call failed:', error);
+      logger.warn('Logout API call failed:', error);
     }
   },
 

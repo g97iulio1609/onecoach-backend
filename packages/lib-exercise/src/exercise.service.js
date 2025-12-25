@@ -3,6 +3,7 @@ import {  createId, toSlug  } from '@onecoach/lib-shared/utils';
 import { ExerciseApprovalStatus, ExerciseRelationType, MuscleRole, Prisma } from '@prisma/client';
 import { compare } from 'fast-json-patch';
 import { SimpleCache } from '@onecoach/lib-shared';
+import { logger } from '@onecoach/lib-core';
 const DEFAULT_LOCALE = 'en';
 // Cache disabilitata per debug e consistenza dati
 const LIST_CACHE_TTL_MS = 0;
@@ -290,7 +291,7 @@ export class ExerciseService {
                 const uniqueTranslations = updateData.translations.filter((translation) => {
                     const locale = translation.locale.toLowerCase();
                     if (seenLocales.has(locale)) {
-                        console.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed during update for exercise "${id}"`);
+                        logger.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed during update for exercise "${id}"`);
                         return false;
                     }
                     seenLocales.add(locale);
@@ -825,7 +826,7 @@ export class ExerciseService {
         const translations = normalizedTranslations.filter((translation) => {
             const locale = translation.locale.toLowerCase();
             if (seenLocales.has(locale)) {
-                console.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed`);
+                logger.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed`);
                 return false;
             }
             seenLocales.add(locale);

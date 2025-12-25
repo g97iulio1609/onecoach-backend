@@ -14,6 +14,7 @@
  */
 import { prisma } from '@onecoach/lib-core/prisma';
 import { AI_FOOD_GENERATION_INSTRUCTIONS } from '@onecoach/schemas';
+import { logger } from '@onecoach/lib-core';
 // Cache configuration for exercises (still useful for common exercises)
 const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 let exerciseCatalogCache = null;
@@ -157,7 +158,7 @@ export class CatalogProviderService {
             return catalog;
         }
         catch (error) {
-            console.error('[CatalogProvider] Error loading exercise catalog:', error);
+            logger.error('[CatalogProvider] Error loading exercise catalog:', error);
             return exerciseCatalogCache ?? []; // Return stale cache on error
         }
     }
@@ -200,7 +201,7 @@ export class CatalogProviderService {
             }
             // Return if name match is good enough (90% threshold)
             if (bestMatch && bestScore >= 0.9) {
-                console.warn(`[CatalogProvider] Exercise match (name): "${exerciseName}" -> "${bestMatch.name}" (score: ${(bestScore * 100).toFixed(1)}%)`);
+                logger.warn(`[CatalogProvider] Exercise match (name): "${exerciseName}" -> "${bestMatch.name}" (score: ${(bestScore * 100).toFixed(1)}%)`);
                 return bestMatch.id;
             }
             // Second: Try searchTerms match (lower threshold - 80%)
@@ -210,14 +211,14 @@ export class CatalogProviderService {
             }
             // If name match has reasonable score (>= 0.75), use it as fallback
             if (bestMatch && bestScore >= 0.75) {
-                console.warn(`[CatalogProvider] Exercise match (fallback): "${exerciseName}" -> "${bestMatch.name}" (score: ${(bestScore * 100).toFixed(1)}%)`);
+                logger.warn(`[CatalogProvider] Exercise match (fallback): "${exerciseName}" -> "${bestMatch.name}" (score: ${(bestScore * 100).toFixed(1)}%)`);
                 return bestMatch.id;
             }
-            console.warn(`[CatalogProvider] No exercise match found for: "${exerciseName}"`);
+            logger.warn(`[CatalogProvider] No exercise match found for: "${exerciseName}"`);
             return null;
         }
         catch (error) {
-            console.error('[CatalogProvider] Error matching exercise:', error);
+            logger.error('[CatalogProvider] Error matching exercise:', error);
             return null;
         }
     }
@@ -265,13 +266,13 @@ export class CatalogProviderService {
                 }
             }
             if (bestMatch && bestScore >= SEARCH_TERMS_THRESHOLD) {
-                console.warn(`[CatalogProvider] Exercise match (searchTerms): "${searchQuery}" -> "${bestMatch.name}" via term "${bestMatch.matchedTerm}" (score: ${(bestScore * 100).toFixed(1)}%)`);
+                logger.warn(`[CatalogProvider] Exercise match (searchTerms): "${searchQuery}" -> "${bestMatch.name}" via term "${bestMatch.matchedTerm}" (score: ${(bestScore * 100).toFixed(1)}%)`);
                 return bestMatch.exerciseId;
             }
             return null;
         }
         catch (error) {
-            console.error('[CatalogProvider] Error matching by searchTerms:', error);
+            logger.error('[CatalogProvider] Error matching by searchTerms:', error);
             return null;
         }
     }

@@ -25,6 +25,7 @@ import {
 import { creditService } from '@onecoach/lib-core/credit.service';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { TOKEN_LIMITS } from '@onecoach/constants';
+import { logger } from '@onecoach/lib-core';
 import {
   ImportedWorkoutProgramSchema,
   type ImportedWorkoutProgram,
@@ -39,9 +40,9 @@ type ImportModelKey = 'imageModel' | 'pdfModel' | 'documentModel' | 'spreadsheet
 
 function traceLog(message: string, context?: Record<string, unknown>) {
   if (context && Object.keys(context).length > 0) {
-    console.warn('[WorkoutVision][trace]', message, context);
+    logger.warn('[WorkoutVision][trace]', message, context);
   } else {
-    console.warn('[WorkoutVision][trace]', message);
+    logger.warn('[WorkoutVision][trace]', message);
   }
 }
 
@@ -370,8 +371,8 @@ async function getVisionModelConfig(type: ImportFileType): Promise<{
   const retryDelayBaseMs = Math.max(0, typedConfig.retryDelayBaseMs ?? 0);
 
   // Enhanced logging for debugging model selection issue
-  console.warn(`[WorkoutVision] ⚙️ RAW Config from DB:`, JSON.stringify(typedConfig, null, 2));
-  console.warn(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
+  logger.warn(`[WorkoutVision] ⚙️ RAW Config from DB:`, JSON.stringify(typedConfig, null, 2));
+  logger.warn(`[WorkoutVision] ⚙️ Model config loaded for ${type}:`, {
     type,
     modelKey,
     model,
@@ -496,14 +497,14 @@ export class WorkoutVisionService {
 
     // Avviso se model == fallbackModel (nessun vero fallback)
     if (config.model === config.fallbackModel) {
-      console.warn('[WorkoutVision] ⚠️ WARNING: Model and fallbackModel are the same!', {
+      logger.warn('[WorkoutVision] ⚠️ WARNING: Model and fallbackModel are the same!', {
         model: config.model,
         suggestion:
           'Configure a different fallback model in Admin > AI Settings > Vision & Import Models',
       });
     }
 
-    console.warn(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
+    logger.warn(`[WorkoutVision] 🚀 Starting spreadsheet parsing:`, {
       userId,
       mimeType,
       provider: config.provider,
@@ -531,14 +532,14 @@ export class WorkoutVisionService {
         return result;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        console.error(
+        logger.error(
           `[WorkoutVision] Spreadsheet parsing attempt ${attempt + 1} failed:`,
           lastError.message
         );
 
         // Su primo fallimento, prova modello fallback
         if (attempt === 0 && currentModel !== config.fallbackModel) {
-          console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+          logger.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
           currentModel = config.fallbackModel;
         }
 
@@ -594,14 +595,14 @@ export class WorkoutVisionService {
     try {
       textContent = decodeBase64ToText(contentBase64);
     } catch (decodeError) {
-      console.error('[WorkoutVision] ❌ Base64 decode failed:', decodeError);
+      logger.error('[WorkoutVision] ❌ Base64 decode failed:', decodeError);
       throw new Error('Impossibile decodificare il contenuto del file');
     }
 
     // Per XLSX, il contenuto binario non può essere decodificato direttamente
     // In questo caso usiamo vision-like approach
     if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
-      console.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
+      logger.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
       return this.parseWithVisionAI(contentBase64, mimeType, '', 'spreadsheet', prompt);
     }
 
@@ -621,7 +622,7 @@ Parse this data and return ONLY valid JSON.`;
     const csvPreview = textContent.substring(0, 500);
     const promptPreview = fullPrompt.substring(0, 1000);
 
-    console.warn('[WorkoutVision] 📋 AI Request Details:', {
+    logger.warn('[WorkoutVision] 📋 AI Request Details:', {
       modelId,
       mimeType,
       csvRows,
@@ -630,7 +631,7 @@ Parse this data and return ONLY valid JSON.`;
       csvPreview: csvPreview + (textContent.length > 500 ? '...' : ''),
     });
 
-    console.warn(
+    logger.warn(
       '[WorkoutVision] 📝 Prompt Preview:',
       promptPreview + (fullPrompt.length > 1000 ? '...' : '')
     );
@@ -654,7 +655,7 @@ Parse this data and return ONLY valid JSON.`;
       // Usiamo esclusivamente modelli reasoning, quindi temperatura non supportata
       const isReasoningModel = true;
 
-      console.warn('[WorkoutVision] 🚀 Calling AI with streamText (structured output)...', {
+      logger.warn('[WorkoutVision] 🚀 Calling AI with streamText (structured output)...', {
         modelId,
         maxOutputTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
         temperature: isReasoningModel ? 'N/A (reasoning model)' : 0.2,
@@ -666,7 +667,7 @@ Parse this data and return ONLY valid JSON.`;
 
       // Usa streamText con Output.object() come workout-generation-orchestrator.service.ts
       // Questo garantisce oggetti completi con validazione Zod
-      console.warn('[WorkoutVision] 📡 Using streamText with Output.object() for structured output...');
+      logger.warn('[WorkoutVision] 📡 Using streamText with Output.object() for structured output...');
 
       const streamResult = streamText({
         model,
@@ -705,7 +706,7 @@ Parse this data and return ONLY valid JSON.`;
 
           // Log progress ogni 20 update o quando cambiano settimane/giorni
           if (partialCount % 20 === 0 || weeksCount !== lastWeeksCount || daysCount !== lastDaysCount) {
-            console.warn(
+            logger.warn(
               `[WorkoutVision] 📊 Stream progress: ${partialCount} partials, ` +
               `${weeksCount} weeks, ${daysCount} days`
             );
@@ -722,7 +723,7 @@ Parse this data and return ONLY valid JSON.`;
         await progressPromise; // Attendi che il tracking finisca
         completeObject = await streamResult.output; // Ottieni l'oggetto COMPLETO validato
       } catch (error: unknown) {
-        console.error('[WorkoutVision] ❌ streamText failed:', {
+        logger.error('[WorkoutVision] ❌ streamText failed:', {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
           partialCount,
@@ -731,7 +732,7 @@ Parse this data and return ONLY valid JSON.`;
       }
 
       if (!completeObject) {
-        console.error('[WorkoutVision] ❌ streamText returned null/undefined');
+        logger.error('[WorkoutVision] ❌ streamText returned null/undefined');
         throw new Error('AI returned empty response');
       }
 
@@ -747,7 +748,7 @@ Parse this data and return ONLY valid JSON.`;
         0
       );
 
-      console.warn('[WorkoutVision] ✅ Stream completed:', {
+      logger.warn('[WorkoutVision] ✅ Stream completed:', {
         partialCount,
         durationMs: Date.now() - startTime,
         programName: parsedOutput.name,
@@ -758,7 +759,7 @@ Parse this data and return ONLY valid JSON.`;
 
       // Valida che non sia un programma vuoto
       if (totalDays === 0) {
-        console.error('[WorkoutVision] ❌ Parsed program has no days!');
+        logger.error('[WorkoutVision] ❌ Parsed program has no days!');
         throw new Error(
           'AI generated a program with no days. The model may have truncated the output. ' +
           'Try using a different model in Admin > AI Settings > Vision & Import Models.'
@@ -781,7 +782,7 @@ Parse this data and return ONLY valid JSON.`;
       const errorMessage = err instanceof Error ? err.message : String(err);
       const errorStack = err instanceof Error ? err.stack : undefined;
 
-      console.error('[WorkoutVision] ❌ AI call failed:', {
+      logger.error('[WorkoutVision] ❌ AI call failed:', {
         modelId,
         durationMs: Date.now() - startTime,
         error: errorMessage,
@@ -858,11 +859,11 @@ Parse this data and return ONLY valid JSON.`;
         return result;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        console.error(`[WorkoutVision] Attempt ${attempt + 1} failed:`, lastError.message);
+        logger.error(`[WorkoutVision] Attempt ${attempt + 1} failed:`, lastError.message);
 
         // Su primo fallimento, prova modello fallback
         if (attempt === 0 && currentModel !== config.fallbackModel) {
-          console.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
+          logger.warn(`[WorkoutVision] Switching to fallback model: ${config.fallbackModel}`);
           currentModel = config.fallbackModel;
         }
 

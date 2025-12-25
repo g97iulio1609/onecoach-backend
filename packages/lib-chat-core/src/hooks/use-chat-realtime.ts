@@ -92,7 +92,7 @@ export function useChatRealtime(options: UseChatRealtimeOptions): void {
 
         callbacksRef.current.onMessage?.(message, event);
       } catch (error) {
-        console.error('[useChatRealtime] Error converting message:', error);
+        logger.error('[useChatRealtime] Error converting message:', error);
         callbacksRef.current.onError?.(error as Error);
       }
     },
@@ -194,7 +194,7 @@ export function useChatConversationsRealtime(options: UseConversationsRealtimeOp
 
         callbacksRef.current.onConversationUpdate?.(conversation, event);
       } catch (error) {
-        console.error('[useChatConversationsRealtime] Error:', error);
+        logger.error('[useChatConversationsRealtime] Error:', error);
         callbacksRef.current.onError?.(error as Error);
       }
     },
@@ -232,7 +232,8 @@ export function useChatConversationsRealtime(options: UseConversationsRealtimeOp
 
 import { useChatCore } from './use-chat-core';
 
-interface UseChatWithRealtimeOptions extends UseChatCoreOptions {
+i
+import { logger } from '@onecoach/lib-core';nterface UseChatWithRealtimeOptions extends UseChatCoreOptions {
   userId?: string;
   realtimeEnabled?: boolean;
 }
@@ -270,7 +271,7 @@ export function useChatWithRealtime(options: UseChatWithRealtimeOptions) {
       // Qui potremmo aggiornare i messaggi se arrivano da altri client
       // Per ora loggiamo solo in development
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[useChatWithRealtime] Realtime event:', event, message);
+        logger.warn('[useChatWithRealtime] Realtime event:', event, message);
       }
     },
   });

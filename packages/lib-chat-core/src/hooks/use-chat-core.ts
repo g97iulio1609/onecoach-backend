@@ -33,6 +33,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useChat as useAIChat } from '@ai-sdk/react';
 import type { ChatStatus, UseChatCoreOptions, UseChatCoreResult, UIMessage } from '../types';
 
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // Constants
 // ============================================================================
@@ -51,7 +52,7 @@ function log(_message: string, _data?: unknown) {
 }
 
 function logError(message: string, error?: unknown) {
-  console.error(`🔴 [useChatCore] ${message}`, error);
+  logger.error(`🔴 [useChatCore] ${message}`, error);
 }
 
 // ============================================================================

@@ -14,6 +14,7 @@ import { updateProgramWeightsForExerciseId } from '@onecoach/lib-workout';
 import { z } from 'zod';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 const upsertSchema = z.object({
@@ -35,7 +36,7 @@ export async function GET() {
 
   // Verifica che userOrError abbia un id valido
   if (!('id' in userOrError) || typeof userOrError.id !== 'string') {
-    console.error('[API] GET /api/profile/maxes: User ID non valido', userOrError);
+    logger.error('[API] GET /api/profile/maxes: User ID non valido', userOrError);
     return NextResponse.json(
       { error: 'Errore di autenticazione: ID utente non valido' },
       { status: 401 }
@@ -48,7 +49,7 @@ export async function GET() {
     const result = await OneRepMaxService.getByUserId(userId);
 
     if (!result.success) {
-      console.error('[API] GET /api/profile/maxes service error:', result.error);
+      logger.error('[API] GET /api/profile/maxes service error:', result.error);
       return NextResponse.json(
         { error: result.error || 'Errore nel recupero dei massimali' },
         { status: 400 }
@@ -76,7 +77,7 @@ export async function POST(_req: Request) {
 
   // Verifica che userOrError abbia un id valido
   if (!('id' in userOrError) || typeof userOrError.id !== 'string') {
-    console.error('[API] POST /api/profile/maxes: User ID non valido', userOrError);
+    logger.error('[API] POST /api/profile/maxes: User ID non valido', userOrError);
     return NextResponse.json(
       { error: 'Errore di autenticazione: ID utente non valido' },
       { status: 401 }

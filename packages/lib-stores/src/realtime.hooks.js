@@ -7,6 +7,7 @@
 'use client';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRealtimeStore, selectIsRealtimeReady } from './realtime.store';
+import { logger } from '@onecoach/lib-core';
 /**
  * Hook per applicare animazioni "magiche" quando arrivano aggiornamenti Realtime.
  *
@@ -53,8 +54,8 @@ import { useRealtimeStore, selectIsRealtimeReady } from './realtime.store';
  * const { animationClass, trigger } = useMagicAnimation({
  *   type: 'glow',
  *   duration: 2000,
- *   onStart: () => console.warn('Animation started'),
- *   onEnd: () => console.warn('Animation ended'),
+ *   onStart: () => logger.warn('Animation started'),
+ *   onEnd: () => logger.warn('Animation ended'),
  * });
  * ```
  */
@@ -166,7 +167,7 @@ export function useRealtimeWithMagic({ animationType = 'update', animationDurati
  *   table: 'users',
  *   filter: userId ? `id=eq.${userId}` : undefined,
  *   enabled: !!userId,
- *   onUpdate: (user) => console.warn('User updated:', user),
+ *   onUpdate: (user) => logger.warn('User updated:', user),
  * });
  * ```
  */
@@ -452,7 +453,7 @@ export function useRealtimeStatus() {
  * @example
  * ```tsx
  * const debug = useRealtimeDebug();
- * console.warn(debug);
+ * logger.warn(debug);
  * // { status: 'connected', subscriptionCount: 2, subscriptions: {...} }
  * ```
  */

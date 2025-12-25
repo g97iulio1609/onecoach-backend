@@ -9,6 +9,7 @@ import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { onboardingService } from '@onecoach/lib-core';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 export async function POST() {
@@ -21,7 +22,7 @@ export async function POST() {
 
     if (!userOrError.id || typeof userOrError.id !== 'string') {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[ONBOARDING RESET] User ID non valido:', userOrError);
+        logger.error('[ONBOARDING RESET] User ID non valido:', userOrError);
       }
       return NextResponse.json(
         { error: 'Errore di autenticazione: ID utente non valido' },
@@ -40,8 +41,8 @@ export async function POST() {
     if (process.env.NODE_ENV === 'development') {
       logError("Impossibile resettare l'onboarding", error);
       if (error instanceof Error) {
-        console.error('[ONBOARDING RESET] Error message:', error.message);
-        console.error('[ONBOARDING RESET] Error stack:', error.stack);
+        logger.error('[ONBOARDING RESET] Error message:', error.message);
+        logger.error('[ONBOARDING RESET] Error stack:', error.stack);
       }
     }
 

@@ -7,6 +7,7 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRealtimeSubscription, useRealtimeSyncWithClient } from './realtime.hooks';
+import { logger } from '@onecoach/lib-core';
 /**
  * Hook per sottoscrivere a eventi realtime sulle conversazioni dirette.
  *
@@ -16,7 +17,7 @@ import { useRealtimeSubscription, useRealtimeSyncWithClient } from './realtime.h
  *   userId: user.id,
  *   role: user.role === 'COACH' ? 'COACH' : 'USER',
  *   onConversationUpdated: (conv) => {
- *     console.warn('Conversation updated:', conv);
+ *     logger.warn('Conversation updated:', conv);
  *   },
  * });
  * ```
@@ -42,7 +43,7 @@ export function useDirectConversationsRealtime({ userId, role, enabled = true, o
  * useDirectMessagesRealtime({
  *   conversationId: selectedConversation?.id,
  *   onMessageSent: (msg) => {
- *     console.warn('New message:', msg);
+ *     logger.warn('New message:', msg);
  *     // Scroll to bottom, play sound, etc.
  *   },
  * });

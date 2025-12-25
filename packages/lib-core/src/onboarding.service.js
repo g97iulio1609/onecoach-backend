@@ -6,6 +6,7 @@
  */
 import { prisma } from './prisma';
 import { createId } from '@onecoach/lib-shared/id-generator';
+import { logger } from '@onecoach/lib-core';
 /**
  * Onboarding step configuration
  * Definisce i 15 step del wizard
@@ -59,7 +60,7 @@ export class OnboardingService {
             return this.deserializeProgress(newProgress);
         }
         catch (error) {
-            console.error('[OnboardingService.getOrCreate]', error);
+            logger.error('[OnboardingService.getOrCreate]', error);
             throw error;
         }
     }
@@ -77,7 +78,7 @@ export class OnboardingService {
             return this.deserializeProgress(progress);
         }
         catch (error) {
-            console.error('[OnboardingService.getProgress]', error);
+            logger.error('[OnboardingService.getProgress]', error);
             throw error;
         }
     }
@@ -128,7 +129,7 @@ export class OnboardingService {
             return this.deserializeProgress(updated);
         }
         catch (error) {
-            console.error('[OnboardingService.completeStep]', error);
+            logger.error('[OnboardingService.completeStep]', error);
             throw error;
         }
     }
@@ -154,7 +155,7 @@ export class OnboardingService {
             return this.deserializeProgress(updated);
         }
         catch (error) {
-            console.error('[OnboardingService.goToStep]', error);
+            logger.error('[OnboardingService.goToStep]', error);
             throw error;
         }
     }
@@ -178,7 +179,7 @@ export class OnboardingService {
             return this.deserializeProgress(updated);
         }
         catch (error) {
-            console.error('[OnboardingService.reset]', error);
+            logger.error('[OnboardingService.reset]', error);
             throw error;
         }
     }
@@ -205,7 +206,7 @@ export class OnboardingService {
             return this.deserializeProgress(updated);
         }
         catch (error) {
-            console.error('[OnboardingService.completeAll]', error);
+            logger.error('[OnboardingService.completeAll]', error);
             throw error;
         }
     }
@@ -218,7 +219,7 @@ export class OnboardingService {
             return progress?.isCompleted ?? false;
         }
         catch (error) {
-            console.error('[OnboardingService.isCompleted]', error);
+            logger.error('[OnboardingService.isCompleted]', error);
             return false;
         }
     }

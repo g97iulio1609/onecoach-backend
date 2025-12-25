@@ -51,6 +51,7 @@ import {
   NutritionPlanBaseSchema,
 } from '@onecoach/schemas';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { logger } from '@onecoach/lib-core';
 import {
   calculateMacros,
   aggregateMealMacros,
@@ -289,7 +290,7 @@ export function parseNutritionStatus(value: unknown): NutritionStatus {
 export function normalizeNutritionPlan(plan: PrismaNutritionPlan): NutritionPlan {
   try {
     if (IS_DEV) {
-      console.warn('[normalizeNutritionPlan] Starting normalization for plan:', plan.id);
+      logger.warn('[normalizeNutritionPlan] Starting normalization for plan:', plan.id);
     }
 
     const weeks = Array.isArray(plan.weeks) ? plan.weeks : [];
@@ -316,7 +317,7 @@ export function normalizeNutritionPlan(plan: PrismaNutritionPlan): NutritionPlan
     };
 
     if (IS_DEV) {
-      console.warn('[normalizeNutritionPlan] Normalization complete:', {
+      logger.warn('[normalizeNutritionPlan] Normalization complete:', {
         planId: normalized.id,
         weeksCount: normalized.weeks.length,
       });
@@ -324,7 +325,7 @@ export function normalizeNutritionPlan(plan: PrismaNutritionPlan): NutritionPlan
 
     return normalized;
   } catch (error: unknown) {
-    console.error('[normalizeNutritionPlan] Error:', error);
+    logger.error('[normalizeNutritionPlan] Error:', error);
     throw error;
   }
 }
@@ -504,7 +505,7 @@ function normalizeFood(food: unknown, fallbackId: string): Food {
     !rawFood.id &&
     IS_DEV
   ) {
-    console.warn('[normalizeFood] Food without foodItemId, using fallback:', {
+    logger.warn('[normalizeFood] Food without foodItemId, using fallback:', {
       foodData: JSON.stringify(food).substring(0, 100),
       fallbackId,
       resolvedName: name,
@@ -605,7 +606,7 @@ export function preparePlanForPersistence(plan: NutritionPlan): {
           foods: meal.foods.map((food: Food) => {
             // SCHEMA VERIFICATION: Log food before persistence
             if (!food.foodItemId) {
-              console.warn(
+              logger.warn(
                 '[SCHEMA_VERIFY] Food without foodItemId in preparePlanForPersistence:',
                 {
                   foodId: food.id,
@@ -792,7 +793,7 @@ export function normalizeAgentPayload(
   // Validate the final plan with Zod schema for type safety
   const validationResult = NutritionPlanBaseSchema.safeParse(planData);
   if (!validationResult.success) {
-    console.error('[normalizeAgentPayload] Validation errors:', validationResult.error.issues);
+    logger.error('[normalizeAgentPayload] Validation errors:', validationResult.error.issues);
     throw new Error(
       `Invalid agent payload structure: ${validationResult.error.issues.map((i: any) => i.message).join(', ')}`
     );

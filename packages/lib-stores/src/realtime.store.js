@@ -28,6 +28,7 @@
 'use client';
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // Helpers
 // ============================================================================
@@ -90,7 +91,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
             lastError: null,
         });
         if (process.env.NODE_ENV === 'development') {
-            console.warn('[RealtimeStore] Initialized');
+            logger.warn('[RealtimeStore] Initialized');
         }
     },
     reset: () => {
@@ -104,7 +105,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
             subscriptions: new Map(),
         });
         if (process.env.NODE_ENV === 'development') {
-            console.warn('[RealtimeStore] Reset');
+            logger.warn('[RealtimeStore] Reset');
         }
     },
     subscribe: (table, listener, options) => {
@@ -116,7 +117,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
         // Supabase Realtime requires valid UUIDs for filtering
         if (!isValidRealtimeFilter(filter)) {
             if (process.env.NODE_ENV === 'development') {
-                console.warn(`[RealtimeStore] Skipping subscription for ${channelKey} - filter contains non-UUID value. ` +
+                logger.warn(`[RealtimeStore] Skipping subscription for ${channelKey} - filter contains non-UUID value. ` +
                     'Realtime subscriptions require valid Supabase UUIDs.');
             }
             // Return empty cleanup function - subscription is silently skipped
@@ -129,7 +130,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
             // Aggiungi listener a sottoscrizione esistente
             existingSub.listeners.set(id, listenerWithId);
             if (process.env.NODE_ENV === 'development') {
-                console.warn(`[RealtimeStore] Added listener to ${channelKey} (total: ${existingSub.listeners.size})`);
+                logger.warn(`[RealtimeStore] Added listener to ${channelKey} (total: ${existingSub.listeners.size})`);
             }
         }
         else if (client) {
@@ -165,7 +166,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                         }
                     }
                     catch (error) {
-                        console.error('[RealtimeStore] Listener error:', error);
+                        logger.error('[RealtimeStore] Listener error:', error);
                         l.onError?.(error);
                     }
                 });
@@ -173,7 +174,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                 .subscribe((status, err) => {
                 if (status === 'SUBSCRIBED') {
                     if (process.env.NODE_ENV === 'development') {
-                        console.warn(`[RealtimeStore] Subscribed to ${channelKey}`);
+                        logger.warn(`[RealtimeStore] Subscribed to ${channelKey}`);
                     }
                 }
                 else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -183,7 +184,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                         : new Error(`Realtime ${status} on channel ${channelKey}${err ? `: ${String(err)}` : ''}`);
                     // Log solo in development per evitare spam nella console
                     if (process.env.NODE_ENV === 'development') {
-                        console.warn(`[RealtimeStore] ${status} on ${channelKey}:`, error.message);
+                        logger.warn(`[RealtimeStore] ${status} on ${channelKey}:`, error.message);
                     }
                     // Aggiorna lo stato con l'errore
                     set({ lastError: error });
@@ -196,7 +197,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                         catch (listenerError) {
                             // Log solo in development per evitare spam
                             if (process.env.NODE_ENV === 'development') {
-                                console.error('[RealtimeStore] Listener onError threw:', listenerError);
+                                logger.error('[RealtimeStore] Listener onError threw:', listenerError);
                             }
                         }
                     });
@@ -223,7 +224,7 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
             });
             set({ subscriptions: newSubscriptions });
             if (process.env.NODE_ENV === 'development') {
-                console.warn(`[RealtimeStore] Created subscription: ${channelKey}`);
+                logger.warn(`[RealtimeStore] Created subscription: ${channelKey}`);
             }
         }
         // Cleanup function
@@ -240,11 +241,11 @@ export const useRealtimeStore = create()(devtools(subscribeWithSelector((set, ge
                 newSubscriptions.delete(channelKey);
                 set({ subscriptions: newSubscriptions });
                 if (process.env.NODE_ENV === 'development') {
-                    console.warn(`[RealtimeStore] Removed subscription: ${channelKey}`);
+                    logger.warn(`[RealtimeStore] Removed subscription: ${channelKey}`);
                 }
             }
             else if (process.env.NODE_ENV === 'development') {
-                console.warn(`[RealtimeStore] Removed listener from ${channelKey} (remaining: ${sub.listeners.size})`);
+                logger.warn(`[RealtimeStore] Removed listener from ${channelKey} (remaining: ${sub.listeners.size})`);
             }
         };
     },

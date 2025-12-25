@@ -31,10 +31,10 @@ class AffiliateLogger {
 
     // Log strutturato per console (può essere sostituito con logger avanzato come pino)
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[AFFILIATE]', JSON.stringify(logEntry, null, 2));
+      logger.warn('[AFFILIATE]', JSON.stringify(logEntry, null, 2));
     } else {
       // In produzione, log come JSON line per parsing da log aggregators
-      console.warn(JSON.stringify(logEntry));
+      logger.warn(JSON.stringify(logEntry));
     }
 
     // TODO: In futuro, inviare a servizio di monitoring (Datadog, Sentry, etc.)

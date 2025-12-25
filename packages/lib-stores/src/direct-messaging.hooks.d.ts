@@ -6,6 +6,7 @@
  */
 import { useQueryClient } from '@tanstack/react-query';
 import type { direct_conversations, direct_messages } from '@prisma/client';
+import { logger } from '@onecoach/lib-core';
 export interface UseDirectConversationsRealtimeOptions {
     /** User ID (coach o atleta) */
     userId: string;
@@ -31,7 +32,7 @@ export interface UseDirectConversationsRealtimeOptions {
  *   userId: user.id,
  *   role: user.role === 'COACH' ? 'COACH' : 'USER',
  *   onConversationUpdated: (conv) => {
- *     console.warn('Conversation updated:', conv);
+ *     logger.warn('Conversation updated:', conv);
  *   },
  * });
  * ```
@@ -59,7 +60,7 @@ export interface UseDirectMessagesRealtimeOptions {
  * useDirectMessagesRealtime({
  *   conversationId: selectedConversation?.id,
  *   onMessageSent: (msg) => {
- *     console.warn('New message:', msg);
+ *     logger.warn('New message:', msg);
  *     // Scroll to bottom, play sound, etc.
  *   },
  * });

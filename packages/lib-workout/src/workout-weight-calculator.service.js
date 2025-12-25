@@ -10,6 +10,7 @@ import { prisma } from '@onecoach/lib-core/prisma';
 import { prepareProgramForPersistence } from './helpers/program-transform';
 import { normalizeWorkoutProgram } from './helpers/normalizers/workout-normalizer';
 import { Prisma } from '@prisma/client';
+import { logger } from '@onecoach/lib-core';
 /**
  * Calculate weights for a single set based on 1RM
  * Extracted common logic for reuse (DRY principle)
@@ -152,7 +153,7 @@ export async function updateProgramWeightsForExerciseId(userId, catalogExerciseI
         }
     }
     catch (error) {
-        console.error('[WorkoutWeightCalculatorService.updateProgramWeightsForExerciseId]', error);
+        logger.error('[WorkoutWeightCalculatorService.updateProgramWeightsForExerciseId]', error);
         // Non propagare l'errore: l'aggiornamento dei programmi è best-effort
         // Se fallisce, l'utente può sempre ricalcolare manualmente
     }

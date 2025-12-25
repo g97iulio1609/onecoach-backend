@@ -16,6 +16,7 @@ import type { Macros } from '@onecoach/types';
 import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 type RouteParams = Promise<{ id: string }>;
@@ -168,7 +169,7 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
     try {
       aiFoodData = JSON.parse(jsonText);
     } catch (parseError: unknown) {
-      console.error('[AI Food Update] JSON parse error:', parseError, 'Response:', jsonText);
+      logger.error('[AI Food Update] JSON parse error:', parseError, 'Response:', jsonText);
       return NextResponse.json(
         { error: 'Invalid JSON response from AI', details: jsonText.substring(0, 200) },
         { status: 500 }

@@ -9,6 +9,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { logger } from '@onecoach/lib-core';
 export const useWorkoutBuilderStore = create()(persist(immer((set, get) => ({
     // Initial State
     activeProgram: null,
@@ -22,7 +23,7 @@ export const useWorkoutBuilderStore = create()(persist(immer((set, get) => ({
     init: async (_programId) => {
         set({ isLoading: true });
         // TODO: Inject workoutApi and supabase client
-        console.warn('WorkoutBuilderStore.init: Not implemented - needs dependency injection');
+        logger.warn('WorkoutBuilderStore.init: Not implemented - needs dependency injection');
         set({ isLoading: false });
     },
     cleanup: () => {
@@ -43,7 +44,7 @@ export const useWorkoutBuilderStore = create()(persist(immer((set, get) => ({
             }
         });
         // TODO: Implement autosave with injected workoutApi
-        console.warn('WorkoutBuilderStore.updateProgram: Autosave not implemented - needs dependency injection');
+        logger.warn('WorkoutBuilderStore.updateProgram: Autosave not implemented - needs dependency injection');
     },
     // UI Actions
     setSelectedWeek: (index) => set({ selectedWeekIndex: index }),

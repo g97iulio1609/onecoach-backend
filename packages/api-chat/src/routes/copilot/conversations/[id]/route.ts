@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@onecoach/lib-core/auth/session';
 import { prisma } from '@onecoach/lib-core/prisma';
 
+import { logger } from '@onecoach/lib-core';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -62,7 +63,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       metadata: conversation.metadata,
     });
   } catch (error: unknown) {
-    console.error('Error fetching conversation:', error);
+    logger.error('Error fetching conversation:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

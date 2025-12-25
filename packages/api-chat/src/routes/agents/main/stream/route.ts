@@ -13,6 +13,7 @@ import { createAgentCoordinator, createAIModel, MODEL_CONSTANTS } from '@onecoac
 import { auth } from '@onecoach/lib-core/auth';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Request schema validation
  */
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    console.error('[Agents Stream API] Error:', error);
+    logger.error('[Agents Stream API] Error:', error);
     return new Response(
       JSON.stringify({
         error: 'Internal server error',

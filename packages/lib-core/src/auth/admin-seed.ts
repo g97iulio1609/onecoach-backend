@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { prisma } from '../prisma';
 
+import { logger } from '@onecoach/lib-core';
 export interface SeedAdminResult {
   admin: {
     id: string;
@@ -77,13 +78,13 @@ async function seedAdminFromEnv(
 
   // Valida email
   if (!email.includes('@') || email.length < 3) {
-    console.warn(`⚠️ Invalid ${prefix}_EMAIL: ${email}`);
+    logger.warn(`⚠️ Invalid ${prefix}_EMAIL: ${email}`);
     return null;
   }
 
   // Valida password (minimo 8 caratteri)
   if (password.length < 8) {
-    console.warn(`⚠️ Invalid ${prefix}_DEFAULT_PASSWORD: must be at least 8 characters`);
+    logger.warn(`⚠️ Invalid ${prefix}_DEFAULT_PASSWORD: must be at least 8 characters`);
     return null;
   }
 
@@ -149,7 +150,7 @@ async function seedAdminFromEnv(
       created,
     };
   } catch (error: unknown) {
-    console.error(`❌ Error seeding ${prefix}:`, error);
+    logger.error(`❌ Error seeding ${prefix}:`, error);
     return null;
   }
 }

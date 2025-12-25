@@ -2,7 +2,8 @@
  * Auth Query Keys and Functions
  *
  * Standardized query keys and query functions for authentication
- */
+ */import { logger } from '@onecoach/lib-core';
+
 /**
  * Query keys for auth queries
  */
@@ -86,7 +87,7 @@ export const authQueries = {
         }
         catch (error) {
             // Ignore errors, we'll clear local session anyway
-            console.warn('Logout API call failed:', error);
+            logger.warn('Logout API call failed:', error);
         }
     },
     /**

@@ -186,6 +186,7 @@ export interface LocalizedExercise {
 // Nessuna duplicazione - tutti i service devono usare i tipi da lib-api come unica fonte di verità
 import type { ExercisesResponse } from '@onecoach/lib-api';
 
+import { logger } from '@onecoach/lib-core';
 // Tipo helper per garantire che page, pageSize, total siano sempre presenti
 // Questo è compatibile con ExercisesResponse che li ha opzionali
 // NOTA: Questo è un tipo interno al service, non un'interfaccia pubblica duplicata
@@ -470,7 +471,7 @@ export class ExerciseService {
         const uniqueTranslations = updateData.translations.filter((translation: any) => {
           const locale = translation.locale.toLowerCase();
           if (seenLocales.has(locale)) {
-            console.warn(
+            logger.warn(
               `[ExerciseService] Duplicate translation locale "${locale}" removed during update for exercise "${id}"`
             );
             return false;
@@ -1170,7 +1171,7 @@ export class ExerciseService {
     const translations = normalizedTranslations.filter((translation: any) => {
       const locale = translation.locale.toLowerCase();
       if (seenLocales.has(locale)) {
-        console.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed`);
+        logger.warn(`[ExerciseService] Duplicate translation locale "${locale}" removed`);
         return false;
       }
       seenLocales.add(locale);

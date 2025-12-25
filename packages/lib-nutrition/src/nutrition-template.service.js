@@ -7,6 +7,7 @@
 import { prisma } from '@onecoach/lib-core/prisma';
 import { Prisma } from '@prisma/client';
 import {  createId  } from '@onecoach/lib-shared/id-generator';
+import { logger } from '@onecoach/lib-core';
 /**
  * Validazione template data in base al tipo
  */
@@ -133,10 +134,10 @@ export class NutritionTemplateService {
             return templates.map((t) => this.mapToNutritionTemplate(t));
         }
         catch (error) {
-            console.error(logPrefix, error);
-            console.error('[NutritionTemplateService] where clause:', JSON.stringify(where, null, 2));
-            console.error('[NutritionTemplateService] orderBy:', JSON.stringify(orderBy, null, 2));
-            console.error('[NutritionTemplateService] options:', JSON.stringify(options, null, 2));
+            logger.error(logPrefix, error);
+            logger.error('[NutritionTemplateService] where clause:', JSON.stringify(where, null, 2));
+            logger.error('[NutritionTemplateService] orderBy:', JSON.stringify(orderBy, null, 2));
+            logger.error('[NutritionTemplateService] options:', JSON.stringify(options, null, 2));
             throw error;
         }
     }
@@ -247,8 +248,8 @@ export class NutritionTemplateService {
             };
         }
         catch (error) {
-            console.error(logPrefix, error);
-            console.error('[NutritionTemplateService] template data:', JSON.stringify(template, null, 2));
+            logger.error(logPrefix, error);
+            logger.error('[NutritionTemplateService] template data:', JSON.stringify(template, null, 2));
             throw error;
         }
     }

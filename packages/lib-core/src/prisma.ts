@@ -15,6 +15,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
+import { logger } from '@onecoach/lib-core';
 const globalForPrisma = globalThis as unknown as {
   prisma_updated: PrismaClient | undefined;
   pool: Pool | undefined;
@@ -31,7 +32,7 @@ const ensureDatabaseUrl = () => {
   if (!process.env.DATABASE_URL && !process.env.DIRECT_URL) {
     if (process.env.NODE_ENV === 'development') {
       const fallback = 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public';
-      console.warn(
+      logger.warn(
         '[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found!',
         '\n  Using fallback:',
         fallback,
@@ -101,7 +102,7 @@ function getPrismaClient(): PrismaClient {
     const idleTimeoutMillis = Number(process.env.PG_IDLE_TIMEOUT_MS ?? 30000);
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[Prisma] Initializing connection pool:', {
+      logger.warn('[Prisma] Initializing connection pool:', {
         max: Number(process.env.PG_POOL_MAX ?? defaultPoolSize),
         connectionTimeoutMillis,
         idleTimeoutMillis,

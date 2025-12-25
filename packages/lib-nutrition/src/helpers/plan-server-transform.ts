@@ -13,6 +13,7 @@
 import type { NutritionPlan, NutritionWeek, NutritionDay, Meal, Food } from '@onecoach/types';
 import { FoodService, calculateMacrosFromQuantity } from '@onecoach/lib-food/food.service';
 
+import { logger } from '@onecoach/lib-core';
 const DEFAULT_MACROS = {
   calories: 0,
   protein: 0,
@@ -28,7 +29,7 @@ const DEFAULT_MACROS = {
  */
 export async function resolveFoodReferences(plan: NutritionPlan): Promise<NutritionPlan> {
   try {
-    console.warn('[resolveFoodReferences] Starting resolution for plan:', plan.id);
+    logger.warn('[resolveFoodReferences] Starting resolution for plan:', plan.id);
 
     // Estrai tutti i foodItemId unici dal piano
     const foodItemIds = new Set<string>();
@@ -44,20 +45,20 @@ export async function resolveFoodReferences(plan: NutritionPlan): Promise<Nutrit
       }
     }
 
-    console.warn('[resolveFoodReferences] Found foodItemIds:', {
+    logger.warn('[resolveFoodReferences] Found foodItemIds:', {
       count: foodItemIds.size,
       ids: Array.from(foodItemIds).slice(0, 10), // Log first 10
     });
 
     if (foodItemIds.size === 0) {
-      console.warn('[resolveFoodReferences] No foodItemIds found, returning plan as-is');
+      logger.warn('[resolveFoodReferences] No foodItemIds found, returning plan as-is');
       return plan;
     }
 
     // Batch load di tutti gli alimenti
-    console.warn('[resolveFoodReferences] Loading foods from database...');
+    logger.warn('[resolveFoodReferences] Loading foods from database...');
     const foodItems = await FoodService.getFoodsByIds(Array.from(foodItemIds));
-    console.warn('[resolveFoodReferences] Loaded foods:', {
+    logger.warn('[resolveFoodReferences] Loaded foods:', {
       requested: foodItemIds.size,
       found: foodItems.length,
     });
@@ -78,7 +79,7 @@ export async function resolveFoodReferences(plan: NutritionPlan): Promise<Nutrit
     const foodMap = new Map<string, FoodItem>(foodItems.map((f: FoodItem) => [f.id, f]));
 
     // Popola name e macros per ogni alimento
-    console.warn('[resolveFoodReferences] Resolving food references...');
+    logger.warn('[resolveFoodReferences] Resolving food references...');
     const resolvedWeeks = plan.weeks.map((week: NutritionWeek) => ({
       ...week,
       days: week.days.map((day: NutritionDay) => ({
@@ -90,7 +91,7 @@ export async function resolveFoodReferences(plan: NutritionPlan): Promise<Nutrit
 
             if (!foodItem) {
               // Se alimento non trovato, mantieni struttura base
-              console.warn('[resolveFoodReferences] Food not found in catalog:', food.foodItemId);
+              logger.warn('[resolveFoodReferences] Food not found in catalog:', food.foodItemId);
               return {
                 ...food,
                 name: food.name || 'Unknown Food',
@@ -115,22 +116,22 @@ export async function resolveFoodReferences(plan: NutritionPlan): Promise<Nutrit
       })),
     }));
 
-    console.warn('[resolveFoodReferences] Resolution complete');
+    logger.warn('[resolveFoodReferences] Resolution complete');
     return {
       ...plan,
       weeks: resolvedWeeks,
     };
   } catch (error: unknown) {
-    console.error('[resolveFoodReferences] Error resolving food references:', error);
+    logger.error('[resolveFoodReferences] Error resolving food references:', error);
     if (error instanceof Error) {
-      console.error('[resolveFoodReferences] Error details:', {
+      logger.error('[resolveFoodReferences] Error details:', {
         message: error.message,
         stack: error.stack,
       });
     }
     // In caso di errore, ritorna il piano senza risolvere i riferimenti
     // (meglio che fallire completamente)
-    console.warn('[resolveFoodReferences] Returning plan without resolved references due to error');
+    logger.warn('[resolveFoodReferences] Returning plan without resolved references due to error');
     return plan;
   }
 }

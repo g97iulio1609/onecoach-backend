@@ -12,6 +12,7 @@ import { SetupIntentService } from './setup-intent.service';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import { getCreditsFromPriceId } from '@onecoach/constants/credit-packs';
 import { getSubscriptionPriceId } from '@onecoach/constants/subscription-prices';
+import { logger } from '@onecoach/lib-core';
 // TODO: Import these when they are available via interface or shared package
 // import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
 // import { OpenRouterSubkeyService } from '@onecoach/lib-ai/openrouter-subkey.service';
@@ -187,7 +188,7 @@ export class SubscriptionService {
         return session.url;
     }
     async handleWebhook(event) {
-        console.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
+        logger.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
         const eventType = event.type;
         switch (eventType) {
             case 'payment_intent.succeeded': {
@@ -220,7 +221,7 @@ export class SubscriptionService {
                 break;
             }
             default: {
-                console.warn(`Unhandled event type: ${event.type}`);
+                logger.warn(`Unhandled event type: ${event.type}`);
             }
         }
     }
@@ -231,7 +232,7 @@ export class SubscriptionService {
         const userId = subscription.metadata?.userId;
         const plan = subscription.metadata?.plan;
         if (!userId || !plan) {
-            console.error('[Subscription] Missing userId or plan in metadata');
+            logger.error('[Subscription] Missing userId or plan in metadata');
             return;
         }
         await prisma.subscriptions.create({
@@ -370,7 +371,7 @@ export class SubscriptionService {
     }
     async handlePaymentRefunded(refundData, eventId) {
         // TODO: Implement refund logic
-        console.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
+        logger.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
     }
     mapStripeStatus(status) {
         switch (status) {

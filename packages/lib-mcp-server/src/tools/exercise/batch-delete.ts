@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import { exerciseService } from '@onecoach/lib-exercise';
 
+import { logger } from '@onecoach/lib-core';
 const batchDeleteParameters = z.object({
   ids: z.array(z.string()).max(100),
 });
@@ -22,7 +23,7 @@ export const exerciseBatchDeleteTool: McpTool = {
         deleted += 1;
       } catch (error) {
         // continue deleting others; collect minimal info
-        console.warn(`[exercise_batch_delete] Failed to delete ${id}:`, error);
+        logger.warn(`[exercise_batch_delete] Failed to delete ${id}:`, error);
       }
     }
 

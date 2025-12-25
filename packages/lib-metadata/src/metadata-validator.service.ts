@@ -12,6 +12,7 @@ import { toSlug } from '@onecoach/lib-shared/utils/formatters';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { SimpleCache } from '@onecoach/lib-shared/utils/simple-cache';
 
+import { logger } from '@onecoach/lib-core';
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour
 
 // Cache for name → ID lookups
@@ -411,14 +412,14 @@ export async function validateExerciseTypeByName(
     try {
       const contextId = sharedContext.metadata.createdExerciseTypes[normalized];
       if (contextId) {
-        console.warn(
+        logger.warn(
           `[MetadataValidator] Found exercise type "${name}" in shared context: ${contextId}`
         );
         nameToIdCache.set(cacheKey, contextId);
         return contextId;
       }
     } catch (error: unknown) {
-      console.warn(`[MetadataValidator] Error accessing shared context for "${name}":`, error);
+      logger.warn(`[MetadataValidator] Error accessing shared context for "${name}":`, error);
     }
   }
 
@@ -474,11 +475,11 @@ export async function validateExerciseTypeByName(
     if (sharedContext?.metadata?.createdExerciseTypes) {
       try {
         sharedContext.metadata.createdExerciseTypes[normalized] = newExerciseType.id;
-        console.warn(
+        logger.warn(
           `[MetadataValidator] Stored exercise type "${name}" in shared context: ${newExerciseType.id}`
         );
       } catch (error: unknown) {
-        console.warn(
+        logger.warn(
           `[MetadataValidator] Error storing exercise type "${name}" in shared context:`,
           error
         );

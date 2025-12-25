@@ -8,6 +8,7 @@
 import { userMemoryService } from '../user-memory.service';
 import type { MemoryDomain, MemoryHistoryItem } from './types';
 
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // EVENT TYPES
 // ============================================================================
@@ -438,11 +439,11 @@ export async function handleMemoryEvent(
           break;
 
         default:
-          console.warn('[Memory] Unknown event type:', (event as { type: string }).type);
+          logger.warn('[Memory] Unknown event type:', (event as { type: string }).type);
       }
     }
   } catch (error) {
-    console.error('[Memory] Error handling event:', error);
+    logger.error('[Memory] Error handling event:', error);
     // Don't throw - memory updates should not break main flow
   }
 }

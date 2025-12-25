@@ -13,6 +13,7 @@ import type { PromotionType, DiscountType } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import type Stripe from 'stripe';
 
+import { logger } from '@onecoach/lib-core';
 export interface CreatePromotionParams {
   code: string;
   type: PromotionType;
@@ -141,12 +142,12 @@ export class PromotionService {
           const coupon = await stripe.coupons.create(couponParams);
           finalStripeCouponId = coupon.id;
 
-          console.warn('[Promotion] Stripe coupon created', {
+          logger.warn('[Promotion] Stripe coupon created', {
             code,
             couponId: finalStripeCouponId,
           });
         } catch (error: unknown) {
-          console.error('[Promotion] Error creating Stripe coupon', {
+          logger.error('[Promotion] Error creating Stripe coupon', {
             code,
             error: error instanceof Error ? error.message : 'Unknown',
           });
@@ -335,7 +336,7 @@ export class PromotionService {
       });
     });
 
-    console.warn('[Promotion] Bonus credits applied', {
+    logger.warn('[Promotion] Bonus credits applied', {
       promotionId,
       userId,
       bonusCredits: promotion.bonusCredits,
@@ -363,7 +364,7 @@ export class PromotionService {
     });
 
     if (existing) {
-      console.warn('[Promotion] Use already recorded (idempotency)', {
+      logger.warn('[Promotion] Use already recorded (idempotency)', {
         promotionId,
         userId,
         existingId: existing.id,
@@ -383,7 +384,7 @@ export class PromotionService {
       },
     });
 
-    console.warn('[Promotion] Use recorded', {
+    logger.warn('[Promotion] Use recorded', {
       promotionId,
       userId,
       paymentId,

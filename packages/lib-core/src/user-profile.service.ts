@@ -11,6 +11,7 @@ import type { user_profiles } from '@prisma/client';
 import type { IUserProfileService, UserProfileInput } from '@onecoach/contracts';
 import { createId } from '@onecoach/lib-shared/id-generator';
 
+import { logger } from '@onecoach/lib-core';
 function sanitizeStringArray(values?: string[] | null): string[] {
   if (!values || values.length === 0) {
     return [];
@@ -48,7 +49,7 @@ function serializeProfile(
         weightKgValue = null;
       }
     } catch (error: unknown) {
-      console.warn('Error converting weightKg to number:', error);
+      logger.warn('Error converting weightKg to number:', error);
       weightKgValue = null;
     }
   }
@@ -126,10 +127,10 @@ export class UserProfileService implements IUserProfileService {
 
       return newProfile as user_profiles;
     } catch (error: unknown) {
-      console.error('[UserProfileService.getOrCreate]', error);
+      logger.error('[UserProfileService.getOrCreate]', error);
       if (error instanceof Error) {
-        console.error('[UserProfileService.getOrCreate] Error message:', error.message);
-        console.error('[UserProfileService.getOrCreate] Error stack:', error.stack);
+        logger.error('[UserProfileService.getOrCreate] Error message:', error.message);
+        logger.error('[UserProfileService.getOrCreate] Error stack:', error.stack);
       }
       throw error;
     }
@@ -142,12 +143,12 @@ export class UserProfileService implements IUserProfileService {
       const profile = await this.getOrCreate(userId);
       const serialized = serializeProfile(profile);
       if (!serialized) {
-        console.error('[UserProfileService.getSerialized] Serialization returned null');
+        logger.error('[UserProfileService.getSerialized] Serialization returned null');
         throw new Error('Impossibile serializzare il profilo');
       }
       return serialized;
     } catch (error: unknown) {
-      console.error('[UserProfileService.getSerialized]', error);
+      logger.error('[UserProfileService.getSerialized]', error);
       throw error;
     }
   }
@@ -216,10 +217,10 @@ export class UserProfileService implements IUserProfileService {
 
       return updated;
     } catch (error: unknown) {
-      console.error('[UserProfileService.update]', error);
+      logger.error('[UserProfileService.update]', error);
       if (error instanceof Error) {
-        console.error('[UserProfileService.update] Error message:', error.message);
-        console.error('[UserProfileService.update] Error stack:', error.stack);
+        logger.error('[UserProfileService.update] Error message:', error.message);
+        logger.error('[UserProfileService.update] Error stack:', error.stack);
       }
       throw error;
     }

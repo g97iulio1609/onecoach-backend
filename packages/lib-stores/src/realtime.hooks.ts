@@ -11,6 +11,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRealtimeStore, selectIsRealtimeReady, type RealtimeListener } from './realtime.store';
 import type { QueryClient, QueryKey } from '@tanstack/react-query';
 
+import { logger } from '@onecoach/lib-core';
 export type MagicAnimationType = 'glow' | 'shimmer' | 'pulse' | 'border' | 'ripple' | 'update';
 
 export interface UseMagicAnimationOptions {
@@ -81,8 +82,8 @@ export interface UseMagicAnimationResult {
  * const { animationClass, trigger } = useMagicAnimation({
  *   type: 'glow',
  *   duration: 2000,
- *   onStart: () => console.warn('Animation started'),
- *   onEnd: () => console.warn('Animation ended'),
+ *   onStart: () => logger.warn('Animation started'),
+ *   onEnd: () => logger.warn('Animation ended'),
  * });
  * ```
  */
@@ -258,7 +259,7 @@ export interface UseRealtimeSubscriptionOptions<T = Record<string, unknown>> {
  *   table: 'users',
  *   filter: userId ? `id=eq.${userId}` : undefined,
  *   enabled: !!userId,
- *   onUpdate: (user) => console.warn('User updated:', user),
+ *   onUpdate: (user) => logger.warn('User updated:', user),
  * });
  * ```
  */
@@ -545,16 +546,16 @@ const createRealtimeLogger = (context: string) => {
   return {
     log: (message: string, data?: unknown) => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Realtime][${context}] ${message}`, data || '');
+        logger.info(`[Realtime][${context}] ${message}`, data || '');
       }
     },
     warn: (message: string, data?: unknown) => {
       if (process.env.NODE_ENV === 'development') {
-        console.warn(`[Realtime][${context}] ${message}`, data || '');
+        logger.warn(`[Realtime][${context}] ${message}`, data || '');
       }
     },
     error: (message: string, error?: unknown) => {
-      console.error(`[Realtime][${context}] ${message}`, error || '');
+      logger.error(`[Realtime][${context}] ${message}`, error || '');
     },
   };
 };
@@ -771,7 +772,7 @@ export function useRealtimeStatus() {
  * @example
  * ```tsx
  * const debug = useRealtimeDebug();
- * console.warn(debug);
+ * logger.warn(debug);
  * // { status: 'connected', subscriptionCount: 2, subscriptions: {...} }
  * ```
  */

@@ -5,10 +5,11 @@
  * Permette aggiornamenti in tempo reale senza redeploy
  *
  * Principi: KISS, SOLID, DRY, YAGNI
- */
+ */import { logger } from '@onecoach/lib-core';
+
 
 function logError(message: string, error: unknown) {
-  console.error(`[VercelAdminCredentials] ${message}`, error);
+  logger.error(`[VercelAdminCredentials] ${message}`, error);
 }
 
 export interface AdminCredentials {

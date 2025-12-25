@@ -40,6 +40,7 @@ function toNutritionDayLog(record) {
     };
 }
 import { normalizeNutritionPlan, } from '@onecoach/lib-nutrition/helpers/plan-transform';
+import { logger } from '@onecoach/lib-core';
 /**
  * Create a new nutrition day log
  *
@@ -48,7 +49,7 @@ import { normalizeNutritionPlan, } from '@onecoach/lib-nutrition/helpers/plan-tr
  */
 export async function createNutritionDayLog(userId, request) {
     const { planId, weekNumber, dayNumber, date, notes } = request;
-    console.warn('[createNutritionDayLog] Creating log:', {
+    logger.warn('[createNutritionDayLog] Creating log:', {
         planId,
         weekNumber,
         dayNumber,
@@ -67,7 +68,7 @@ export async function createNutritionDayLog(userId, request) {
     // Normalize plan to ensure structure consistency (fixes empty meals issue)
     const plan = normalizeNutritionPlan(rawPlan);
     // Debug: Log plan weeks structure
-    console.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
+    logger.warn('[createNutritionDayLog] Plan weeks structure (normalized):', {
         planId: plan.id,
         weeksCount: plan.weeks.length,
         firstWeekDays: plan.weeks[0]?.days?.length ?? 0,
@@ -76,14 +77,14 @@ export async function createNutritionDayLog(userId, request) {
     const week = plan.weeks.find((w) => w.weekNumber === weekNumber);
     const day = week?.days.find((d) => d.dayNumber === dayNumber);
     if (!day) {
-        console.error('[createNutritionDayLog] Day not found:', {
+        logger.error('[createNutritionDayLog] Day not found:', {
             weekNumber,
             dayNumber,
             weeksCount: plan.weeks.length,
         });
         throw new Error(`Giorno ${dayNumber} della settimana ${weekNumber} non trovato nel piano`);
     }
-    console.warn('[createNutritionDayLog] Day found:', {
+    logger.warn('[createNutritionDayLog] Day found:', {
         dayNumber: day.dayNumber,
         dayName: day.dayName,
         mealsCount: day.meals.length,

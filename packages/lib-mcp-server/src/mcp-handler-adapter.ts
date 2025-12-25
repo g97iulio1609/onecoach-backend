@@ -18,6 +18,7 @@
 import type { McpTool, McpContext, McpResponse } from './types';
 import { formatMcpSuccess, formatMcpError } from './utils/error-handler';
 
+import { logger } from '@onecoach/lib-core';
 // Tipo per authInfo secondo la documentazione ufficiale
 interface AuthInfo {
   token: string;
@@ -91,7 +92,7 @@ export function registerMcpTool(
         const context = extractContextFromAuthInfo(extra?.authInfo);
 
         if (process.env.NODE_ENV === 'development') {
-          console.warn(`🔧 [MCP] [${callId}] ${tool.name} | User: ${context.userId}`);
+          logger.warn(`🔧 [MCP] [${callId}] ${tool.name} | User: ${context.userId}`);
         }
 
         // Gli args arrivano già validati dallo schema Zod passato a server.tool()
@@ -109,14 +110,14 @@ export function registerMcpTool(
         );
 
         if (process.env.NODE_ENV === 'development') {
-          console.warn(
+          logger.warn(
             `✅ [MCP] [${callId}] ${tool.name} completato in ${Date.now() - startTime}ms`
           );
         }
 
         return formatMcpSuccess(result);
       } catch (error: unknown) {
-        console.error(`❌ [MCP] [${callId}] ${tool.name} errore:`, error);
+        logger.error(`❌ [MCP] [${callId}] ${tool.name} errore:`, error);
         return formatMcpError(error);
       }
     }

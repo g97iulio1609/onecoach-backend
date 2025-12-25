@@ -14,6 +14,7 @@ import type { LabelExtractionResult, DishSegmentationResult } from '@onecoach/ty
 
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
+import { logger } from '@onecoach/lib-core';
 // Configurazione AI centralizzata per import
 const AI_IMPORT_CONFIG = {
   TIMEOUT_MS: 600000, // 10 minuti
@@ -229,7 +230,7 @@ export class FoodVisionService {
 
       return validated as LabelExtractionResult;
     } catch (error: unknown) {
-      console.error('Error extracting label data:', error);
+      logger.error('Error extracting label data:', error);
       // Rimborsa crediti in caso di errore
       await creditService.addCredits({
         userId,
@@ -332,7 +333,7 @@ export class FoodVisionService {
         totalMacros: segmentationResult.totalMacros,
       };
     } catch (error: unknown) {
-      console.error('Error segmenting dish:', error);
+      logger.error('Error segmenting dish:', error);
       // Rimborsa crediti in caso di errore
       await creditService.addCredits({
         userId,

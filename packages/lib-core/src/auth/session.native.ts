@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Session data stored securely
  */
@@ -31,7 +32,7 @@ async function securelySetItem(key: string, value: string): Promise<void> {
       await SecureStore.setItemAsync(key, value);
     }
   } catch (error: unknown) {
-    console.error('Error storing secure item', error);
+    logger.error('Error storing secure item', error);
     // Fallback to AsyncStorage
     await AsyncStorage.setItem(key, value);
   }
@@ -48,7 +49,7 @@ async function securelyGetItem(key: string): Promise<string | null> {
       return await SecureStore.getItemAsync(key);
     }
   } catch (error: unknown) {
-    console.error('Error retrieving secure item', error);
+    logger.error('Error retrieving secure item', error);
     // Fallback to AsyncStorage
     return await AsyncStorage.getItem(key);
   }
@@ -65,7 +66,7 @@ async function securelyDeleteItem(key: string): Promise<void> {
       await SecureStore.deleteItemAsync(key);
     }
   } catch (error: unknown) {
-    console.error('Error deleting secure item', error);
+    logger.error('Error deleting secure item', error);
     // Fallback to AsyncStorage
     await AsyncStorage.removeItem(key);
   }
@@ -85,7 +86,7 @@ export async function saveSession(session: SessionData): Promise<void> {
       securelySetItem(USER_ID_KEY, session.userId),
     ]);
   } catch (error: unknown) {
-    console.error('Error saving session data', error);
+    logger.error('Error saving session data', error);
     throw new Error('Failed to save session data');
   }
 }
@@ -116,7 +117,7 @@ export async function getSession(): Promise<SessionData | null> {
       userId,
     };
   } catch (error: unknown) {
-    console.error('Error getting session', error);
+    logger.error('Error getting session', error);
     return null;
   }
 }
@@ -133,7 +134,7 @@ export async function clearSession(): Promise<void> {
       securelyDeleteItem(USER_ID_KEY),
     ]);
   } catch (error: unknown) {
-    console.error('Error clearing session', error);
+    logger.error('Error clearing session', error);
     throw new Error('Failed to clear session data');
   }
 }
@@ -184,7 +185,7 @@ export async function updateAccessToken(accessToken: string, expiresAt: number):
       securelySetItem(EXPIRES_AT_KEY, expiresAt.toString()),
     ]);
   } catch (error: unknown) {
-    console.error('Error updating access token', error);
+    logger.error('Error updating access token', error);
     throw new Error('Failed to update access token');
   }
 }

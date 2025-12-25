@@ -17,6 +17,7 @@ import type { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import { mapToWorkoutSession, mapToWorkoutSessions } from './mappers/workout-session.mapper';
 import { hydrateSetGroups } from './helpers/utils/set-group-helpers';
+import { logger } from '@onecoach/lib-core';
 import type {
   WorkoutSession,
   CreateWorkoutSessionRequest,
@@ -34,7 +35,7 @@ export async function createWorkoutSession(
   userId: string,
   request: CreateWorkoutSessionRequest
 ): Promise<WorkoutSession> {
-  console.warn('[createWorkoutSession] Starting for user:', userId, 'request:', request);
+  logger.warn('[createWorkoutSession] Starting for user:', userId, 'request:', request);
   const { programId, weekNumber, dayNumber, notes } = request;
 
   try {
@@ -43,7 +44,7 @@ export async function createWorkoutSession(
       where: { id: programId },
     });
 
-    console.warn('[createWorkoutSession] Program found:', program ? 'yes' : 'no');
+    logger.warn('[createWorkoutSession] Program found:', program ? 'yes' : 'no');
 
     if (!program) {
       throw new Error('Programma di allenamento non trovato');
@@ -55,7 +56,7 @@ export async function createWorkoutSession(
 
     // Extract exercises from the program's week/day structure
     let weeks = program.weeks as any; // JSON from DB
-    console.warn(
+    logger.warn(
       '[createWorkoutSession] Weeks type:',
       typeof weeks,
       'isArray:',
@@ -65,9 +66,9 @@ export async function createWorkoutSession(
     if (typeof weeks === 'string') {
       try {
         weeks = JSON.parse(weeks);
-        console.warn('[createWorkoutSession] Parsed weeks from string');
+        logger.warn('[createWorkoutSession] Parsed weeks from string');
       } catch (e) {
-        console.error('[createWorkoutSession] Failed to parse weeks JSON:', e);
+        logger.error('[createWorkoutSession] Failed to parse weeks JSON:', e);
         weeks = [];
       }
     }
@@ -76,7 +77,7 @@ export async function createWorkoutSession(
     const week = Array.isArray(weeks) ? weeks.find((w: any) => w.weekNumber == weekNumber) : null;
 
     if (!week) {
-      console.error(
+      logger.error(
         '[createWorkoutSession] Week not found:',
         weekNumber,
         'available:',
@@ -89,7 +90,7 @@ export async function createWorkoutSession(
     const day = week.days?.find((d: any) => d.dayNumber == dayNumber);
 
     if (!day) {
-      console.error(
+      logger.error(
         '[createWorkoutSession] Day not found:',
         dayNumber,
         'available:',
@@ -98,7 +99,7 @@ export async function createWorkoutSession(
       throw new Error(`Giorno ${dayNumber} non trovato nella settimana ${weekNumber}`);
     }
 
-    console.warn('[createWorkoutSession] Day found, exercises count:', day.exercises?.length);
+    logger.warn('[createWorkoutSession] Day found, exercises count:', day.exercises?.length);
 
     // Ensure exercises is a valid object for Prisma JSON
     // SSOT: setGroups è l'unica fonte di verità per le serie
@@ -106,7 +107,7 @@ export async function createWorkoutSession(
     const exercises = day.exercises
       ? JSON.parse(JSON.stringify(day.exercises)).map((ex: any) => {
           if (ex.setGroups && ex.setGroups.length > 0) {
-            console.warn(
+            logger.warn(
               `[createWorkoutSession] Hydrating setGroups for exercise ${ex.name || ex.id}`
             );
             // Usa helper SSOT per idratare i setGroups
@@ -134,12 +135,12 @@ export async function createWorkoutSession(
       },
     });
 
-    console.warn('[createWorkoutSession] Session created:', session.id);
+    logger.warn('[createWorkoutSession] Session created:', session.id);
 
     // Map Prisma entity to domain type
     return mapToWorkoutSession(session);
   } catch (error) {
-    console.error('[createWorkoutSession] Error:', error);
+    logger.error('[createWorkoutSession] Error:', error);
     throw error;
   }
 }

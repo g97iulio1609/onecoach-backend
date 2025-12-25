@@ -566,7 +566,7 @@ export class AffiliateService {
                 notes: reason,
             },
         });
-        console.warn('[AFFILIATE] Payout rejected', {
+        logger.warn('[AFFILIATE] Payout rejected', {
             payoutId,
             userId: reward.userId,
             adminUserId,
@@ -607,7 +607,7 @@ export class AffiliateService {
                 performedBy: adminUserId,
             },
         });
-        console.warn('[AFFILIATE] Payout marked as paid', {
+        logger.warn('[AFFILIATE] Payout marked as paid', {
             payoutId,
             userId: reward.userId,
             adminUserId,

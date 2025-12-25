@@ -12,6 +12,7 @@ import { createAgentCoordinator } from '@onecoach/lib-ai/agents';
 import { createAIModel } from '../../../lib/services/ai/model-factory';
 import { auth } from '@onecoach/lib-core/auth';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * GET /api/agents/status
  *
@@ -154,7 +155,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error: unknown) {
-    console.error('[Agents Status API] Error:', error);
+    logger.error('[Agents Status API] Error:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',
@@ -237,7 +238,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error: unknown) {
-    console.error('[Agents Status API] Error:', error);
+    logger.error('[Agents Status API] Error:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',

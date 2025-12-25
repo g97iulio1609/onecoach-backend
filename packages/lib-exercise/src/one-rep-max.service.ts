@@ -20,6 +20,7 @@ import { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared';
 import { OneRepMaxInputSchema, type OneRepMaxInput } from '@onecoach/schemas';
 
+import { logger } from '@onecoach/lib-core';
 /**
  * Input per creare/aggiornare un massimale
  */
@@ -68,7 +69,7 @@ export class OneRepMaxService {
   static async getByUserId(userId: string): Promise<ServiceResult<UserOneRepMaxWithExercise[]>> {
     try {
       if (!prisma) {
-        console.error('[OneRepMaxService] Prisma client not available');
+        logger.error('[OneRepMaxService] Prisma client not available');
         return {
           success: false,
           error: 'Database connection error: Prisma client not initialized',
@@ -76,7 +77,7 @@ export class OneRepMaxService {
       }
 
       if (typeof prisma.user_one_rep_max === 'undefined') {
-        console.error('[OneRepMaxService] userOneRepMax model not available in Prisma client');
+        logger.error('[OneRepMaxService] userOneRepMax model not available in Prisma client');
         return {
           success: false,
           error: 'Database model not available. Please restart the development server.',
@@ -105,7 +106,7 @@ export class OneRepMaxService {
 
       return { success: true, data: normalized };
     } catch (error: unknown) {
-      console.error('[OneRepMaxService.getByUserId]', error);
+      logger.error('[OneRepMaxService.getByUserId]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Errore nel recupero dei massimali',
@@ -149,7 +150,7 @@ export class OneRepMaxService {
 
       return { success: true, data: normalized };
     } catch (error: unknown) {
-      console.error('[OneRepMaxService.getByExercise]', error);
+      logger.error('[OneRepMaxService.getByExercise]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Errore nel recupero del massimale',
@@ -357,7 +358,7 @@ export class OneRepMaxService {
         }
       }
 
-      console.error('[OneRepMaxService.upsert]', error);
+      logger.error('[OneRepMaxService.upsert]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Errore nel salvataggio del massimale',
@@ -401,7 +402,7 @@ export class OneRepMaxService {
 
       return { success: true, data: normalized };
     } catch (error: unknown) {
-      console.error('[OneRepMaxService.getVersions]', error);
+      logger.error('[OneRepMaxService.getVersions]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Errore nel recupero delle versioni',
@@ -437,7 +438,7 @@ export class OneRepMaxService {
           error: 'Massimale non trovato',
         };
       }
-      console.error('[OneRepMaxService.delete]', error);
+      logger.error('[OneRepMaxService.delete]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Errore nell'eliminazione del massimale",
@@ -473,7 +474,7 @@ export class OneRepMaxService {
 
       return { success: true, data: map };
     } catch (error: unknown) {
-      console.error('[OneRepMaxService.getBatchByExercises]', error);
+      logger.error('[OneRepMaxService.getBatchByExercises]', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Errore nel recupero batch dei massimali',

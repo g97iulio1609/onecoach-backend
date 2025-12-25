@@ -23,6 +23,7 @@ import { prisma } from '@onecoach/lib-core/prisma';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import { SUPPORTED_FOOD_LOCALES } from '@onecoach/constants';
 import { Prisma } from '@prisma/client';
+import { logger } from '@onecoach/lib-core';
 import {
   type AIGeneratedFood,
   safeValidateAIGeneratedFood,
@@ -150,7 +151,7 @@ export class FoodAutoCreationService {
     }
 
     if (IS_DEV) {
-      console.warn(
+      logger.warn(
         `[FoodAutoCreation] Processing ${uniqueFoods.size} unique foods from ${foods.length} total`
       );
     }
@@ -163,7 +164,7 @@ export class FoodAutoCreationService {
           return { normalizedName, resolution, error: null };
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error(`[FoodAutoCreation] Error processing "${food.name}":`, errorMessage);
+          logger.error(`[FoodAutoCreation] Error processing "${food.name}":`, errorMessage);
           return {
             normalizedName,
             resolution: null,
@@ -190,7 +191,7 @@ export class FoodAutoCreationService {
       }
     }
 
-    console.warn(
+    logger.warn(
       `[FoodAutoCreation] Batch complete: ${result.created} created, ${result.matched} matched, ${result.existing} existing, ${result.errors.length} errors`
     );
 
@@ -231,7 +232,7 @@ export class FoodAutoCreationService {
     if (searchResults.length > 0) {
       const bestMatch = this.findBestMatch(food.name, food.macrosPer100g, searchResults);
       if (bestMatch) {
-        console.warn(
+        logger.warn(
           `[FoodAutoCreation] Fuzzy match for "${food.name}": "${bestMatch.match.name}" (${(bestMatch.score * 100).toFixed(1)}%)`
         );
         return {
@@ -246,7 +247,7 @@ export class FoodAutoCreationService {
     }
 
     // 3. Nessun match trovato - crea nuovo alimento
-    console.warn(`[FoodAutoCreation] Creating new food: "${food.name}"`);
+    logger.warn(`[FoodAutoCreation] Creating new food: "${food.name}"`);
     const newFood = await this.createFoodInDatabase(food);
 
     return {
@@ -335,7 +336,7 @@ export class FoodAutoCreationService {
       // Handle Unique Constraint Violation (P2002)
       // This happens if the food was created by another process/thread between our check and creation
       if (error.code === 'P2002') {
-        console.warn(
+        logger.warn(
           `[FoodAutoCreation] Food "${food.name}" already exists (race condition). Fetching existing...`
         );
         const existing = await prisma.food_items.findFirst({
@@ -372,7 +373,7 @@ export class FoodAutoCreationService {
       });
       return newBrand.id;
     } catch (error) {
-      console.error('[FoodAutoCreation] Error creating brand:', error);
+      logger.error('[FoodAutoCreation] Error creating brand:', error);
       return undefined;
     }
   }
@@ -666,7 +667,7 @@ export class FoodAutoCreationService {
         });
       } else {
         // Log warning ma processa comunque con defaults
-        console.warn(
+        logger.warn(
           `[FoodAutoCreation] AIFood validation failed for "${aiFood.name}":`,
           validation.error.issues.map((i: any) => i.message).join(', ')
         );

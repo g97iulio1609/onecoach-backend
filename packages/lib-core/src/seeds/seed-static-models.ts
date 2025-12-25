@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
+import { logger } from '@onecoach/lib-core';
 const staticModels = [
   {
     id: 'gemini-2.5-flash',
@@ -92,7 +93,7 @@ const staticModels = [
 ];
 
 export async function seedStaticModels(prisma: PrismaClient) {
-  console.warn('Seeding static AI models to ai_external_models...');
+  logger.warn('Seeding static AI models to ai_external_models...');
 
   for (const model of staticModels) {
     await prisma.ai_external_models.upsert({
@@ -123,14 +124,14 @@ export async function seedStaticModels(prisma: PrismaClient) {
     });
   }
 
-  console.warn('Seeding complete.');
+  logger.warn('Seeding complete.');
 }
 
 if (require.main === module) {
   const prisma = new PrismaClient();
   seedStaticModels(prisma)
     .catch((e: unknown) => {
-      console.error(e);
+      logger.error(e);
       process.exit(1);
     })
     .finally(async () => {

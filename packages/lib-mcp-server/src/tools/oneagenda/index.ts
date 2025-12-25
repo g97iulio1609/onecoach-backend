@@ -18,6 +18,7 @@ import {
 } from '../../services/oneagenda';
 import { oneAgendaImportTool } from './import';
 
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // PROJECT TOOLS
 // ============================================================================
@@ -32,9 +33,9 @@ export const createProjectTool: McpTool = {
     color: z.string().optional().describe('The color hex code (e.g. #3B82F6)'),
   }),
   execute: async (args, context) => {
-    console.warn('📁 [oneagenda_create_project] Creazione progetto...');
-    console.warn('📁 [oneagenda_create_project] Args:', JSON.stringify(args, null, 2));
-    console.warn('📁 [oneagenda_create_project] UserId:', context.userId);
+    logger.warn('📁 [oneagenda_create_project] Creazione progetto...');
+    logger.warn('📁 [oneagenda_create_project] Args:', JSON.stringify(args, null, 2));
+    logger.warn('📁 [oneagenda_create_project] UserId:', context.userId);
 
     if (!context.userId) {
       throw new Error('Unauthorized: User ID required');
@@ -47,7 +48,7 @@ export const createProjectTool: McpTool = {
       color: args.color,
     });
 
-    console.warn('✅ [oneagenda_create_project] Progetto creato:', project.id);
+    logger.warn('✅ [oneagenda_create_project] Progetto creato:', project.id);
 
     return {
       content: [

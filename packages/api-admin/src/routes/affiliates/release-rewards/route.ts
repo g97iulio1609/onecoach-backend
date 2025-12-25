@@ -10,6 +10,7 @@ import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { AffiliateRewardStatus } from '@onecoach/types';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 /**
@@ -76,7 +77,7 @@ export async function GET() {
       rewards: pendingRewards.slice(0, 50), // Limit per performance
     });
   } catch (error: unknown) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return NextResponse.json(
       { error: 'Errore nel recupero delle statistiche reward' },
       { status: 500 }
@@ -105,7 +106,7 @@ export async function POST() {
       message: `Rilasciati ${releasedCount} reward pending`,
     });
   } catch (error: unknown) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     return NextResponse.json({ error: 'Errore nel rilascio dei reward pending' }, { status: 500 });
   }
 }

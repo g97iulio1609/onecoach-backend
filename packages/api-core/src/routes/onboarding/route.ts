@@ -9,6 +9,7 @@ import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { onboardingService } from '@onecoach/lib-core';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
+import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -21,7 +22,7 @@ export async function GET() {
 
     if (!userOrError.id || typeof userOrError.id !== 'string') {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[ONBOARDING GET] User ID non valido:', userOrError);
+        logger.error('[ONBOARDING GET] User ID non valido:', userOrError);
       }
       return NextResponse.json(
         { error: 'Errore di autenticazione: ID utente non valido' },

@@ -16,6 +16,7 @@ import {
 } from '@onecoach/lib-ai/ai-framework-config.service';
 import { creditService } from '@onecoach/lib-core/credit.service';
 import { TOKEN_LIMITS } from '@onecoach/constants';
+import { logger } from '@onecoach/lib-core';
 import {
   ImportedBodyMeasurementsSchema,
   type ImportedBodyMeasurements,
@@ -308,7 +309,7 @@ export class BodyMeasurementsVisionService {
         return object;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
-        console.error(`Attempt ${attempt + 1} failed:`, lastError);
+        logger.error(`Attempt ${attempt + 1} failed:`, lastError);
 
         if (attempt === 0 && currentModel !== config.fallbackModel) {
           currentModel = config.fallbackModel;
@@ -375,7 +376,7 @@ export class BodyMeasurementsVisionService {
         // However, referencing workout-vision.ts:
         /*
           if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
-            console.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
+            logger.warn('[WorkoutVision] XLSX detected, using vision approach for binary content');
             return this.parseWithVisionAI(contentBase64, mimeType, '', 'spreadsheet', prompt);
           }
         */

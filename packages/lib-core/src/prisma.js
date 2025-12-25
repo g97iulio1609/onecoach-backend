@@ -12,6 +12,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { logger } from '@onecoach/lib-core';
 const globalForPrisma = globalThis;
 // Prisma 7: Il client legge DATABASE_URL direttamente da process.env
 // Assicuriamoci che sia impostato prima di creare il client
@@ -23,7 +24,7 @@ const ensureDatabaseUrl = () => {
     if (!process.env.DATABASE_URL && !process.env.DIRECT_URL) {
         if (process.env.NODE_ENV === 'development') {
             const fallback = 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public';
-            console.warn('[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found!', '\n  Using fallback:', fallback, '\n  To fix: Configure DATABASE_URL in .env.local or .env');
+            logger.warn('[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found!', '\n  Using fallback:', fallback, '\n  To fix: Configure DATABASE_URL in .env.local or .env');
             process.env.DATABASE_URL = fallback;
         }
         else {

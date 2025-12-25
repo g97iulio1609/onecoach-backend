@@ -10,6 +10,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRealtimeSubscription } from '@onecoach/lib-stores';
 import { useBodyMeasurementsStore } from '@onecoach/lib-stores';
+import { logger } from '@onecoach/lib-core';
 // Query keys for body measurements
 export const bodyMeasurementsKeys = {
     all: ['body-measurements'],
@@ -106,7 +107,7 @@ export function useBodyMeasurementsRealtime({ userId, enabled = true, } = {}) {
             });
         },
         onError: (error) => {
-            console.error('[BodyMeasurements Realtime] Error:', error);
+            logger.error('[BodyMeasurements Realtime] Error:', error);
         },
     });
 }

@@ -15,6 +15,7 @@
 import type { McpSuccessResponse, McpTool } from '../types';
 import { handleMemoryEvent } from '@onecoach/lib-core';
 
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // VALIDATION HELPERS
 // ============================================================================
@@ -74,7 +75,7 @@ export async function safeHandleMemoryEvent(
     await handleMemoryEvent(event);
   } catch (error: unknown) {
     // Non-blocking: memory update failures shouldn't break tool execution
-    console.warn(`[MCP Helper] Error updating memory for ${event.type}:`, error);
+    logger.warn(`[MCP Helper] Error updating memory for ${event.type}:`, error);
   }
 }
 

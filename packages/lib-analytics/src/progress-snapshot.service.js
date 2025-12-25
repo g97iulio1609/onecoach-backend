@@ -8,6 +8,7 @@
 import { prisma } from '@onecoach/lib-core/prisma';
 import { getExerciseSets } from '@onecoach/lib-workout';
 import { Prisma } from '@prisma/client';
+import { logger } from '@onecoach/lib-core';
 // ============================================
 // SNAPSHOT GENERATION
 // ============================================
@@ -280,7 +281,7 @@ export async function backfillSnapshots(userId, startDate, endDate) {
             snapshots.push(snapshot);
         }
         catch (error) {
-            console.error('Error generating progress snapshot', error);
+            logger.error('Error generating progress snapshot', error);
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }

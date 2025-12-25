@@ -11,6 +11,7 @@ import Apple from 'next-auth/providers/apple';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../prisma';
 import {  createId, generateUUID  } from '@onecoach/lib-shared/id-generator';
+import { logger } from '@onecoach/lib-core';
 // Production-safe: require explicit env vars, no hardcoded defaults
 const isProduction = process.env.NODE_ENV === 'production';
 // Admin config (priorità: SUPER_ADMIN > ADMIN) - DEVE essere definito PRIMA di ENABLE_AUTO_PROVISION
@@ -44,8 +45,8 @@ if (!AUTH_SECRET) {
         throw new Error(errorMessage);
     }
     else {
-        console.error(`[Auth] ⚠️ ${errorMessage}`);
-        console.error("[Auth] ⚠️ L'autenticazione potrebbe non funzionare correttamente senza AUTH_SECRET");
+        logger.error(`[Auth] ⚠️ ${errorMessage}`);
+        logger.error("[Auth] ⚠️ L'autenticazione potrebbe non funzionare correttamente senza AUTH_SECRET");
     }
 }
 /**
@@ -137,11 +138,11 @@ const nextAuth = NextAuth({
                 const isDevelopment = process.env.NODE_ENV === 'development';
                 const isProduction = process.env.NODE_ENV === 'production';
                 if (isDevelopment) {
-                    console.warn('🔐 Login attempt for:', credentials?.email);
+                    logger.warn('🔐 Login attempt for:', credentials?.email);
                 }
                 if (!credentials?.email || !credentials?.password) {
                     if (isDevelopment) {
-                        console.warn('❌ Missing credentials');
+                        logger.warn('❌ Missing credentials');
                     }
                     throw new Error('Email e password richiesti');
                 }
@@ -151,7 +152,7 @@ const nextAuth = NextAuth({
                 // NON fare trim sulla password - potrebbe contenere spazi significativi
                 const normalizedPassword = rawPassword;
                 if (isDevelopment) {
-                    console.warn('🔍 Looking up user in database...', { email: normalizedEmail });
+                    logger.warn('🔍 Looking up user in database...', { email: normalizedEmail });
                 }
                 let user = await prisma.users.findFirst({
                     where: {
@@ -170,7 +171,7 @@ const nextAuth = NextAuth({
                 const isAdminPassword = ADMIN_PASSWORD && normalizedPassword === ADMIN_PASSWORD;
                 // Logging dettagliato per debug auto-provisioning
                 if (isProduction && (isSuperAdminEmail || isAdminEmail)) {
-                    console.warn('🔍 Admin login attempt detected', {
+                    logger.warn('🔍 Admin login attempt detected', {
                         email: normalizedEmail,
                         isSuperAdminEmail,
                         isSuperAdminPassword,
@@ -190,7 +191,7 @@ const nextAuth = NextAuth({
                 if (!user && ENABLE_AUTO_PROVISION) {
                     // Debug: verifica perché l'auto-provisioning non viene eseguito
                     if (isProduction) {
-                        console.warn('🔍 Auto-provisioning check (production):', {
+                        logger.warn('🔍 Auto-provisioning check (production):', {
                             enableAutoProvision: ENABLE_AUTO_PROVISION,
                             isSuperAdminEmail,
                             isSuperAdminPassword,
@@ -208,22 +209,22 @@ const nextAuth = NextAuth({
                     if (isSuperAdminEmail && isSuperAdminPassword) {
                         try {
                             if (isDevelopment) {
-                                console.warn('⚙️ Super Admin from env vars missing, provisioning now');
+                                logger.warn('⚙️ Super Admin from env vars missing, provisioning now');
                             }
                             if (isProduction) {
-                                console.warn('⚙️ Auto-provisioning Super Admin in production');
+                                logger.warn('⚙️ Auto-provisioning Super Admin in production');
                             }
                             const superAdminName = process.env.SUPER_ADMIN_DEFAULT_NAME?.trim() || 'Super Admin onecoach';
                             const superAdminCredits = Number(process.env.SUPER_ADMIN_DEFAULT_CREDITS ?? 10000) || 10000;
                             user = await provisionAdmin(SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD, superAdminName, 'SUPER_ADMIN', superAdminCredits);
                             if (isDevelopment) {
-                                console.warn('✅ Super Admin from env vars created:', {
+                                logger.warn('✅ Super Admin from env vars created:', {
                                     id: user.id,
                                     email: user.email,
                                 });
                             }
                             if (isProduction) {
-                                console.warn('✅ Super Admin auto-provisioned successfully:', {
+                                logger.warn('✅ Super Admin auto-provisioned successfully:', {
                                     id: user.id,
                                     email: user.email,
                                     role: user.role,
@@ -231,39 +232,39 @@ const nextAuth = NextAuth({
                             }
                         }
                         catch (error) {
-                            console.error('❌ Error provisioning Super Admin:', error);
+                            logger.error('❌ Error provisioning Super Admin:', error);
                             // Non bloccare il login se il provisioning fallisce
                             throw new Error("Errore durante la creazione dell'account super admin");
                         }
                     }
                     else if (isAdminEmail && isAdminPassword) {
                         if (isDevelopment) {
-                            console.warn('⚙️ Admin from env vars missing, provisioning now');
+                            logger.warn('⚙️ Admin from env vars missing, provisioning now');
                         }
                         if (isProduction) {
-                            console.warn('⚙️ Auto-provisioning Admin in production');
+                            logger.warn('⚙️ Auto-provisioning Admin in production');
                         }
                         const adminName = process.env.ADMIN_DEFAULT_NAME?.trim() || 'Admin onecoach';
                         const adminCredits = Number(process.env.ADMIN_DEFAULT_CREDITS ?? 10000) || 10000;
                         user = await provisionAdmin(ADMIN_EMAIL, ADMIN_PASSWORD, adminName, 'ADMIN', adminCredits);
                         if (isDevelopment) {
-                            console.warn('✅ Admin from env vars created:', { id: user.id, email: user.email });
+                            logger.warn('✅ Admin from env vars created:', { id: user.id, email: user.email });
                         }
                     }
                     else if (isDefaultAdminEmail && isDefaultAdminPassword && !isProduction) {
                         // Solo in development con defaults
                         if (isDevelopment) {
-                            console.warn('⚙️ Default admin missing, provisioning now');
+                            logger.warn('⚙️ Default admin missing, provisioning now');
                         }
                         user = await provisionAdmin(DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD, DEFAULT_ADMIN_NAME, 'SUPER_ADMIN', DEFAULT_ADMIN_CREDITS);
                         if (isDevelopment) {
-                            console.warn('✅ Default admin created:', { id: user.id, email: user.email });
+                            logger.warn('✅ Default admin created:', { id: user.id, email: user.email });
                         }
                     }
                     else {
                         // Log quando auto-provisioning non viene eseguito (per debug)
                         if (isProduction && ENABLE_AUTO_PROVISION) {
-                            console.warn('⚠️ Auto-provisioning skipped - conditions not met:', {
+                            logger.warn('⚠️ Auto-provisioning skipped - conditions not met:', {
                                 isSuperAdminEmail,
                                 isSuperAdminPassword,
                                 isAdminEmail,
@@ -282,7 +283,7 @@ const nextAuth = NextAuth({
                     if (!isPasswordValid) {
                         // Password nel DB non corrisponde alle env vars, aggiorna
                         if (isDevelopment) {
-                            console.warn('⚠️ Super Admin password out of sync. Updating from env vars.');
+                            logger.warn('⚠️ Super Admin password out of sync. Updating from env vars.');
                         }
                         const hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
                         const superAdminName = process.env.SUPER_ADMIN_DEFAULT_NAME?.trim() || 'Super Admin onecoach';
@@ -326,7 +327,7 @@ const nextAuth = NextAuth({
                     if (!isPasswordValid) {
                         // Password nel DB non corrisponde alle env vars, aggiorna
                         if (isDevelopment) {
-                            console.warn('⚠️ Admin password out of sync. Updating from env vars.');
+                            logger.warn('⚠️ Admin password out of sync. Updating from env vars.');
                         }
                         const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
                         const adminName = process.env.ADMIN_DEFAULT_NAME?.trim() || 'Admin onecoach';
@@ -370,7 +371,7 @@ const nextAuth = NextAuth({
                     (user.role !== 'SUPER_ADMIN' || user.status !== 'ACTIVE')) {
                     const isDevelopment = process.env.NODE_ENV === 'development';
                     if (isDevelopment) {
-                        console.warn('⚠️ Default admin out of sync. Restoring super admin privileges.');
+                        logger.warn('⚠️ Default admin out of sync. Restoring super admin privileges.');
                     }
                     user = await prisma.users.update({
                         where: { id: user.id },
@@ -401,24 +402,24 @@ const nextAuth = NextAuth({
                         passwordMatch: normalizedPassword === SUPER_ADMIN_PASSWORD,
                     };
                     if (isDevelopment) {
-                        console.warn('❌ User not found:', debugInfo);
+                        logger.warn('❌ User not found:', debugInfo);
                     }
                     if (isProduction) {
-                        console.error('❌ User not found and auto-provisioning failed:', debugInfo);
+                        logger.error('❌ User not found and auto-provisioning failed:', debugInfo);
                     }
                     throw new Error('Credenziali non valide');
                 }
                 if (isDevelopment) {
-                    console.warn('✅ User found:', { id: user.id, email: user.email, status: user.status });
+                    logger.warn('✅ User found:', { id: user.id, email: user.email, status: user.status });
                 }
                 if (user.status !== 'ACTIVE') {
                     if (isDevelopment) {
-                        console.warn('❌ User status is not ACTIVE:', user.status);
+                        logger.warn('❌ User status is not ACTIVE:', user.status);
                     }
                     throw new Error('Account sospeso o disabilitato');
                 }
                 if (isDevelopment) {
-                    console.warn('🔐 Verifying password...');
+                    logger.warn('🔐 Verifying password...');
                 }
                 // Se le credenziali env corrispondono, il login è valido (già sincronizzato sopra)
                 // Altrimenti verifica la password hashata nel database
@@ -433,7 +434,7 @@ const nextAuth = NextAuth({
                 }
                 if (!isPasswordValid) {
                     if (isDevelopment) {
-                        console.warn('❌ Invalid password for user:', {
+                        logger.warn('❌ Invalid password for user:', {
                             email: credentials.email,
                             isSuperAdminEmail,
                             isAdminEmail,
@@ -445,7 +446,7 @@ const nextAuth = NextAuth({
                     throw new Error('Credenziali non valide');
                 }
                 if (isDevelopment) {
-                    console.warn('✅ Login successful for:', user.email);
+                    logger.warn('✅ Login successful for:', user.email);
                 }
                 // Ritorna user senza password
                 return {
@@ -492,7 +493,7 @@ const nextAuth = NextAuth({
                 try {
                     const email = user.email?.toLowerCase();
                     if (!email) {
-                        console.error('[Auth] OAuth sign-in without email');
+                        logger.error('[Auth] OAuth sign-in without email');
                         return false;
                     }
                     // Check if user exists with this email
@@ -535,7 +536,7 @@ const nextAuth = NextAuth({
                                 },
                             });
                             if (process.env.NODE_ENV === 'development') {
-                                console.warn(`✅ Linked ${account.provider} account to existing user: ${existingUser.email}`);
+                                logger.warn(`✅ Linked ${account.provider} account to existing user: ${existingUser.email}`);
                             }
                         }
                         // Update user info from OAuth if name or image is missing
@@ -558,13 +559,13 @@ const nextAuth = NextAuth({
                         // New user via OAuth - will be created by PrismaAdapter
                         // Set default values for new OAuth users
                         if (process.env.NODE_ENV === 'development') {
-                            console.warn(`✅ Creating new user via ${account.provider}: ${email}`);
+                            logger.warn(`✅ Creating new user via ${account.provider}: ${email}`);
                         }
                     }
                     return true;
                 }
                 catch (error) {
-                    console.error('[Auth] Error in linkAccount:', error);
+                    logger.error('[Auth] Error in linkAccount:', error);
                     return false;
                 }
             }
@@ -603,7 +604,7 @@ const nextAuth = NextAuth({
                 });
                 if (!dbUser) {
                     // L'utente non esiste più nel database - invalida il token
-                    console.warn(`[Auth] User ${token.id} not found in database, invalidating token`);
+                    logger.warn(`[Auth] User ${token.id} not found in database, invalidating token`);
                     return null; // Questo causerà il logout
                 }
                 if (dbUser.status === 'ACTIVE') {
@@ -614,7 +615,7 @@ const nextAuth = NextAuth({
                 }
                 else {
                     // Utente non attivo - invalida il token
-                    console.warn(`[Auth] User ${token.id} is not ACTIVE (status: ${dbUser.status}), invalidating token`);
+                    logger.warn(`[Auth] User ${token.id} is not ACTIVE (status: ${dbUser.status}), invalidating token`);
                     return null;
                 }
             }
@@ -641,7 +642,7 @@ const nextAuth = NextAuth({
     events: {
         async signIn({ user }) {
             if (process.env.NODE_ENV === 'development') {
-                console.warn(`✅ User signed in: ${user.email}`);
+                logger.warn(`✅ User signed in: ${user.email}`);
             }
         },
     },
