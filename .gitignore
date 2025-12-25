@@ -6,3 +6,6 @@ build
 .turbo
 .next
 coverage
+
+# macOS AppleDouble files
+._*
