@@ -15,16 +15,60 @@ import { SetupIntentService } from './setup-intent.service';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import { getCreditsFromPriceId } from '@onecoach/constants/credit-packs';
 import { getSubscriptionPriceId } from '@onecoach/constants/subscription-prices';
-import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
-import { PromotionService } from '@onecoach/lib-marketplace/promotion.service';
-import { OpenRouterSubkeyService } from '@onecoach/lib-ai/openrouter-subkey.service';
-import { marketplaceService } from '@onecoach/lib-marketplace/marketplace.service';
+import { logger } from './logger.service';
 
-import { logger } from '@onecoach/lib-core';
+// ----------------------------------------------------------------------------
+// Interfaces for External Services (to break cyclic dependencies)
+// ----------------------------------------------------------------------------
+
+export interface IAffiliateService {
+  handlePostRegistration(params: { userId: string; referralCode: string; now: Date }): Promise<any>;
+  handleSubscriptionCancellation(params: { userId: string; occurredAt: Date }): Promise<any>;
+  handleInvoicePaid(params: {
+    userId: string;
+    stripeInvoiceId: string;
+    stripeSubscriptionId: string;
+    totalAmountCents: number;
+    currency: string;
+    occurredAt: Date;
+  }): Promise<any>;
+  ensureUserReferralCode?(userId: string, programId: string): Promise<any>;
+}
+
+export interface IPromotionService {
+  getPromotionByCode(code: string): Promise<any>;
+  applyBonusCredits(promotionId: string, userId: string): Promise<void>;
+}
+
+export interface IOpenRouterSubkeyService {
+  createSubkey(params: { userId: string; credits: number; paymentIntentId: string }): Promise<any>;
+  saveSubkeyToDb(data: any, tx?: any): Promise<void>;
+  revokeSubkey(keyLabel: string): Promise<void>;
+}
+
+export interface IMarketplaceService {
+  createPurchase(data: any): Promise<any>;
+  updatePurchaseStatus(purchaseId: string, status: string): Promise<any>;
+}
+
+export interface SubscriptionDependencies {
+  affiliateService?: IAffiliateService;
+  promotionService?: IPromotionService;
+  openRouterSubkeyService?: IOpenRouterSubkeyService;
+  marketplaceService?: IMarketplaceService;
+}
 /**
  * Implementazione Subscription Service
  */
 export class SubscriptionService implements ISubscriptionService {
+  private deps: SubscriptionDependencies = {};
+
+  /**
+   * Inject external dependencies to resolve cyclic imports
+   */
+  setDependencies(deps: SubscriptionDependencies) {
+    this.deps = { ...this.deps, ...deps };
+  }
   async createSetupIntent(
     userId: string,
     plan: SubscriptionPlan,
@@ -333,8 +377,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     // Handle affiliate referral if present
     const referralCode = subscription.metadata?.referralCode;
-    if (referralCode) {
-      await AffiliateService.handlePostRegistration({
+    if (referralCode && this.deps.affiliateService) {
+      await this.deps.affiliateService.handlePostRegistration({
         userId,
         referralCode,
         now: new Date(),
@@ -343,11 +387,11 @@ export class SubscriptionService implements ISubscriptionService {
 
     // Handle promotion code if present
     const promoCode = subscription.metadata?.promoCode;
-    if (promoCode) {
+    if (promoCode && this.deps.promotionService) {
       try {
-        const promotion = await PromotionService.getPromotionByCode(promoCode);
+        const promotion = await this.deps.promotionService.getPromotionByCode(promoCode);
         if (promotion && promotion.type === 'BONUS_CREDITS' && promotion.bonusCredits) {
-          await PromotionService.applyBonusCredits(promotion.id, userId);
+          await this.deps.promotionService.applyBonusCredits(promotion.id, userId);
         }
       } catch (error) {
         logger.error('[Subscription] Error applying promotion:', error);
@@ -375,8 +419,8 @@ export class SubscriptionService implements ISubscriptionService {
       });
 
       if (newStatus === 'CANCELLED' || newStatus === 'EXPIRED') {
-        if (dbSubscription.userId) {
-          await AffiliateService.handleSubscriptionCancellation({
+        if (dbSubscription.userId && this.deps.affiliateService) {
+          await this.deps.affiliateService.handleSubscriptionCancellation({
             userId: dbSubscription.userId,
             occurredAt: new Date(),
           });
@@ -400,9 +444,9 @@ export class SubscriptionService implements ISubscriptionService {
 
     await Promise.all(
       dbSubscriptions
-        .filter((sub) => sub.userId)
+        .filter((sub) => sub.userId && this.deps.affiliateService)
         .map((sub) =>
-          AffiliateService.handleSubscriptionCancellation({
+          this.deps.affiliateService!.handleSubscriptionCancellation({
             userId: sub.userId!,
             occurredAt: new Date(),
           })
@@ -427,11 +471,11 @@ export class SubscriptionService implements ISubscriptionService {
       });
     }
 
-    if (subscription && subscription.userId && invoice.total) {
+    if (subscription && subscription.userId && invoice.total && this.deps.affiliateService) {
       const totalAmountCents = invoice.total;
       const currency = invoice.currency || 'usd';
 
-      await AffiliateService.handleInvoicePaid({
+      await this.deps.affiliateService.handleInvoicePaid({
         userId: subscription.userId,
         stripeInvoiceId: invoice.id,
         stripeSubscriptionId: subscriptionId,
@@ -476,28 +520,30 @@ export class SubscriptionService implements ISubscriptionService {
     if (credits > 0) {
       await prisma.$transaction(async (tx) => {
         // Create OpenRouter subkey for credits purchase
-        try {
-          const subkeyResult = await OpenRouterSubkeyService.createSubkey({
-            userId,
-            credits,
-            paymentIntentId: paymentIntent.id,
-          });
-
-          // Save subkey to database
-          await OpenRouterSubkeyService.saveSubkeyToDb(
-            {
+        if (this.deps.openRouterSubkeyService) {
+          try {
+            const subkeyResult = await this.deps.openRouterSubkeyService.createSubkey({
               userId,
-              provider: 'OPENROUTER',
-              keyLabel: subkeyResult.keyLabel,
-              keyHash: subkeyResult.keyHash,
-              limit: subkeyResult.limit,
-              stripePaymentIntentId: paymentIntent.id,
-            },
-            tx
-          );
-        } catch (error) {
-          logger.error('[Subscription] Error creating OpenRouter subkey:', error);
-          // Continue with credit addition even if subkey creation fails
+              credits,
+              paymentIntentId: paymentIntent.id,
+            });
+
+            // Save subkey to database
+            await this.deps.openRouterSubkeyService.saveSubkeyToDb(
+              {
+                userId,
+                provider: 'OPENROUTER',
+                keyLabel: subkeyResult.keyLabel,
+                keyHash: subkeyResult.keyHash,
+                limit: subkeyResult.limit,
+                stripePaymentIntentId: paymentIntent.id,
+              },
+              tx
+            );
+          } catch (error) {
+            logger.error('[Subscription] Error creating OpenRouter subkey:', error);
+            // Continue with credit addition even if subkey creation fails
+          }
         }
 
         await creditService.addCredits({
@@ -592,9 +638,9 @@ export class SubscriptionService implements ISubscriptionService {
       },
     });
 
-    if (apiKey) {
+    if (apiKey && this.deps.openRouterSubkeyService) {
       try {
-        await OpenRouterSubkeyService.revokeSubkey(apiKey.keyLabel);
+        await this.deps.openRouterSubkeyService.revokeSubkey(apiKey.keyLabel);
       } catch (error) {
         logger.error('[Subscription] Error revoking OpenRouter subkey:', error);
       }
@@ -625,9 +671,9 @@ export class SubscriptionService implements ISubscriptionService {
       },
     });
 
-    if (!purchase) {
+    if (!purchase && this.deps.marketplaceService) {
       // Create purchase record if it doesn't exist
-      purchase = await marketplaceService.createPurchase({
+      purchase = await this.deps.marketplaceService.createPurchase({
         userId,
         marketplacePlanId,
         stripePaymentId: paymentIntent.id,
@@ -637,7 +683,9 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     // Update purchase status to completed
-    await marketplaceService.updatePurchaseStatus(purchase.id, 'COMPLETED');
+    if (purchase && this.deps.marketplaceService) {
+      await this.deps.marketplaceService.updatePurchaseStatus(purchase.id, 'COMPLETED');
+    }
   }
 
   private mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
