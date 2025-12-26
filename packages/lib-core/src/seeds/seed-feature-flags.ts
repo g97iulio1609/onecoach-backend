@@ -27,7 +27,26 @@ export async function seedFeatureFlags(prisma: PrismaClient, adminUserId: string
 
   logger.warn(`  ✓ Feature flag: ${invitationRegistrationFlag.key}`);
 
+  // Feature flag per abilitare/disabilitare login con Google OAuth
+  const googleLoginFlag = await prisma.feature_flags.upsert({
+    where: { key: 'GOOGLE_LOGIN_ENABLED' },
+    update: {},
+    create: {
+      key: 'GOOGLE_LOGIN_ENABLED',
+      name: 'Login con Google',
+      description:
+        'Abilita o disabilita la possibilità di accedere tramite Google OAuth. Quando disabilitato, il pulsante "Continua con Google" non sarà visibile nella pagina di login.',
+      enabled: true, // Abilitato di default
+      strategy: 'ALL',
+      config: {},
+      createdBy: adminUserId,
+    },
+  });
+
+  logger.warn(`  ✓ Feature flag: ${googleLoginFlag.key}`);
+
   return {
     invitationRegistrationFlag,
+    googleLoginFlag,
   };
 }

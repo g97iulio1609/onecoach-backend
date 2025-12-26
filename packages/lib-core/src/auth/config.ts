@@ -5,13 +5,12 @@
  */
 
 import NextAuth from 'next-auth';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import type { Adapter } from 'next-auth/adapters';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import Apple from 'next-auth/providers/apple';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../prisma';
+import { prisma, getPrisma } from '../prisma';
 import { createId, generateUUID } from '@onecoach/lib-shared/id-generator';
 import type { UserRole } from '@prisma/client';
 
@@ -114,11 +113,207 @@ async function provisionAdmin(
 
 type NextAuthReturn = ReturnType<typeof NextAuth>;
 
+/**
+ * Custom adapter that maps NextAuth model names to our Prisma schema names.
+ * NextAuth expects: Account, User, Session, VerificationToken (singular, PascalCase)
+ * Our schema has: accounts, users, sessions, verification_tokens (plural, snake_case)
+ */
+function createCustomPrismaAdapter(): Adapter {
+  const p = getPrisma();
+  
+  return {
+    async createUser(data) {
+      const user = await p.users.create({
+        data: {
+          id: generateUUID(),
+          email: data.email!,
+          name: data.name ?? null,
+          image: data.image ?? null,
+          emailVerified: data.emailVerified ?? null,
+          password: '', // OAuth users don't have password
+          role: 'USER',
+          status: 'ACTIVE',
+          credits: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
+    },
+    async getUser(id) {
+      const user = await p.users.findUnique({ where: { id } });
+      if (!user) return null;
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
+    },
+    async getUserByEmail(email) {
+      const user = await p.users.findFirst({
+        where: { email: { equals: email, mode: 'insensitive' } },
+      });
+      if (!user) return null;
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
+    },
+    async getUserByAccount({ provider, providerAccountId }) {
+      const account = await p.accounts.findUnique({
+        where: { provider_providerAccountId: { provider, providerAccountId } },
+        include: { users: true },
+      });
+      if (!account?.users) return null;
+      const user = account.users;
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
+    },
+    async updateUser(data) {
+      const user = await p.users.update({
+        where: { id: data.id },
+        data: {
+          name: data.name ?? undefined,
+          email: data.email ?? undefined,
+          image: data.image ?? undefined,
+          emailVerified: data.emailVerified ?? undefined,
+          updatedAt: new Date(),
+        },
+      });
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
+    },
+    async linkAccount(account) {
+      await p.accounts.create({
+        data: {
+          id: `${account.provider}-${account.providerAccountId}`,
+          userId: account.userId,
+          type: account.type,
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+          access_token: account.access_token ?? null,
+          expires_at: account.expires_at ?? null,
+          token_type: account.token_type ?? null,
+          scope: account.scope ?? null,
+          id_token: account.id_token ?? null,
+          refresh_token: account.refresh_token ?? null,
+          session_state: typeof account.session_state === 'string' ? account.session_state : null,
+        },
+      });
+    },
+    async createSession(data) {
+      const session = await p.sessions.create({
+        data: {
+          id: createId('session'),
+          sessionToken: data.sessionToken,
+          userId: data.userId,
+          expires: data.expires,
+        },
+      });
+      return {
+        sessionToken: session.sessionToken,
+        userId: session.userId!,
+        expires: session.expires,
+      };
+    },
+    async getSessionAndUser(sessionToken) {
+      const session = await p.sessions.findUnique({
+        where: { sessionToken },
+        include: { users: true },
+      });
+      if (!session?.users) return null;
+      return {
+        session: {
+          sessionToken: session.sessionToken,
+          userId: session.userId!,
+          expires: session.expires,
+        },
+        user: {
+          id: session.users.id,
+          email: session.users.email,
+          name: session.users.name,
+          image: session.users.image,
+          emailVerified: session.users.emailVerified,
+        },
+      };
+    },
+    async updateSession(data) {
+      const session = await p.sessions.update({
+        where: { sessionToken: data.sessionToken },
+        data: {
+          expires: data.expires ?? undefined,
+          userId: data.userId ?? undefined,
+        },
+      });
+      return {
+        sessionToken: session.sessionToken,
+        userId: session.userId!,
+        expires: session.expires,
+      };
+    },
+    async deleteSession(sessionToken) {
+      await p.sessions.delete({ where: { sessionToken } });
+    },
+    async createVerificationToken(data) {
+      const token = await p.verification_tokens.create({
+        data: {
+          identifier: data.identifier,
+          token: data.token,
+          expires: data.expires,
+        },
+      });
+      return { identifier: token.identifier, token: token.token, expires: token.expires };
+    },
+    async useVerificationToken({ identifier, token }) {
+      try {
+        const verificationToken = await p.verification_tokens.delete({
+          where: { identifier_token: { identifier, token } },
+        });
+        return {
+          identifier: verificationToken.identifier,
+          token: verificationToken.token,
+          expires: verificationToken.expires,
+        };
+      } catch {
+        return null;
+      }
+    },
+    async deleteUser(id) {
+      await p.users.delete({ where: { id } });
+    },
+    async unlinkAccount({ provider, providerAccountId }) {
+      await p.accounts.delete({
+        where: { provider_providerAccountId: { provider, providerAccountId } },
+      });
+    },
+  };
+}
+
 const nextAuth: NextAuthReturn = NextAuth({
-  // @auth/core version mismatch resolved via pnpm overrides in package.json
-  // Both next-auth and @auth/prisma-adapter now use @auth/core@0.41.1
-  // Type cast still needed for TypeScript compatibility
-  adapter: PrismaAdapter(prisma) as unknown as Adapter | undefined,
+  // Custom adapter that maps our schema names (accounts, users, etc.)
+  // to the names expected by NextAuth (Account, User, etc.)
+  adapter: createCustomPrismaAdapter(),
 
   // Passa esplicitamente AUTH_SECRET per garantire che sia usato correttamente
   // NextAuth v5 legge automaticamente da process.env, ma passarlo esplicitamente è più sicuro
