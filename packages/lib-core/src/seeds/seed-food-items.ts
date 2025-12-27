@@ -7,7 +7,7 @@ import type { PrismaClient } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import type { Macros } from '@onecoach/types';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 /**
  * Calculate main macro from macros
  */

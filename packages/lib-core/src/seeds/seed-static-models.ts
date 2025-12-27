@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 const staticModels = [
   {
     id: 'gemini-2.5-flash',
@@ -131,7 +131,7 @@ if (require.main === module) {
   const prisma = new PrismaClient();
   seedStaticModels(prisma)
     .catch((e: unknown) => {
-      logger.error(e);
+      logger.error('Error seeding static models', e);
       process.exit(1);
     })
     .finally(async () => {

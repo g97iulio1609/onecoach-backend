@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { prisma } from '../prisma';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 export interface SeedAdminResult {
   admin: {
     id: string;

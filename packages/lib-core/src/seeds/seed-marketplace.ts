@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 // Stable UUIDs for seed data (idempotent)
 // Generated once and kept constant to allow repeated seeding
 const SEED_PLAN_WORKOUT_ID = '00000000-0000-4000-8000-000000000001';

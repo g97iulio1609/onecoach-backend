@@ -15,10 +15,11 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from './logger.service';
 const globalForPrisma = globalThis as unknown as {
   prisma_updated: PrismaClient | undefined;
   pool: Pool | undefined;
+  prismaInitLogged?: boolean;
 };
 
 // Prisma 7: Il client legge DATABASE_URL direttamente da process.env
@@ -33,10 +34,7 @@ const ensureDatabaseUrl = () => {
     if (process.env.NODE_ENV === 'development') {
       const fallback = 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public';
       logger.warn(
-        '[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found!',
-        '\n  Using fallback:',
-        fallback,
-        '\n  To fix: Configure DATABASE_URL in .env.local or .env'
+        `[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found! Using fallback. To fix: Configure DATABASE_URL in .env.local or .env`
       );
       process.env.DATABASE_URL = fallback;
     } else {
@@ -101,8 +99,10 @@ function getPrismaClient(): PrismaClient {
     const connectionTimeoutMillis = Number(process.env.PG_CONNECTION_TIMEOUT_MS ?? 30000);
     const idleTimeoutMillis = Number(process.env.PG_IDLE_TIMEOUT_MS ?? 30000);
 
-    if (process.env.NODE_ENV === 'development') {
-      logger.warn('[Prisma] Initializing connection pool:', {
+    // Log connection pool info only once per process (avoid spam during hot reloads)
+    if (process.env.NODE_ENV === 'development' && !globalForPrisma.prismaInitLogged) {
+      globalForPrisma.prismaInitLogged = true;
+      logger.debug('[Prisma] Connection pool initialized:', {
         max: Number(process.env.PG_POOL_MAX ?? defaultPoolSize),
         connectionTimeoutMillis,
         idleTimeoutMillis,

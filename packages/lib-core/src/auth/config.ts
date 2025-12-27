@@ -14,7 +14,7 @@ import { prisma, getPrisma } from '../prisma';
 import { createId, generateUUID } from '@onecoach/lib-shared/id-generator';
 import type { UserRole } from '@prisma/client';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 // Production-safe: require explicit env vars, no hardcoded defaults
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -101,7 +101,7 @@ async function provisionAdmin(
       updatedAt: new Date(),
     },
     create: {
-      id: createId('user_profile'),
+      id: createId(),
       userId: user.id,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -225,7 +225,7 @@ function createCustomPrismaAdapter(): Adapter {
     async createSession(data) {
       const session = await p.sessions.create({
         data: {
-          id: createId('session'),
+          id: createId(),
           sessionToken: data.sessionToken,
           userId: data.userId,
           expires: data.expires,
@@ -362,7 +362,7 @@ const nextAuth: NextAuthReturn = NextAuth({
         const isProduction = process.env.NODE_ENV === 'production';
 
         if (isDevelopment) {
-          logger.warn('🔐 Login attempt for:', credentials?.email);
+          logger.warn('🔐 Login attempt for:', { email: credentials?.email });
         }
 
         if (!credentials?.email || !credentials?.password) {
@@ -694,7 +694,7 @@ const nextAuth: NextAuthReturn = NextAuth({
 
         if (user.status !== 'ACTIVE') {
           if (isDevelopment) {
-            logger.warn('❌ User status is not ACTIVE:', user.status);
+            logger.warn('❌ User status is not ACTIVE:', { status: user.status });
           }
           throw new Error('Account sospeso o disabilitato');
         }
@@ -729,7 +729,7 @@ const nextAuth: NextAuthReturn = NextAuth({
         }
 
         if (isDevelopment) {
-          logger.warn('✅ Login successful for:', user.email);
+          logger.warn('✅ Login successful for:', { email: user.email });
         }
 
         // Ritorna user senza password

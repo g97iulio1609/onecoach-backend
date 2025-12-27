@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
 import { seedAdminsFromEnv } from '../auth/admin-seed';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '../logger.service';
 // Stable UUID for seed data (idempotent)
 const SEED_DEMO_CREDITS_ID = '00000000-0000-4000-8000-000000000100';
 

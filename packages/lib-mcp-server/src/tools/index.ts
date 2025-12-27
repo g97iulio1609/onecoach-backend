@@ -24,8 +24,12 @@ import { analyticsTools } from './analytics';
 import { memoryToolsRecord } from './memory';
 import { profileToolsRecord } from './profile';
 import * as bodyMeasurementsTools from './body-measurements';
+import { kiwiSearchFlightTool } from './flight';
 import type { McpTool } from '../types';
 import { arrayToToolRecord } from '../utils/helpers';
+
+// Re-export flight tool for direct access
+export { kiwiSearchFlightTool } from './flight';
 
 // Convert array to record for list-based tools using shared helper
 const oneagendaToolsRecord = arrayToToolRecord(oneagendaToolsList);
@@ -95,6 +99,8 @@ export const allTools: Record<string, McpTool> = {
       .filter(([, v]) => typeof v === 'object' && 'execute' in v)
       .map(([, v]) => [(v as McpTool).name, v])
   ) as Record<string, McpTool>),
+  // Flight domain tools
+  [kiwiSearchFlightTool.name]: kiwiSearchFlightTool,
 };
 
 /**
