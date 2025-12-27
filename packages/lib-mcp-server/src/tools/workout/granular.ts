@@ -53,39 +53,34 @@ const SessionTargetSchema = z.object({
 
 /**
  * Set Field Update Schema - granular field updates for sets
+ * Each field has explicit description for AI model guidance
  */
 const SetFieldUpdateSchema = z.object({
-  reps: z.number().int().positive().optional().describe('Number of repetitions'),
-  repsMax: z.number().int().positive().optional().describe('Maximum reps (for ranges)'),
-  duration: z
-    .number()
-    .positive()
-    .optional()
-    .describe('Duration in seconds (for time-based exercises)'),
-  weight: z.number().nonnegative().optional().describe('Weight in kg'),
-  weightMax: z.number().nonnegative().optional().describe('Maximum weight in kg (for ranges)'),
-  weightLbs: z
-    .number()
-    .nonnegative()
-    .optional()
-    .describe('Weight in lbs (auto-calculated if weight provided)'),
-  intensityPercent: z.number().min(0).max(100).optional().describe('Intensity as % of 1RM'),
-  intensityPercentMax: z
-    .number()
-    .min(0)
-    .max(100)
-    .optional()
-    .describe('Maximum intensity % (for ranges)'),
-  rpe: z.number().min(1).max(10).optional().describe('RPE (Rate of Perceived Exertion)'),
-  rpeMax: z.number().min(1).max(10).optional().describe('Maximum RPE (for ranges)'),
-  rest: z.number().int().positive().optional().describe('Rest time in seconds'),
+  reps: z.number().int().positive().optional().describe(
+    'REQUIRED when changing reps! For "5x5" the second number is reps. Example: "5x5" → reps: 5'
+  ),
+  repsMax: z.number().int().positive().optional().describe('Maximum reps for rep ranges like "8-12"'),
+  duration: z.number().positive().optional().describe('Duration in seconds for time-based exercises'),
+  weight: z.number().nonnegative().optional().describe('Weight in kg. Example: "100kg" → weight: 100'),
+  weightMax: z.number().nonnegative().optional().describe('Maximum weight in kg for ranges'),
+  weightLbs: z.number().nonnegative().optional().describe('Weight in lbs (auto-calculated)'),
+  intensityPercent: z.number().min(0).max(100).optional().describe(
+    'REQUIRED when user mentions percentage! Intensity as % of 1RM. Example: "80%" → intensityPercent: 80'
+  ),
+  intensityPercentMax: z.number().min(0).max(100).optional().describe('Max intensity % for ranges'),
+  rpe: z.number().min(1).max(10).optional().describe('RPE (Rate of Perceived Exertion) 1-10'),
+  rpeMax: z.number().min(1).max(10).optional().describe('Maximum RPE for ranges'),
+  rest: z.number().int().positive().optional().describe('Rest time in seconds. Example: "60s rest" → rest: 60'),
 });
 
 /**
  * SetGroup Update Schema - includes count and all set fields
+ * IMPORTANT: For "5x5" notation, BOTH count AND reps are required!
  */
 const SetGroupUpdateSchema = SetFieldUpdateSchema.extend({
-  count: z.number().int().positive().optional().describe('Number of sets in the group'),
+  count: z.number().int().positive().optional().describe(
+    'REQUIRED when changing number of sets! For "5x5" the first number is count. Example: "5x5" → count: 5, reps: 5 (BOTH!)'
+  ),
 });
 
 /**
@@ -771,7 +766,7 @@ const applyModificationParams = z.object({
   target: ModificationTargetSchema.optional().describe('Where to apply the modification'),
   // Use explicit SetGroupUpdateSchema with detailed description
   changes: SetGroupUpdateSchema.optional().describe(
-    'REQUIRED for update actions. Fields: count (number of sets), reps, weight (kg), intensityPercent (0-100 for %1RM), rest (seconds), rpe (1-10). Example for "5x5 at 80%": { "count": 5, "reps": 5, "intensityPercent": 80 }'
+    'REQUIRED for update actions! For "5x5 at 80%": { "count": 5, "reps": 5, "intensityPercent": 80 }. CRITICAL: "5x5" means count=5 AND reps=5, you MUST include BOTH!'
   ),
   newData: z.any().optional().describe('New data to add (for add actions)'),
   // Batch modifications: array of modifications to apply in sequence
@@ -834,10 +829,16 @@ TARGETING:
 
 ⚠️ CRITICAL: For update actions, the "changes" object MUST contain at least one field!
 
+UNDERSTANDING "5x5" NOTATION:
+The notation "5x5" means 5 sets × 5 reps each. You MUST include BOTH:
+- "count": 5 → First number = number of SETS
+- "reps": 5 → Second number = reps PER SET
+
 CHANGES FIELD MAPPING (for update_setgroup):
 | User Request | changes Object |
 |--------------|----------------|
-| "5x5 at 80%" | {"count": 5, "reps": 5, "intensityPercent": 80} |
+| "5x5 at 80%" | {"count": 5, "reps": 5, "intensityPercent": 80} | ← count AND reps!
+| "3x10" | {"count": 3, "reps": 10} | ← count AND reps!
 | "3 sets of 10" | {"count": 3, "reps": 10} |
 | "weight 100kg" | {"weight": 100} |
 | "rest 90 seconds" | {"rest": 90} |
@@ -974,10 +975,85 @@ EXAMPLE - Change squat to 5x5 at 80%:
           }
           
           const originalSetGroup = { ...targetExercise.setGroups[sgIdx] };
-          weeks[weekIndex].days[dayIndex].exercises[targetExerciseIndex].setGroups[sgIdx] = {
-            ...targetExercise.setGroups[sgIdx],
+          const currentSetGroup = targetExercise.setGroups[sgIdx];
+          
+          // Build the updated setGroup
+          const updatedSetGroup = {
+            ...currentSetGroup,
             ...changes,
           };
+          
+          // CRITICAL: Also update baseSet if it exists - UI reads from baseSet!
+          if (currentSetGroup.baseSet) {
+            // Fields that should be propagated to baseSet
+            const baseSetFields = ['reps', 'repsMax', 'weight', 'weightMax', 'intensityPercent', 'intensityPercentMax', 'rpe', 'rpeMax', 'rest', 'duration'];
+            const baseSetChanges: Record<string, any> = {};
+            
+            for (const field of baseSetFields) {
+              if (changes[field as keyof typeof changes] !== undefined) {
+                baseSetChanges[field] = changes[field as keyof typeof changes];
+              }
+            }
+            
+            if (Object.keys(baseSetChanges).length > 0) {
+              updatedSetGroup.baseSet = {
+                ...currentSetGroup.baseSet,
+                ...baseSetChanges,
+              };
+              console.log('[MCP:workout_apply_modification] 📝 Also updating baseSet:', baseSetChanges);
+            }
+          }
+          
+          // If count changed, also update the sets array to match
+          if (changes.count !== undefined && changes.count !== currentSetGroup.count) {
+            const newCount = changes.count;
+            const currentSets = currentSetGroup.sets || [];
+            const templateSet = updatedSetGroup.baseSet || { reps: 10 };
+            
+            if (newCount > currentSets.length) {
+              // Add sets - clone the baseSet
+              const newSets = [...currentSets];
+              while (newSets.length < newCount) {
+                newSets.push({ ...templateSet, setNumber: newSets.length + 1 });
+              }
+              updatedSetGroup.sets = newSets;
+            } else if (newCount < currentSets.length) {
+              // Remove sets from the end
+              updatedSetGroup.sets = currentSets.slice(0, newCount);
+            }
+            console.log('[MCP:workout_apply_modification] 📝 Adjusted sets array:', { 
+              oldCount: currentSets.length, 
+              newCount,
+              setsArrayLength: updatedSetGroup.sets?.length 
+            });
+          }
+          
+          // CRITICAL: Propagate baseSet changes to ALL existing sets in the array
+          // This ensures individual sets reflect the updated reps/intensityPercent/weight
+          if (updatedSetGroup.baseSet && updatedSetGroup.sets && updatedSetGroup.sets.length > 0) {
+            const baseSetFields = ['reps', 'repsMax', 'weight', 'weightMax', 'intensityPercent', 'intensityPercentMax', 'rest', 'duration'];
+            const fieldsToPropagate: Record<string, any> = {};
+            
+            for (const field of baseSetFields) {
+              if (changes[field as keyof typeof changes] !== undefined) {
+                fieldsToPropagate[field] = updatedSetGroup.baseSet[field];
+              }
+            }
+            
+            if (Object.keys(fieldsToPropagate).length > 0) {
+              updatedSetGroup.sets = updatedSetGroup.sets.map((set: any, idx: number) => ({
+                ...set,
+                ...fieldsToPropagate,
+                setNumber: idx + 1,
+              }));
+              console.log('[MCP:workout_apply_modification] 📝 Propagated to all sets:', {
+                fieldsUpdated: Object.keys(fieldsToPropagate),
+                setsCount: updatedSetGroup.sets.length,
+              });
+            }
+          }
+          
+          weeks[weekIndex].days[dayIndex].exercises[targetExerciseIndex].setGroups[sgIdx] = updatedSetGroup;
           
           // Log the actual changes applied
           console.log('[MCP:workout_apply_modification] 📝 Applied changes:', {
