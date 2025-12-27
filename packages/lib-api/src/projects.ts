@@ -33,6 +33,14 @@ export const projectsApi = {
   delete: async (id: string) => {
     await apiClient.delete(`/api/projects?id=${id}`);
   },
+
+  duplicate: async (id: string) => {
+    const data = await apiClient.post<{ project: Project; message: string }>(
+      `/api/projects/${id}/duplicate`,
+      {}
+    );
+    return data;
+  },
 };
 
 export interface CreateTaskInput {

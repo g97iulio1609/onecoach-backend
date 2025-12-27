@@ -104,3 +104,23 @@ export function useDeleteProject() {
     },
   });
 }
+
+/**
+ * Hook to duplicate a project
+ */
+export function useDuplicateProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => projectsApi.duplicate(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: projectsKeys.lists() });
+      if (response.project?.id) {
+        queryClient.invalidateQueries({ queryKey: projectsKeys.detail(response.project.id) });
+      }
+    },
+    onError: (error) => {
+      logger.error('Failed to duplicate project:', getErrorMessage(error));
+    },
+  });
+}

@@ -206,3 +206,10 @@ export async function disconnectPrisma() {
     globalForPrisma.pool = undefined;
   }
 }
+
+// Re-export Prisma types so consumers don't need @prisma/client dependency
+export { Prisma } from '@prisma/client';
+export type { PrismaClient } from '@prisma/client';
+
+// Alias for backward compatibility
+export const db = prisma;
