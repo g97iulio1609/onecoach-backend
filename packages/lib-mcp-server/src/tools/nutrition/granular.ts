@@ -11,6 +11,7 @@ import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import { prisma } from '@onecoach/lib-core';
 import type { Prisma } from '@prisma/client';
+import { fuzzyMatch, successResult } from '../shared';
 
 // =====================================================
 // Type Definitions (Mirrors day-meal.ts)
@@ -218,7 +219,7 @@ Examples:
         if (target.foodId) {
           foodIndex = meal.foods.findIndex(f => f.foodId === target.foodId);
         } else if (target.foodName) {
-           foodIndex = meal.foods.findIndex(f => f.name.toLowerCase().includes(target.foodName!.toLowerCase()));
+           foodIndex = meal.foods.findIndex(f => fuzzyMatch(f.name, target.foodName!));
         }
         
         if (foodIndex === -1) throw new Error(`Alimento "${target.foodName || target.foodId}" non trovato`);
@@ -283,7 +284,7 @@ Examples:
         if (target.foodId) {
           foodIndex = meal.foods.findIndex(f => f.foodId === target.foodId);
         } else if (target.foodName) {
-           foodIndex = meal.foods.findIndex(f => f.name.toLowerCase().includes(target.foodName!.toLowerCase()));
+           foodIndex = meal.foods.findIndex(f => fuzzyMatch(f.name, target.foodName!));
         }
         
         if (foodIndex === -1) throw new Error(`Alimento non trovato`);
@@ -327,10 +328,6 @@ Examples:
       }
     });
     
-    return {
-      success: true,
-      message,
-      updatedDay: day
-    };
+    return successResult(message, day);
   }
 };

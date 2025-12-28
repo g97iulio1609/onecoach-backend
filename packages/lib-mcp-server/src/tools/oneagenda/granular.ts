@@ -11,6 +11,7 @@ import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import { prisma } from '@onecoach/lib-core';
 import type { Prisma } from '@prisma/client';
+import { successResult } from '../shared';
 
 // =====================================================
 // Schema Definitions
@@ -187,10 +188,6 @@ Examples:
       }
     }
     
-    return {
-      success: true,
-      message,
-      projectId
-    };
+    return successResult(message, { projectId });
   }
 };
