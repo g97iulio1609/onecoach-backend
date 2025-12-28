@@ -18,7 +18,7 @@ import {
 } from '../../services/oneagenda';
 import { oneAgendaImportTool } from './import';
 
-import { logger } from '@onecoach/lib-core';
+
 // ============================================================================
 // PROJECT TOOLS
 // ============================================================================
@@ -33,9 +33,9 @@ export const createProjectTool: McpTool = {
     color: z.string().optional().describe('The color hex code (e.g. #3B82F6)'),
   }),
   execute: async (args, context) => {
-    logger.warn('📁 [oneagenda_create_project] Creazione progetto...');
-    logger.warn('📁 [oneagenda_create_project] Args:', JSON.stringify(args, null, 2));
-    logger.warn('📁 [oneagenda_create_project] UserId:', context.userId);
+    console.log('📁 [oneagenda_create_project] Creazione progetto...');
+    console.log('📁 [oneagenda_create_project] Args:', JSON.stringify(args, null, 2));
+    console.log('📁 [oneagenda_create_project] UserId:', context.userId);
 
     if (!context.userId) {
       throw new Error('Unauthorized: User ID required');
@@ -48,7 +48,7 @@ export const createProjectTool: McpTool = {
       color: args.color,
     });
 
-    logger.warn('✅ [oneagenda_create_project] Progetto creato:', project.id);
+    console.log('✅ [oneagenda_create_project] Progetto creato:', project.id);
 
     return {
       content: [
@@ -624,6 +624,8 @@ export const getAgendaDashboardTool: McpTool = {
 // EXPORTS
 // ============================================================================
 
+import { agendaApplyModificationTool } from './granular';
+
 export const oneagendaTools: McpTool[] = [
   // Projects
   createProjectTool,
@@ -650,6 +652,8 @@ export const oneagendaTools: McpTool[] = [
   deleteHabitTool,
   toggleHabitTool,
   listHabitsTool,
+  // Granular Modifications
+  agendaApplyModificationTool,
   // Dashboard
   getAgendaDashboardTool,
 ];
