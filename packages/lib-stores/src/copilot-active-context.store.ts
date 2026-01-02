@@ -155,9 +155,45 @@ export interface OneAgendaActiveContext {
 }
 
 /**
+ * Live workout session context
+ * For real-time coaching during active workout sessions
+ */
+export interface LiveSessionContext {
+  sessionId: string;
+  programId: string;
+  status: 'active' | 'paused' | 'completed';
+  
+  // Progress tracking
+  currentExerciseIndex: number;
+  currentSetIndex: number;
+  completedSets: number;
+  totalSets: number;
+  
+  // Current exercise info (for coaching)
+  currentExerciseName: string | null;
+  
+  // Last completed set (for AI coaching analysis)
+  lastSet: {
+    weight: number;
+    reps: number;
+    rpe: number | null;
+    duration: number; // seconds
+  } | null;
+  
+  // Rest timer state
+  restTimerRunning: boolean;
+  restTimeRemaining: number; // seconds
+  suggestedRestTime: number; // seconds
+  
+  // Session duration
+  sessionStartTime: number; // timestamp
+  elapsedTime: number; // seconds
+}
+
+/**
  * Domain type
  */
-export type ActiveDomain = 'workout' | 'nutrition' | 'oneagenda' | null;
+export type ActiveDomain = 'workout' | 'nutrition' | 'oneagenda' | 'liveSession' | null;
 
 // ============================================================================
 // Store State & Actions
@@ -171,6 +207,7 @@ interface CopilotActiveContextState {
   workout: WorkoutActiveContext | null;
   nutrition: NutritionActiveContext | null;
   oneAgenda: OneAgendaActiveContext | null;
+  liveSession: LiveSessionContext | null;
   
   // Last update timestamp (for debugging/staleness checks)
   lastUpdated: number;
@@ -205,10 +242,20 @@ interface CopilotActiveContextActions {
   selectMilestone: (milestone: SelectedMilestone | null) => void;
   setRelatedTasks: (subtasks: string[], parallelTasks: string[]) => void;
   
+  // === Live Session Actions ===
+  initLiveSessionContext: (sessionId: string, programId: string, totalSets: number) => void;
+  updateLiveSessionProgress: (exerciseIndex: number, setIndex: number, completedSets: number) => void;
+  setCurrentExercise: (exerciseName: string | null, exerciseIndex: number) => void;
+  recordCompletedSet: (setData: LiveSessionContext['lastSet']) => void;
+  updateRestTimer: (running: boolean, remaining: number) => void;
+  setLiveSessionStatus: (status: LiveSessionContext['status']) => void;
+  clearLiveSession: () => void;
+  
   // === Selectors (for MCP tools) ===
-  getActiveContext: () => WorkoutActiveContext | NutritionActiveContext | OneAgendaActiveContext | null;
+  getActiveContext: () => WorkoutActiveContext | NutritionActiveContext | OneAgendaActiveContext | LiveSessionContext | null;
   getWorkoutForTools: () => WorkoutProgram | null;
   getNutritionForTools: () => NutritionPlan | null;
+  getLiveSessionForTools: () => LiveSessionContext | null;
 }
 
 export type CopilotActiveContextStore = CopilotActiveContextState & CopilotActiveContextActions;
@@ -222,6 +269,7 @@ const initialState: CopilotActiveContextState = {
   workout: null,
   nutrition: null,
   oneAgenda: null,
+  liveSession: null,
   lastUpdated: 0,
 };
 
@@ -487,6 +535,106 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
           'setRelatedTasks'
         ),
 
+      // === Live Session Actions ===
+      initLiveSessionContext: (sessionId, programId, totalSets) =>
+        set(
+          {
+            domain: 'liveSession',
+            liveSession: {
+              sessionId,
+              programId,
+              status: 'active',
+              currentExerciseIndex: 0,
+              currentSetIndex: 0,
+              completedSets: 0,
+              totalSets,
+              currentExerciseName: null,
+              lastSet: null,
+              restTimerRunning: false,
+              restTimeRemaining: 0,
+              suggestedRestTime: 90,
+              sessionStartTime: Date.now(),
+              elapsedTime: 0,
+            },
+            lastUpdated: Date.now(),
+          },
+          false,
+          'initLiveSessionContext'
+        ),
+
+      updateLiveSessionProgress: (exerciseIndex, setIndex, completedSets) =>
+        set(
+          (state) => ({
+            liveSession: state.liveSession
+              ? { ...state.liveSession, currentExerciseIndex: exerciseIndex, currentSetIndex: setIndex, completedSets }
+              : null,
+            lastUpdated: Date.now(),
+          }),
+          false,
+          'updateLiveSessionProgress'
+        ),
+
+      setCurrentExercise: (exerciseName, exerciseIndex) =>
+        set(
+          (state) => ({
+            liveSession: state.liveSession
+              ? { ...state.liveSession, currentExerciseName: exerciseName, currentExerciseIndex: exerciseIndex, currentSetIndex: 0 }
+              : null,
+            lastUpdated: Date.now(),
+          }),
+          false,
+          'setCurrentExercise'
+        ),
+
+      recordCompletedSet: (setData) =>
+        set(
+          (state) => ({
+            liveSession: state.liveSession
+              ? {
+                  ...state.liveSession,
+                  lastSet: setData,
+                  completedSets: state.liveSession.completedSets + 1,
+                  currentSetIndex: state.liveSession.currentSetIndex + 1,
+                  restTimerRunning: true,
+                  restTimeRemaining: state.liveSession.suggestedRestTime,
+                }
+              : null,
+            lastUpdated: Date.now(),
+          }),
+          false,
+          'recordCompletedSet'
+        ),
+
+      updateRestTimer: (running, remaining) =>
+        set(
+          (state) => ({
+            liveSession: state.liveSession
+              ? { ...state.liveSession, restTimerRunning: running, restTimeRemaining: remaining }
+              : null,
+          }),
+          false,
+          'updateRestTimer'
+        ),
+
+      setLiveSessionStatus: (status) =>
+        set(
+          (state) => ({
+            liveSession: state.liveSession
+              ? { ...state.liveSession, status }
+              : null,
+            lastUpdated: Date.now(),
+          }),
+          false,
+          'setLiveSessionStatus'
+        ),
+
+      clearLiveSession: () =>
+        set(
+          { liveSession: null, domain: null, lastUpdated: Date.now() },
+          false,
+          'clearLiveSession'
+        ),
+
       // === Selectors ===
       getActiveContext: () => {
         const state = get();
@@ -497,6 +645,8 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
             return state.nutrition;
           case 'oneagenda':
             return state.oneAgenda;
+          case 'liveSession':
+            return state.liveSession;
           default:
             return null;
         }
@@ -504,6 +654,7 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
 
       getWorkoutForTools: () => get().workout?.program ?? null,
       getNutritionForTools: () => get().nutrition?.plan ?? null,
+      getLiveSessionForTools: () => get().liveSession ?? null,
     })),
     { name: 'copilot-active-context' }
   )
@@ -517,6 +668,7 @@ export const selectActiveDomain = (state: CopilotActiveContextStore) => state.do
 export const selectWorkoutContext = (state: CopilotActiveContextStore) => state.workout;
 export const selectNutritionContext = (state: CopilotActiveContextStore) => state.nutrition;
 export const selectOneAgendaContext = (state: CopilotActiveContextStore) => state.oneAgenda;
+export const selectLiveSessionContext = (state: CopilotActiveContextStore) => state.liveSession;
 
 export const selectSelectedExercise = (state: CopilotActiveContextStore) => 
   state.workout?.selectedExercise ?? null;
@@ -529,12 +681,29 @@ export const selectSelectedFood = (state: CopilotActiveContextStore) =>
 export const selectSelectedTask = (state: CopilotActiveContextStore) => 
   state.oneAgenda?.selectedTask ?? null;
 
+// Live Session specific selectors
+export const selectLiveSessionStatus = (state: CopilotActiveContextStore) =>
+  state.liveSession?.status ?? null;
+export const selectLiveSessionProgress = (state: CopilotActiveContextStore) =>
+  state.liveSession ? {
+    completedSets: state.liveSession.completedSets,
+    totalSets: state.liveSession.totalSets,
+    currentExercise: state.liveSession.currentExerciseName,
+  } : null;
+export const selectLastCompletedSet = (state: CopilotActiveContextStore) =>
+  state.liveSession?.lastSet ?? null;
+export const selectRestTimerState = (state: CopilotActiveContextStore) =>
+  state.liveSession ? {
+    running: state.liveSession.restTimerRunning,
+    remaining: state.liveSession.restTimeRemaining,
+  } : null;
+
 /**
  * Get full active context for MCP tools
  * Includes all relevant data the AI needs
  */
 export const selectMcpActiveContext = (state: CopilotActiveContextStore) => {
-  const { domain, workout, nutrition, oneAgenda } = state;
+  const { domain, workout, nutrition, oneAgenda, liveSession } = state;
   
   return {
     domain,
@@ -559,6 +728,19 @@ export const selectMcpActiveContext = (state: CopilotActiveContextStore) => {
       selectedMilestone: oneAgenda.selectedMilestone,
       subtasks: oneAgenda.subtasks,
       parallelTasks: oneAgenda.parallelTasks,
+    } : null,
+    liveSession: liveSession ? {
+      sessionId: liveSession.sessionId,
+      programId: liveSession.programId,
+      status: liveSession.status,
+      currentExerciseName: liveSession.currentExerciseName,
+      currentExerciseIndex: liveSession.currentExerciseIndex,
+      currentSetIndex: liveSession.currentSetIndex,
+      completedSets: liveSession.completedSets,
+      totalSets: liveSession.totalSets,
+      lastSet: liveSession.lastSet,
+      restTimerRunning: liveSession.restTimerRunning,
+      restTimeRemaining: liveSession.restTimeRemaining,
     } : null,
   };
 };

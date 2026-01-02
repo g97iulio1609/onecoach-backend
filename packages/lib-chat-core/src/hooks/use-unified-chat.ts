@@ -152,6 +152,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   const workoutContext = useCopilotActiveContextStore((s) => s.workout);
   const nutritionContext = useCopilotActiveContextStore((s) => s.nutrition);
   const oneAgendaContext = useCopilotActiveContextStore((s) => s.oneAgenda);
+  const liveSessionContext = useCopilotActiveContextStore((s) => s.liveSession);
 
   const requestBody = useMemo(() => {
     const body: Record<string, unknown> = {
@@ -205,6 +206,29 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
         };
       }
       
+      // Live Session context mapping (for real-time AI coaching)
+      if (liveSessionContext) {
+        contextObj.liveSession = {
+          sessionId: liveSessionContext.sessionId,
+          programId: liveSessionContext.programId,
+          status: liveSessionContext.status,
+          isActive: liveSessionContext.status === 'active',
+          currentExerciseName: liveSessionContext.currentExerciseName,
+          currentExerciseIndex: liveSessionContext.currentExerciseIndex,
+          currentSetIndex: liveSessionContext.currentSetIndex,
+          completedSets: liveSessionContext.completedSets,
+          totalSets: liveSessionContext.totalSets,
+          lastSet: liveSessionContext.lastSet,
+          restTimerRunning: liveSessionContext.restTimerRunning,
+          restTimeRemaining: liveSessionContext.restTimeRemaining,
+        };
+        logger.info('[useUnifiedChat] 🏋️ Live session context:', {
+          sessionId: liveSessionContext.sessionId,
+          exercise: liveSessionContext.currentExerciseName,
+          progress: `${liveSessionContext.completedSets}/${liveSessionContext.totalSets}`,
+        });
+      }
+      
       body.context = contextObj;
       
       logger.info('[useUnifiedChat] 📍 Active context:', {
@@ -233,7 +257,7 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
     }
 
     return body;
-  }, [selectedModelName, domain, workoutContext, nutritionContext, oneAgendaContext, screenContext, reasoningEnabled, newConversationId, chatStoreCurrentConversationId, initialConversationId]);
+  }, [selectedModelName, domain, workoutContext, nutritionContext, oneAgendaContext, liveSessionContext, screenContext, reasoningEnabled, newConversationId, chatStoreCurrentConversationId, initialConversationId]);
 
   // Fetch conversations non più necessario - ChatStore viene aggiornato via Realtime
   // Mantenuto solo per retrocompatibilità se necessario
