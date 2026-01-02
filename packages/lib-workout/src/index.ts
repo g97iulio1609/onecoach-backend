@@ -25,5 +25,6 @@ export * from './services/granular-session.service';
 export * from './schemas/imported-workout.schema';
 
 export type { ImportProgress, AIParseContext } from '@onecoach/lib-import-core';
+export { SUPPORTED_MIME_TYPES, IMPORT_LIMITS, ImportFileSchema, ImportOptionsSchema } from '@onecoach/lib-import-core';
 export { WorkoutImportService, type WorkoutImportResult, type WorkoutImportResult as ImportResult } from './services/workout-import.service';
 
