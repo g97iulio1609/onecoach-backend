@@ -28,6 +28,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useCopilotActiveContextStore } from '../copilot-active-context.store';
+import { logger } from '@onecoach/lib-shared/utils/logger';
 
 export interface UseLiveSessionSyncOptions {
   sessionId: string;
@@ -61,6 +62,11 @@ export function useLiveSessionSync(options: UseLiveSessionSyncOptions) {
   // Initialize session context on mount
   useEffect(() => {
     if (autoInitialize && sessionId && programId && !initializedRef.current) {
+      logger.info('[useLiveSessionSync] 🚀 Initializing live session context', {
+        sessionId,
+        programId,
+        totalSets,
+      });
       initLiveSessionContext(sessionId, programId, totalSets);
       initializedRef.current = true;
     }
@@ -68,11 +74,25 @@ export function useLiveSessionSync(options: UseLiveSessionSyncOptions) {
     // Cleanup on unmount
     return () => {
       if (initializedRef.current) {
+        logger.info('[useLiveSessionSync] 🧹 Clearing live session context');
         clearLiveSession();
         initializedRef.current = false;
       }
     };
   }, [sessionId, programId, totalSets, autoInitialize, initLiveSessionContext, clearLiveSession]);
+
+  // Log when live session is present
+  useEffect(() => {
+    if (liveSession) {
+      logger.debug('[useLiveSessionSync] 📊 Current live session state:', {
+        sessionId: liveSession.sessionId,
+        status: liveSession.status,
+        currentExerciseName: liveSession.currentExerciseName,
+        completedSets: liveSession.completedSets,
+        totalSets: liveSession.totalSets,
+      });
+    }
+  }, [liveSession]);
 
   // Progress tracking
   const setProgress = useCallback(

@@ -536,7 +536,12 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
         ),
 
       // === Live Session Actions ===
-      initLiveSessionContext: (sessionId, programId, totalSets) =>
+      initLiveSessionContext: (sessionId, programId, totalSets) => {
+        console.warn('[CopilotActiveContextStore] 🚀 initLiveSessionContext called', {
+          sessionId,
+          programId,
+          totalSets,
+        });
         set(
           {
             domain: 'liveSession',
@@ -560,7 +565,8 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
           },
           false,
           'initLiveSessionContext'
-        ),
+        );
+      },
 
       updateLiveSessionProgress: (exerciseIndex, setIndex, completedSets) =>
         set(

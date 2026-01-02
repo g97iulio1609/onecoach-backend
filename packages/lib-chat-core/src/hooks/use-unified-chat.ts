@@ -169,6 +169,15 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
 
     // Add full active context from CopilotActiveContextStore
     // Maps new granular context to API format
+    console.warn('[useUnifiedChat] 🔍 Reading context from store:', {
+      domain,
+      hasWorkout: !!workoutContext,
+      hasNutrition: !!nutritionContext,
+      hasOneAgenda: !!oneAgendaContext,
+      hasLiveSession: !!liveSessionContext,
+      liveSessionId: liveSessionContext?.sessionId ?? 'none',
+    });
+    
     if (domain) {
       body.domain = domain;
       
