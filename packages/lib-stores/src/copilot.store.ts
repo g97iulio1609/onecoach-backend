@@ -38,12 +38,14 @@ export interface NutritionContext {
  */
 export interface WorkoutContext {
   programId: string | null;
+  sessionId: string | null; // Live session identifier
   weekNumber: number | null;
   dayNumber: number | null;
   exerciseIndex: number | null;
   setGroupIndex: number | null;
   athleteId: string | null;
   totalWeeks: number | null;
+  isLiveSession: boolean; // Flag for live workout sessions
 }
 
 /**
@@ -139,12 +141,14 @@ const DEFAULT_NUTRITION_CONTEXT: NutritionContext = {
 
 const DEFAULT_WORKOUT_CONTEXT: WorkoutContext = {
   programId: null,
+  sessionId: null,
   weekNumber: null,
   dayNumber: null,
   exerciseIndex: null,
   setGroupIndex: null,
   athleteId: null,
   totalWeeks: null,
+  isLiveSession: false,
 };
 
 const DEFAULT_ONEAGENDA_CONTEXT: OneAgendaContext = {
