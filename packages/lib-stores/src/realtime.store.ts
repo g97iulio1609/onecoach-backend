@@ -303,7 +303,7 @@ export const useRealtimeStore = create<RealtimeStore>()(
 
                 // Log solo in development per evitare spam nella console
                 if (process.env.NODE_ENV === 'development') {
-                  logger.warn(`[RealtimeStore] ${status} on ${channelKey}:`, error.message);
+                  logger.warn(`[RealtimeStore] ${status} on ${channelKey}`, { message: error.message });
                 }
 
                 // Aggiorna lo stato con l'errore

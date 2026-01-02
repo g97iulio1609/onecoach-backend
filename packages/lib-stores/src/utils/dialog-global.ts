@@ -23,7 +23,7 @@ export const dialog = {
             return;
         }
         const store = getDialogStore();
-        return store.alert(message, title);
+        return store.alert(message, title ? { title } : undefined);
     },
 
     confirm: async (message: string, title?: string): Promise<boolean> => {
@@ -32,7 +32,7 @@ export const dialog = {
             return false;
         }
         const store = getDialogStore();
-        return store.confirm(message, title);
+        return store.confirm(message, title ? { title } : undefined);
     },
 
     prompt: async (
@@ -45,7 +45,7 @@ export const dialog = {
             return null;
         }
         const store = getDialogStore();
-        return store.prompt(message, defaultValue, title);
+        return store.prompt(message, { defaultValue, title });
     },
 
     info: async (message: string, title?: string): Promise<void> => {
@@ -53,7 +53,7 @@ export const dialog = {
             return;
         }
         const store = getDialogStore();
-        return store.info(message, title);
+        return store.info(message, title ? { title } : undefined);
     },
 
     success: async (message: string, title?: string): Promise<void> => {
@@ -61,7 +61,7 @@ export const dialog = {
             return;
         }
         const store = getDialogStore();
-        return store.success(message, title);
+        return store.success(message, title ? { title } : undefined);
     },
 
     warning: async (message: string, title?: string): Promise<void> => {
@@ -69,7 +69,7 @@ export const dialog = {
             return;
         }
         const store = getDialogStore();
-        return store.warning(message, title);
+        return store.warning(message, title ? { title } : undefined);
     },
 
     error: async (message: string, title?: string): Promise<void> => {
@@ -77,6 +77,6 @@ export const dialog = {
             return;
         }
         const store = getDialogStore();
-        return store.error(message, title);
+        return store.error(message, title ? { title } : undefined);
     },
 };

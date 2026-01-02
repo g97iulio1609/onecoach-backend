@@ -3,7 +3,7 @@
  *
  * SSOT for type-safe alternatives to `any` across the codebase.
  * Following SOLID principles: Single Responsibility for type safety.
- */import { logger } from '@onecoach/lib-core';
+ */
 
 
 /**

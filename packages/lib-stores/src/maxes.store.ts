@@ -179,7 +179,7 @@ export const useMaxesStore = create<MaxesStore>()(
         addMax(record);
 
         if (process.env.NODE_ENV === 'development') {
-          logger.warn('[MaxesStore] Realtime INSERT:', record.exerciseName);
+          logger.warn('[MaxesStore] Realtime INSERT', { exerciseName: record.exerciseName });
         }
       },
 
@@ -188,7 +188,7 @@ export const useMaxesStore = create<MaxesStore>()(
         updateMax(record.exerciseId, record);
 
         if (process.env.NODE_ENV === 'development') {
-          logger.warn('[MaxesStore] Realtime UPDATE:', record.exerciseName);
+          logger.warn('[MaxesStore] Realtime UPDATE', { exerciseName: record.exerciseName });
         }
       },
 
@@ -197,7 +197,7 @@ export const useMaxesStore = create<MaxesStore>()(
         removeMax(record.exerciseId);
 
         if (process.env.NODE_ENV === 'development') {
-          logger.warn('[MaxesStore] Realtime DELETE:', record.exerciseId);
+          logger.warn('[MaxesStore] Realtime DELETE', { exerciseId: record.exerciseId });
         }
       },
 

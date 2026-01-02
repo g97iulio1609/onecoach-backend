@@ -11,7 +11,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRealtimeSubscription, useRealtimeSyncWithClient } from './realtime.hooks';
 import type { direct_conversations, direct_messages } from '@prisma/client';
 
-import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // useDirectConversationsRealtime - Sottoscrizione conversazioni
 // ============================================================================

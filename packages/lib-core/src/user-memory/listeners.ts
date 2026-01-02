@@ -439,7 +439,7 @@ export async function handleMemoryEvent(
           break;
 
         default:
-          logger.warn('[Memory] Unknown event type:', (event as { type: string }).type);
+          logger.warn('[Memory] Unknown event type:', { type: (event as { type: string }).type });
       }
     }
   } catch (error) {

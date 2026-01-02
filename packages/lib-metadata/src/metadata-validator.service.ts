@@ -419,7 +419,7 @@ export async function validateExerciseTypeByName(
         return contextId;
       }
     } catch (error: unknown) {
-      logger.warn(`[MetadataValidator] Error accessing shared context for "${name}":`, error);
+      logger.warn(`[MetadataValidator] Error accessing shared context for "${name}":`, { error });
     }
   }
 
@@ -481,7 +481,7 @@ export async function validateExerciseTypeByName(
       } catch (error: unknown) {
         logger.warn(
           `[MetadataValidator] Error storing exercise type "${name}" in shared context:`,
-          error
+          { error }
         );
       }
     }

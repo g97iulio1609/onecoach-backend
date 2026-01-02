@@ -62,7 +62,7 @@
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0",
-    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query": "^5.90.16",
     "react": "^19.2.3",
     "react-native": "^0.83.1"
   },

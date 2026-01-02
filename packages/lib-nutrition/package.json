@@ -74,6 +74,7 @@
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-import-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
+    "@onecoach/lib-validation": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0"

@@ -491,7 +491,7 @@ export class ExerciseService {
                 },
               },
               create: {
-                id: createId('ext'),
+                id: createId(),
                 exerciseId: id,
                 ...translation,
                 updatedAt: new Date(),
@@ -1188,7 +1188,7 @@ export class ExerciseService {
 
     const slug = payload.slug?.trim() || toSlug((englishTranslation as any).name);
 
-    const exerciseId = createId('exr');
+    const exerciseId = createId();
 
     const approvalStatus = options.autoApprove
       ? ExerciseApprovalStatus.APPROVED
@@ -1218,7 +1218,7 @@ export class ExerciseService {
         updatedAt: new Date(),
       },
       translations: translations.map((translation: any) => ({
-        id: createId('ext'),
+        id: createId(),
         locale: translation.locale,
         name: translation.name,
         shortName: translation.shortName ?? null,
@@ -1347,7 +1347,7 @@ export class ExerciseService {
     }
 
     const normalizedRelations = relations.map((relation: any) => ({
-      id: createId('exr'),
+      id: createId(),
       fromId: exerciseId,
       toId: relation.id,
       relation: relation.relation,

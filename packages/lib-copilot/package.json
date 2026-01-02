@@ -18,7 +18,7 @@
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
     "framer-motion": "^12.23.26",
-    "lucide-react": "^0.561.0"
+    "lucide-react": "^0.562.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

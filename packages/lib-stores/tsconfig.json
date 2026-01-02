@@ -4,8 +4,13 @@
     "outDir": "./dist",
     "composite": true,
     "noEmit": false,
-    "strict": true
+    "strict": true,
+    "rootDir": "./src"
   },
+  "references": [
+    { "path": "../lib-core" },
+    { "path": "../../../onecoach-shared/packages/types" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

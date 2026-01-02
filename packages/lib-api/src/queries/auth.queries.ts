@@ -148,7 +148,7 @@ export const authQueries = {
       });
     } catch (error: unknown) {
       // Ignore errors, we'll clear local session anyway
-      logger.warn('Logout API call failed:', error);
+      logger.warn('Logout API call failed:', { error });
     }
   },
 

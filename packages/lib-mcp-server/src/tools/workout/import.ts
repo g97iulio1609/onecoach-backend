@@ -11,15 +11,17 @@ import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import {
   WorkoutImportService,
-  WorkoutVisionService,
   ImportFileSchema,
   ImportOptionsSchema,
   IMPORT_LIMITS,
   SUPPORTED_MIME_TYPES,
   type ImportProgress,
   type AIParseContext,
-  type ImportedWorkoutProgram,
 } from '@onecoach/lib-workout';
+import { WorkoutVisionService } from '@onecoach/lib-ai-agents';
+import {
+  type ImportedWorkoutProgram,
+} from '@onecoach/schemas';
 import { randomUUID } from 'crypto';
 
 import { logger } from '@onecoach/lib-core';

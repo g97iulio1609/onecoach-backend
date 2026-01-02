@@ -50,12 +50,11 @@ interface WorkoutBuilderState {
   setViewMode: (mode: 'editor' | 'statistics' | 'progression') => void;
 }
 
-export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>> =
-  create<WorkoutBuilderState>()(
-    persist(
-      immer((set, get) => ({
-        // Initial State
-        dependencies: null,
+export const useWorkoutBuilderStore = create<WorkoutBuilderState>()(
+  persist(
+    immer((set, get) => ({
+      // Initial State
+      dependencies: null,
         activeProgram: null,
         isLoading: false,
         isSaving: false,
@@ -84,7 +83,7 @@ export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>
 
             // Initialize Supabase Realtime subscription if available
             if (dependencies.supabase) {
-              const channel = dependencies.supabase
+              dependencies.supabase
                 .channel(`workout-program:${programId}`)
                 .on(
                   'postgres_changes',
@@ -170,4 +169,4 @@ export const useWorkoutBuilderStore: UseBoundStore<StoreApi<WorkoutBuilderState>
         }),
       }
     )
-  );
+  ) as UseBoundStore<StoreApi<WorkoutBuilderState>> | any; // forced cast to avoid complex middleware typing issues

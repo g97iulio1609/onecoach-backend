@@ -46,13 +46,13 @@ export interface DialogState extends DialogOptions {
  */
 export interface DialogActions {
   showDialog: (options: DialogOptions) => Promise<boolean | string | null>;
-  alert: (message: string, title?: string) => Promise<void>;
-  confirm: (message: string, title?: string) => Promise<boolean>;
-  prompt: (message: string, defaultValue?: string, title?: string) => Promise<string | null>;
-  info: (message: string, title?: string) => Promise<void>;
-  success: (message: string, title?: string) => Promise<void>;
-  warning: (message: string, title?: string) => Promise<void>;
-  error: (message: string, title?: string) => Promise<void>;
+  alert: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>) => Promise<void>;
+  confirm: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel'>) => Promise<boolean>;
+  prompt: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel' | 'defaultValue' | 'placeholder'>) => Promise<string | null>;
+  info: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>) => Promise<void>;
+  success: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>) => Promise<void>;
+  warning: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel'>) => Promise<void>;
+  error: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>) => Promise<void>;
   closeDialog: () => void;
   setInputValue: (value: string) => void;
 }
@@ -100,51 +100,50 @@ export const useDialogStore = create<DialogStore>()(
         });
       },
 
-      alert: (message: string, title?: string): Promise<void> => {
+      alert: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>): Promise<void> => {
         return get()
-          .showDialog({ type: 'alert', message, title })
+          .showDialog({ type: 'alert', message, ...options })
           .then(() => undefined);
       },
 
-      confirm: (message: string, title?: string): Promise<boolean> => {
+      confirm: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel'>): Promise<boolean> => {
         return get()
-          .showDialog({ type: 'confirm', message, title })
+          .showDialog({ type: 'confirm', message, ...options })
           .then((result) => result === true);
       },
 
-      prompt: (message: string, defaultValue?: string, title?: string): Promise<string | null> => {
+      prompt: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel' | 'defaultValue' | 'placeholder'>): Promise<string | null> => {
         return get()
           .showDialog({
             type: 'prompt',
             message,
-            defaultValue,
-            title,
-            placeholder: 'Inserisci un valore...',
+            ...options,
+            placeholder: options?.placeholder || 'Enter a value...',
           })
           .then((result) => (result === null ? null : String(result)));
       },
 
-      info: (message: string, title?: string): Promise<void> => {
+      info: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>): Promise<void> => {
         return get()
-          .showDialog({ type: 'info', message, title })
+          .showDialog({ type: 'info', message, ...options })
           .then(() => undefined);
       },
 
-      success: (message: string, title?: string): Promise<void> => {
+      success: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>): Promise<void> => {
         return get()
-          .showDialog({ type: 'success', message, title })
+          .showDialog({ type: 'success', message, ...options })
           .then(() => undefined);
       },
 
-      warning: (message: string, title?: string): Promise<void> => {
+      warning: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel' | 'cancelLabel'>): Promise<void> => {
         return get()
-          .showDialog({ type: 'warning', message, title })
+          .showDialog({ type: 'warning', message, ...options })
           .then(() => undefined);
       },
 
-      error: (message: string, title?: string): Promise<void> => {
+      error: (message: string, options?: Pick<DialogOptions, 'title' | 'confirmLabel'>): Promise<void> => {
         return get()
-          .showDialog({ type: 'error', message, title })
+          .showDialog({ type: 'error', message, ...options })
           .then(() => undefined);
       },
 

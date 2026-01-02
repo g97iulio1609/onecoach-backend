@@ -17,8 +17,8 @@
     "@onecoach/lib-ai": "workspace:*",
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-import-core": "workspace:*",
-    "ai": "6.0.0-beta.166",
-    "zod": "4.1.13"
+    "ai": "6.0.5",
+    "zod": "4.3.4"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

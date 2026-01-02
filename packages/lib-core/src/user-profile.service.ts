@@ -49,7 +49,7 @@ function serializeProfile(
         weightKgValue = null;
       }
     } catch (error: unknown) {
-      logger.warn('Error converting weightKg to number:', error);
+      logger.warn('Error converting weightKg to number:', { error });
       weightKgValue = null;
     }
   }

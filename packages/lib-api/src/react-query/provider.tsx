@@ -39,7 +39,8 @@ function isDevEnvironment(): boolean {
 }
 
 // Componente per i devtools che viene caricato solo lato client
-function Devtools({ client }: { client?: QueryClient }) {
+function Devtools({
+  client }: { client?: QueryClient }) {
   const [DevtoolsComponent, setDevtoolsComponent] = useState<ComponentType<{
     initialIsOpen?: boolean;
     client?: QueryClient;

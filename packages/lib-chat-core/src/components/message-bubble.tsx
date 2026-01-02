@@ -106,7 +106,8 @@ interface CodeBlockProps {
   variant: ChatVariant;
 }
 
-const CodeBlock = memo(function CodeBlock({ language, value, variant }: CodeBlockProps) {
+const CodeBlock = memo(function CodeBlock({
+  language, value, variant }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {

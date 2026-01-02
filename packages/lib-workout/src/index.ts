@@ -12,12 +12,10 @@ export * from './workout-normalization.service';
 export * from './mappers/workout-session.mapper';
 
 // Workout Import Feature
-export * from './schemas/imported-workout.schema';
 export * from './services/file-validator.service';
 export * from './services/file-parser.service';
 export * from './services/exercise-matcher.service';
 export * from './services/workout-import.service';
-export * from './services/workout-vision.service';
 export * from './services/workout-statistics.service';
 export * from './services/workout-progression.service';
 export * from './services/progression-template.service';
