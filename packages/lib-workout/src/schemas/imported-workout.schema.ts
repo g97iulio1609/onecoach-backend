@@ -7,64 +7,73 @@
  * @module lib-workout/schemas/imported-workout
  */
 
+import { z } from 'zod';
+
 // Re-export shared types from lib-import-core
 export type { ImportFile, ImportOptions, ImportProgress, AIParseContext } from '@onecoach/lib-import-core';
 export { IMPORT_LIMITS, SUPPORTED_MIME_TYPES, ImportFileSchema, ImportOptionsSchema } from '@onecoach/lib-import-core';
 
 /**
- * Imported exercise from AI parsing
+ * Zod schema for imported exercise
  */
-export interface ImportedExercise {
-  name: string;
-  sets?: number;
-  reps?: string;
-  weight?: string;
-  rest?: string;
-  notes?: string;
-  tempo?: string;
-  rpe?: number;
-  rir?: number;
-  intensity?: number;
-  supersetGroup?: string;
-  exerciseId?: string; // Matched exercise ID
-  confidence?: number; // Match confidence 0-1
-}
+export const ImportedExerciseSchema = z.object({
+  name: z.string(),
+  sets: z.number().optional(),
+  reps: z.string().optional(),
+  weight: z.string().optional(),
+  rest: z.string().optional(),
+  notes: z.string().optional(),
+  tempo: z.string().optional(),
+  rpe: z.number().optional(),
+  rir: z.number().optional(),
+  intensity: z.number().optional(),
+  supersetGroup: z.string().optional(),
+  exerciseId: z.string().optional(),
+  confidence: z.number().optional(),
+});
 
 /**
- * Imported workout day from AI parsing
+ * Zod schema for imported day
  */
-export interface ImportedDay {
-  name: string;
-  dayNumber?: number;
-  exercises: ImportedExercise[];
-  notes?: string;
-  focus?: string;
-}
+export const ImportedDaySchema = z.object({
+  name: z.string(),
+  dayNumber: z.number().optional(),
+  exercises: z.array(ImportedExerciseSchema),
+  notes: z.string().optional(),
+  focus: z.string().optional(),
+});
 
 /**
- * Imported workout week from AI parsing  
+ * Zod schema for imported week
  */
-export interface ImportedWeek {
-  name?: string;
-  weekNumber: number;
-  days: ImportedDay[];
-  notes?: string;
-}
+export const ImportedWeekSchema = z.object({
+  name: z.string().optional(),
+  weekNumber: z.number(),
+  days: z.array(ImportedDaySchema),
+  notes: z.string().optional(),
+});
 
 /**
- * Complete imported workout program from AI parsing
+ * Zod schema for complete imported workout program
  */
-export interface ImportedWorkoutProgram {
-  name: string;
-  description?: string;
-  weeks: ImportedWeek[];
-  metadata?: {
-    source?: string;
-    author?: string;
-    difficulty?: 'beginner' | 'intermediate' | 'advanced';
-    duration?: string;
-    frequency?: string;
-    equipment?: string[];
-    goals?: string[];
-  };
-}
+export const ImportedWorkoutProgramSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  weeks: z.array(ImportedWeekSchema),
+  metadata: z.object({
+    source: z.string().optional(),
+    author: z.string().optional(),
+    difficulty: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+    duration: z.string().optional(),
+    frequency: z.string().optional(),
+    equipment: z.array(z.string()).optional(),
+    goals: z.array(z.string()).optional(),
+  }).optional(),
+});
+/**
+ * Type inferences from zod schemas
+ */
+export type ImportedExercise = z.infer<typeof ImportedExerciseSchema>;
+export type ImportedDay = z.infer<typeof ImportedDaySchema>;
+export type ImportedWeek = z.infer<typeof ImportedWeekSchema>;
+export type ImportedWorkoutProgram = z.infer<typeof ImportedWorkoutProgramSchema>;
