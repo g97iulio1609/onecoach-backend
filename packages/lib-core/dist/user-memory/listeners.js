@@ -5,6 +5,7 @@
  * These are called directly from MCP tools, API routes, and other services.
  */
 import { userMemoryService } from '../user-memory.service';
+import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // WORKOUT EVENT LISTENERS
 // ============================================================================
@@ -337,12 +338,12 @@ export async function handleMemoryEvent(event) {
                     await handlePreferenceChange(event);
                     break;
                 default:
-                    console.warn('[Memory] Unknown event type:', event.type);
+                    logger.warn('[Memory] Unknown event type:', { type: event.type });
             }
         }
     }
     catch (error) {
-        console.error('[Memory] Error handling event:', error);
+        logger.error('[Memory] Error handling event:', error);
         // Don't throw - memory updates should not break main flow
     }
 }

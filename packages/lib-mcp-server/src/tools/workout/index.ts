@@ -46,3 +46,12 @@ export { workoutProgramTools } from './program';
 
 // Exercise Management Tools
 export { workoutExerciseTools } from './exercises';
+
+// Live Coaching Tools (real-time session coaching)
+export {
+  workoutSessionReadTool,
+  workoutSessionAnalyzeTool,
+  workoutCoachSuggestTool,
+  workoutExerciseTipsTool,
+  liveCoachingTools,
+} from './live-coaching';

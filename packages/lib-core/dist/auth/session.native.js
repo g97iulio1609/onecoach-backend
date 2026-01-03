@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { logger } from '@onecoach/lib-core';
 const ACCESS_TOKEN_KEY = 'auth_access_token';
 const REFRESH_TOKEN_KEY = 'auth_refresh_token';
 const EXPIRES_AT_KEY = 'auth_expires_at';
@@ -21,7 +22,7 @@ async function securelySetItem(key, value) {
         }
     }
     catch (error) {
-        console.error('Error storing secure item', error);
+        logger.error('Error storing secure item', error);
         // Fallback to AsyncStorage
         await AsyncStorage.setItem(key, value);
     }
@@ -39,7 +40,7 @@ async function securelyGetItem(key) {
         }
     }
     catch (error) {
-        console.error('Error retrieving secure item', error);
+        logger.error('Error retrieving secure item', error);
         // Fallback to AsyncStorage
         return await AsyncStorage.getItem(key);
     }
@@ -57,7 +58,7 @@ async function securelyDeleteItem(key) {
         }
     }
     catch (error) {
-        console.error('Error deleting secure item', error);
+        logger.error('Error deleting secure item', error);
         // Fallback to AsyncStorage
         await AsyncStorage.removeItem(key);
     }
@@ -77,7 +78,7 @@ export async function saveSession(session) {
         ]);
     }
     catch (error) {
-        console.error('Error saving session data', error);
+        logger.error('Error saving session data', error);
         throw new Error('Failed to save session data');
     }
 }
@@ -105,7 +106,7 @@ export async function getSession() {
         };
     }
     catch (error) {
-        console.error('Error getting session', error);
+        logger.error('Error getting session', error);
         return null;
     }
 }
@@ -122,7 +123,7 @@ export async function clearSession() {
         ]);
     }
     catch (error) {
-        console.error('Error clearing session', error);
+        logger.error('Error clearing session', error);
         throw new Error('Failed to clear session data');
     }
 }
@@ -168,7 +169,7 @@ export async function updateAccessToken(accessToken, expiresAt) {
         ]);
     }
     catch (error) {
-        console.error('Error updating access token', error);
+        logger.error('Error updating access token', error);
         throw new Error('Failed to update access token');
     }
 }

@@ -21,6 +21,8 @@ export type UIMessage = AIUIMessage;
 // Re-export unified chat types
 export * from './unified-chat';
 
+import type { ChatConversation } from './conversation';
+
 // ============================================================================
 // Tool State (AI SDK v6 compatible)
 // ============================================================================
@@ -164,50 +166,8 @@ export interface ChatMessageMetadata {
   [key: string]: unknown;
 }
 
-// ============================================================================
-// Conversation Types
-// ============================================================================
-
-/**
- * Stato della conversazione.
- */
-export type ConversationStatus = 'active' | 'archived' | 'deleted';
-
-/**
- * Dominio della conversazione (per context routing).
- */
-export type ChatDomain =
-  | 'general'
-  | 'workout'
-  | 'nutrition'
-  | 'analytics'
-  | 'coach'
-  | 'marketplace'
-  | 'support';
-
-/**
- * Conversazione chat.
- */
-export interface ChatConversation {
-  /** ID univoco della conversazione */
-  id: string;
-  /** Titolo generato o custom */
-  title: string;
-  /** Anteprima dell'ultimo messaggio */
-  preview: string;
-  /** Data ultimo aggiornamento */
-  updatedAt: Date;
-  /** Data creazione */
-  createdAt?: Date;
-  /** Dominio della conversazione */
-  domain?: ChatDomain;
-  /** Stato della conversazione */
-  status?: ConversationStatus;
-  /** Numero messaggi */
-  messageCount?: number;
-  /** Metadati aggiuntivi */
-  metadata?: Record<string, unknown>;
-}
+// Re-export conversation types
+export * from './conversation';
 
 // ============================================================================
 // Chat Status Types (AI SDK v6)

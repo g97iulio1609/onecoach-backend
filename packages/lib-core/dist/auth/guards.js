@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from './session';
 import { isAdminRole, isSuperAdminRole } from './roles';
+import { logger } from '@onecoach/lib-core';
 /**
  * Guard per verificare autenticazione
  * Ritorna user se autenticato, altrimenti NextResponse con errore 401
@@ -17,7 +18,7 @@ export async function requireAuth() {
     }
     // Verifica che l'utente abbia un ID valido
     if (!user.id || typeof user.id !== 'string') {
-        console.error('[requireAuth] User object senza ID valido:', user);
+        logger.error('[requireAuth] User object senza ID valido:', user);
         return NextResponse.json({ error: 'Errore di autenticazione: sessione non valida' }, { status: 401 });
     }
     return user;

@@ -12,14 +12,18 @@ import { SetupIntentService } from './setup-intent.service';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import { getCreditsFromPriceId } from '@onecoach/constants/credit-packs';
 import { getSubscriptionPriceId } from '@onecoach/constants/subscription-prices';
-// TODO: Import these when they are available via interface or shared package
-// import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
-// import { OpenRouterSubkeyService } from '@onecoach/lib-ai/openrouter-subkey.service';
-// import { PromotionService } from '@onecoach/lib-marketplace/promotion.service';
+import { logger } from './logger.service';
 /**
  * Implementazione Subscription Service
  */
 export class SubscriptionService {
+    deps = {};
+    /**
+     * Inject external dependencies to resolve cyclic imports
+     */
+    setDependencies(deps) {
+        this.deps = { ...this.deps, ...deps };
+    }
     async createSetupIntent(userId, plan, promoCode, referralCode) {
         const metadata = { plan };
         if (promoCode)
@@ -144,13 +148,28 @@ export class SubscriptionService {
             throw new Error('Stripe Subscription ID missing');
         const stripe = await getStripe();
         const priceId = this.getPriceIdForPlan(plan);
-        // TODO: Handle proration logic properly based on plan upgrade/downgrade
         // Get current subscription item
         const currentSub = await stripe.subscriptions.retrieve(dbSub.stripeSubscriptionId);
         const itemId = currentSub.items.data[0]?.id;
         if (!itemId) {
             throw new Error('Subscription item non trovato per aggiornamento');
         }
+        // Determine if upgrade or downgrade based on plan tier
+        // SubscriptionPlan enum only has 'PLUS' and 'PRO'
+        const planTiers = {
+            PLUS: 1,
+            PRO: 2,
+        };
+        const currentTier = planTiers[subscription.plan] || 0;
+        const newTier = planTiers[plan] || 0;
+        const isUpgrade = newTier > currentTier;
+        const isDowngrade = newTier < currentTier;
+        // Handle proration: always create prorations for upgrades, always_invoice for downgrades
+        const prorationBehavior = isUpgrade
+            ? 'create_prorations'
+            : isDowngrade
+                ? 'always_invoice'
+                : 'create_prorations';
         return await stripe.subscriptions.update(dbSub.stripeSubscriptionId, {
             items: [
                 {
@@ -158,7 +177,7 @@ export class SubscriptionService {
                     price: priceId,
                 },
             ],
-            proration_behavior: 'create_prorations',
+            proration_behavior: prorationBehavior,
         });
     }
     async getActiveSubscription(userId) {
@@ -187,7 +206,7 @@ export class SubscriptionService {
         return session.url;
     }
     async handleWebhook(event) {
-        console.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
+        logger.warn(`[SubscriptionService] Handling webhook: ${event.type}`);
         const eventType = event.type;
         switch (eventType) {
             case 'payment_intent.succeeded': {
@@ -220,7 +239,7 @@ export class SubscriptionService {
                 break;
             }
             default: {
-                console.warn(`Unhandled event type: ${event.type}`);
+                logger.warn(`Unhandled event type: ${event.type}`);
             }
         }
     }
@@ -231,7 +250,7 @@ export class SubscriptionService {
         const userId = subscription.metadata?.userId;
         const plan = subscription.metadata?.plan;
         if (!userId || !plan) {
-            console.error('[Subscription] Missing userId or plan in metadata');
+            logger.error('[Subscription] Missing userId or plan in metadata');
             return;
         }
         await prisma.subscriptions.create({
@@ -256,8 +275,28 @@ export class SubscriptionService {
                 description: 'Crediti iniziali PLUS',
             });
         }
-        // TODO: Call AffiliateService.handlePostRegistration
-        // TODO: Call PromotionService/CreditService for bonus credits
+        // Handle affiliate referral if present
+        const referralCode = subscription.metadata?.referralCode;
+        if (referralCode && this.deps.affiliateService) {
+            await this.deps.affiliateService.handlePostRegistration({
+                userId,
+                referralCode,
+                now: new Date(),
+            });
+        }
+        // Handle promotion code if present
+        const promoCode = subscription.metadata?.promoCode;
+        if (promoCode && this.deps.promotionService) {
+            try {
+                const promotion = await this.deps.promotionService.getPromotionByCode(promoCode);
+                if (promotion && promotion.type === 'BONUS_CREDITS' && promotion.bonusCredits) {
+                    await this.deps.promotionService.applyBonusCredits(promotion.id, userId);
+                }
+            }
+            catch (error) {
+                logger.error('[Subscription] Error applying promotion:', error);
+            }
+        }
     }
     async handleSubscriptionUpdate(subscription) {
         const dbSubscription = await prisma.subscriptions.findUnique({
@@ -276,7 +315,12 @@ export class SubscriptionService {
                 },
             });
             if (newStatus === 'CANCELLED' || newStatus === 'EXPIRED') {
-                // TODO: Call AffiliateService.handleSubscriptionCancellation
+                if (dbSubscription.userId && this.deps.affiliateService) {
+                    await this.deps.affiliateService.handleSubscriptionCancellation({
+                        userId: dbSubscription.userId,
+                        occurredAt: new Date(),
+                    });
+                }
             }
         }
     }
@@ -288,7 +332,15 @@ export class SubscriptionService {
                 updatedAt: new Date(),
             },
         });
-        // TODO: Call AffiliateService.handleSubscriptionCancellation for all
+        const dbSubscriptions = await prisma.subscriptions.findMany({
+            where: { stripeSubscriptionId: subscription.id },
+        });
+        await Promise.all(dbSubscriptions
+            .filter((sub) => sub.userId && this.deps.affiliateService)
+            .map((sub) => this.deps.affiliateService.handleSubscriptionCancellation({
+            userId: sub.userId,
+            occurredAt: new Date(),
+        })));
     }
     async handleInvoicePaid(invoice) {
         const subscriptionId = invoice.subscription;
@@ -297,14 +349,26 @@ export class SubscriptionService {
         const subscription = await prisma.subscriptions.findFirst({
             where: { stripeSubscriptionId: subscriptionId },
         });
-        if (subscription && subscription.plan === 'PLUS') {
-            // Note: CreditService.renewMonthlyCredits might need to be implemented or exposed?
-            // It wasn't in the CreditService file I read.
-            // I'll leave it as TODO or implement manually
-            // await creditService.renewMonthlyCredits(subscription.userId);
+        if (subscription && subscription.plan === 'PLUS' && subscription.userId) {
+            // Rinnovo crediti mensili PLUS
+            await creditService.addCredits({
+                userId: subscription.userId,
+                amount: 500,
+                type: 'SUBSCRIPTION_RENEWAL',
+                description: 'Rinnovo crediti mensili PLUS',
+            });
         }
-        if (subscription && invoice.total) {
-            // TODO: Call AffiliateService.handleInvoicePaid
+        if (subscription && subscription.userId && invoice.total && this.deps.affiliateService) {
+            const totalAmountCents = invoice.total;
+            const currency = invoice.currency || 'usd';
+            await this.deps.affiliateService.handleInvoicePaid({
+                userId: subscription.userId,
+                stripeInvoiceId: invoice.id,
+                stripeSubscriptionId: subscriptionId,
+                totalAmountCents,
+                currency,
+                occurredAt: new Date(invoice.created * 1000),
+            });
         }
     }
     async handleInvoicePaymentFailed(invoice) {
@@ -326,7 +390,7 @@ export class SubscriptionService {
             return;
         const paymentType = paymentIntent.metadata?.type;
         if (paymentType === 'marketplace') {
-            // TODO: handleMarketplacePurchase (requires marketplace service)
+            await this.handleMarketplacePurchase(paymentIntent, eventId, userId);
             return;
         }
         // Credits logic
@@ -338,9 +402,30 @@ export class SubscriptionService {
             credits = getCreditsFromPriceId(paymentIntent.metadata.price_id) || 0;
         }
         if (credits > 0) {
-            // TODO: OpenRouterSubkeyService.createSubkey
             await prisma.$transaction(async (tx) => {
-                // TODO: Save subkey
+                // Create OpenRouter subkey for credits purchase
+                if (this.deps.openRouterSubkeyService) {
+                    try {
+                        const subkeyResult = await this.deps.openRouterSubkeyService.createSubkey({
+                            userId,
+                            credits,
+                            paymentIntentId: paymentIntent.id,
+                        });
+                        // Save subkey to database
+                        await this.deps.openRouterSubkeyService.saveSubkeyToDb({
+                            userId,
+                            provider: 'OPENROUTER',
+                            keyLabel: subkeyResult.keyLabel,
+                            keyHash: subkeyResult.keyHash,
+                            limit: subkeyResult.limit,
+                            stripePaymentIntentId: paymentIntent.id,
+                        }, tx);
+                    }
+                    catch (error) {
+                        logger.error('[Subscription] Error creating OpenRouter subkey:', error);
+                        // Continue with credit addition even if subkey creation fails
+                    }
+                }
                 await creditService.addCredits({
                     userId,
                     amount: credits,
@@ -369,8 +454,103 @@ export class SubscriptionService {
         }
     }
     async handlePaymentRefunded(refundData, eventId) {
-        // TODO: Implement refund logic
-        console.warn(`[Subscription] Refund handled`, { eventId, paymentIntentId: refundData.id });
+        const userId = refundData.metadata?.userId;
+        if (!userId) {
+            logger.warn('[Subscription] Refund without userId', { eventId, paymentIntentId: refundData.id });
+            return;
+        }
+        // Find payment record
+        const payment = await prisma.payments.findFirst({
+            where: {
+                stripePaymentIntentId: refundData.id,
+                userId,
+            },
+        });
+        if (!payment) {
+            logger.warn('[Subscription] Payment record not found for refund', {
+                eventId,
+                paymentIntentId: refundData.id,
+                userId,
+            });
+            return;
+        }
+        // Update payment status
+        await prisma.payments.update({
+            where: { id: payment.id },
+            data: {
+                status: 'REFUNDED',
+                updatedAt: new Date(),
+                metadata: {
+                    ...(payment.metadata || {}),
+                    refundEventId: eventId,
+                    refundedAt: new Date().toISOString(),
+                },
+            },
+        });
+        // If credits were added, remove them
+        if (payment.creditsAdded && payment.creditsAdded > 0) {
+            await creditService.consumeCredits({
+                userId,
+                amount: payment.creditsAdded,
+                type: 'REFUND',
+                description: `Rimborso per acquisto ${payment.creditsAdded} crediti`,
+                metadata: {
+                    originalPaymentId: payment.id,
+                    stripePaymentIntentId: refundData.id,
+                    refundEventId: eventId,
+                },
+            });
+        }
+        // Revoke OpenRouter subkey if exists
+        const apiKey = await prisma.user_api_keys.findFirst({
+            where: {
+                userId,
+                stripePaymentIntentId: refundData.id,
+                status: 'ACTIVE',
+                provider: 'OPENROUTER',
+            },
+        });
+        if (apiKey && this.deps.openRouterSubkeyService) {
+            try {
+                await this.deps.openRouterSubkeyService.revokeSubkey(apiKey.keyLabel);
+            }
+            catch (error) {
+                logger.error('[Subscription] Error revoking OpenRouter subkey:', error);
+            }
+        }
+    }
+    async handleMarketplacePurchase(paymentIntent, eventId, userId) {
+        const marketplacePlanId = paymentIntent.metadata?.marketplacePlanId;
+        if (!marketplacePlanId) {
+            logger.warn('[Subscription] Marketplace purchase without planId', {
+                eventId,
+                paymentIntentId: paymentIntent.id,
+                userId,
+            });
+            return;
+        }
+        // Find or create purchase record
+        let purchase = await prisma.plan_purchases.findFirst({
+            where: {
+                userId,
+                marketplacePlanId,
+                stripePaymentId: paymentIntent.id,
+            },
+        });
+        if (!purchase && this.deps.marketplaceService) {
+            // Create purchase record if it doesn't exist
+            purchase = await this.deps.marketplaceService.createPurchase({
+                userId,
+                marketplacePlanId,
+                stripePaymentId: paymentIntent.id,
+                price: paymentIntent.amount / 100, // Convert from cents to currency unit
+                currency: paymentIntent.currency || 'usd',
+            });
+        }
+        // Update purchase status to completed
+        if (purchase && this.deps.marketplaceService) {
+            await this.deps.marketplaceService.updatePurchaseStatus(purchase.id, 'COMPLETED');
+        }
     }
     mapStripeStatus(status) {
         switch (status) {

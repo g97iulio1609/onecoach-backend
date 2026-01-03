@@ -26,8 +26,12 @@ export interface OneAgendaImportResult extends BaseImportResult {
 /**
  * Service for importing OneAgenda data (projects, tasks, habits).
  * Extends BaseImportService for standardized workflow.
+ * 
+ * TAIRaw = ImportedOneAgenda (what AI returns)
+ * TParsed = ImportedOneAgenda (same, no transformation needed)
+ * TResult = OneAgendaImportResult
  */
-export class OneAgendaImportService extends BaseImportService<ImportedOneAgenda, OneAgendaImportResult> {
+export class OneAgendaImportService extends BaseImportService<ImportedOneAgenda, ImportedOneAgenda, OneAgendaImportResult> {
   protected getLoggerName(): string {
     return 'OneAgendaImport';
   }
@@ -82,10 +86,10 @@ Regole:
   }
 
   protected async persist(
-    processed: unknown,
+    processed: ImportedOneAgenda,
     userId: string
   ): Promise<Partial<OneAgendaImportResult>> {
-    const parseResult = processed as ImportedOneAgenda;
+    const parseResult = processed;
     const projectIds: string[] = [];
     const habitIds: string[] = [];
 
@@ -206,7 +210,7 @@ Regole:
   }
 }
 
-export function createOneAgendaAIContext(): AIParseContext<ImportedOneAgenda> {
+export function createOneAgendaAIContext(userId: string): AIParseContext<ImportedOneAgenda> {
   return {
     parseWithAI: (content: string, mimeType: string, prompt: string) =>
       parseWithVisionAI<ImportedOneAgenda>({
@@ -214,6 +218,8 @@ export function createOneAgendaAIContext(): AIParseContext<ImportedOneAgenda> {
         mimeType,
         prompt,
         schema: ImportedOneAgendaSchema,
+        userId,
+        fileType: mimeType.startsWith('image/') ? 'image' : mimeType === 'application/pdf' ? 'pdf' : 'document',
       }),
   };
 }

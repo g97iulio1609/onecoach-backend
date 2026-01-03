@@ -61,8 +61,17 @@ export function useLiveSessionSync(options: UseLiveSessionSyncOptions) {
 
   // Initialize session context on mount
   useEffect(() => {
+    // Debug logging to trace initialization
+    console.warn('[useLiveSessionSync] 🔍 Effect running with:', {
+      autoInitialize,
+      sessionId,
+      programId,
+      totalSets,
+      alreadyInitialized: initializedRef.current,
+    });
+
     if (autoInitialize && sessionId && programId && !initializedRef.current) {
-      logger.info('[useLiveSessionSync] 🚀 Initializing live session context', {
+      console.warn('[useLiveSessionSync] 🚀 Initializing live session context', {
         sessionId,
         programId,
         totalSets,
@@ -74,7 +83,7 @@ export function useLiveSessionSync(options: UseLiveSessionSyncOptions) {
     // Cleanup on unmount
     return () => {
       if (initializedRef.current) {
-        logger.info('[useLiveSessionSync] 🧹 Clearing live session context');
+        console.warn('[useLiveSessionSync] 🧹 Clearing live session context');
         clearLiveSession();
         initializedRef.current = false;
       }

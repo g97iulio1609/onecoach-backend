@@ -10,8 +10,8 @@
  */
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useRealtimeSubscription } from '@onecoach/lib-stores';
-import { useBodyMeasurementsStore } from '@onecoach/lib-stores';
+import { useRealtimeSubscription } from './realtime.hooks';
+import { useBodyMeasurementsStore } from './body-measurements.store';
 import type { BodyMeasurement } from '@onecoach/types';
 
 import { logger } from '@onecoach/lib-core';

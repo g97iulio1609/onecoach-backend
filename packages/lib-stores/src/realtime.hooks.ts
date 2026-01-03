@@ -546,16 +546,16 @@ const createRealtimeLogger = (context: string) => {
   return {
     log: (message: string, data?: unknown) => {
       if (process.env.NODE_ENV === 'development') {
-        logger.info(`[Realtime][${context}] ${message}`, data || '');
+        logger.info(`[Realtime][${context}] ${message}`, data !== undefined ? { data } : undefined);
       }
     },
     warn: (message: string, data?: unknown) => {
       if (process.env.NODE_ENV === 'development') {
-        logger.warn(`[Realtime][${context}] ${message}`, data || '');
+        logger.warn(`[Realtime][${context}] ${message}`, data !== undefined ? { data } : undefined);
       }
     },
     error: (message: string, error?: unknown) => {
-      logger.error(`[Realtime][${context}] ${message}`, error || '');
+      logger.error(`[Realtime][${context}] ${message}`, error);
     },
   };
 };

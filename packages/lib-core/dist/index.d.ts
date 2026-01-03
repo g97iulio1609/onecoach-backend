@@ -32,4 +32,7 @@ export * from './setup-intent.service';
 export * from './edge-config.service';
 export * from './iap-verification.server';
 export * from './direct-messaging.service';
+export * from './logger.service';
 export * from './types/safe-types';
+export * from './ai/provider-factory';
+export * from './config/env';

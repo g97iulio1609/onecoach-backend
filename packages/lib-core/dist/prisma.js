@@ -12,6 +12,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { logger } from './logger.service';
 const globalForPrisma = globalThis;
 // Prisma 7: Il client legge DATABASE_URL direttamente da process.env
 // Assicuriamoci che sia impostato prima di creare il client
@@ -23,7 +24,7 @@ const ensureDatabaseUrl = () => {
     if (!process.env.DATABASE_URL && !process.env.DIRECT_URL) {
         if (process.env.NODE_ENV === 'development') {
             const fallback = 'postgresql://postgres:postgres@localhost:5432/postgres?schema=public';
-            console.warn('[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found!', '\n  Using fallback:', fallback, '\n  To fix: Configure DATABASE_URL in .env.local or .env');
+            logger.warn(`[Prisma] ⚠️  No DATABASE_URL or DIRECT_URL found! Using fallback. To fix: Configure DATABASE_URL in .env.local or .env`);
             process.env.DATABASE_URL = fallback;
         }
         else {
@@ -80,6 +81,16 @@ function getPrismaClient() {
         const defaultPoolSize = isServerless ? 2 : 10;
         const connectionTimeoutMillis = Number(process.env.PG_CONNECTION_TIMEOUT_MS ?? 30000);
         const idleTimeoutMillis = Number(process.env.PG_IDLE_TIMEOUT_MS ?? 30000);
+        // Log connection pool info only once per process (avoid spam during hot reloads)
+        if (process.env.NODE_ENV === 'development' && !globalForPrisma.prismaInitLogged) {
+            globalForPrisma.prismaInitLogged = true;
+            logger.debug('[Prisma] Connection pool initialized:', {
+                max: Number(process.env.PG_POOL_MAX ?? defaultPoolSize),
+                connectionTimeoutMillis,
+                idleTimeoutMillis,
+                isServerless: !!isServerless,
+            });
+        }
         // Reuse a single Pool across hot reloads to avoid exhausting connections
         const pool = globalForPrisma.pool ??
             new Pool({
@@ -110,10 +121,38 @@ function getPrismaClient() {
     }
     return globalForPrisma.prisma_updated;
 }
-// Export con Proxy per lazy initialization
+// =============================================================================
+// EXPORTS
+// =============================================================================
+// IMPORTANTE: Prisma 7 con driver adapter richiede che il PrismaClient sia
+// inizializzato LAZY, cioè solo quando viene effettivamente usato.
+// Questo è necessario perché:
+// 1. Le variabili d'ambiente potrebbero non essere caricate al momento dell'import
+// 2. Il singleton deve essere condiviso correttamente tra hot reloads
+// 3. I model accessors (es. 'generation_states') sono getters sul prototype
+// Singleton cache nel modulo
+let _prismaInstance;
+/**
+ * Get the singleton PrismaClient instance.
+ * Creates the client on first call, then reuses it.
+ */
+export function getPrisma() {
+    if (!_prismaInstance) {
+        _prismaInstance = getPrismaClient();
+    }
+    return _prismaInstance;
+}
+/**
+ * Prisma client getter - LAZY initialization.
+ * Uses a getter function to defer client creation until first access.
+ *
+ * @example
+ * import { prisma } from '@onecoach/lib-core';
+ * const users = await prisma.users.findMany(); // Client created here
+ */
 export const prisma = new Proxy({}, {
     get(_target, prop) {
-        const client = getPrismaClient();
+        const client = getPrisma();
         const value = client[prop];
         if (typeof value === 'function') {
             return value.bind(client);
@@ -122,6 +161,10 @@ export const prisma = new Proxy({}, {
     },
 });
 export async function disconnectPrisma() {
+    if (_prismaInstance) {
+        await _prismaInstance.$disconnect();
+        _prismaInstance = undefined;
+    }
     if (globalForPrisma.prisma_updated) {
         await globalForPrisma.prisma_updated.$disconnect();
         globalForPrisma.prisma_updated = undefined;
@@ -131,3 +174,5 @@ export async function disconnectPrisma() {
         globalForPrisma.pool = undefined;
     }
 }
+// Re-export Prisma types so consumers don't need @prisma/client dependency
+export { Prisma } from '@prisma/client';

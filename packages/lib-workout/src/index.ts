@@ -20,11 +20,17 @@ export * from './services/workout-statistics.service';
 export * from './services/workout-progression.service';
 export * from './services/progression-template.service';
 export * from './services/granular-session.service';
+export * from './services/workout-vision.service';
 
 // Schemas
 export * from './schemas/imported-workout.schema';
 
 export type { ImportProgress, AIParseContext } from '@onecoach/lib-import-core';
 export { SUPPORTED_MIME_TYPES, IMPORT_LIMITS, ImportFileSchema, ImportOptionsSchema } from '@onecoach/lib-import-core';
+
+// Type-safe AIParseContext for workout domain
+import type { AIParseContext as GenericAIParseContext } from '@onecoach/lib-import-core';
+import type { ImportedWorkoutProgram } from './schemas/imported-workout.schema';
+export type WorkoutAIParseContext = GenericAIParseContext<ImportedWorkoutProgram>;
 export { WorkoutImportService, type WorkoutImportResult, type WorkoutImportResult as ImportResult } from './services/workout-import.service';
 

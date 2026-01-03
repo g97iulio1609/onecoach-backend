@@ -1,7 +1,3 @@
-/**
- * In-App Purchase Receipt Verification
- * Handles verification for both iOS (Apple) and Android (Google Play)
- */
 export interface VerificationResult {
     valid: boolean;
     subscription?: {

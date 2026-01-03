@@ -7,6 +7,7 @@
 import { prisma } from './prisma';
 import { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/id-generator';
+import { logger } from '@onecoach/lib-core';
 function sanitizeStringArray(values) {
     if (!values || values.length === 0) {
         return [];
@@ -35,7 +36,7 @@ function serializeProfile(profile) {
             }
         }
         catch (error) {
-            console.warn('Error converting weightKg to number:', error);
+            logger.warn('Error converting weightKg to number:', { error });
             weightKgValue = null;
         }
     }
@@ -68,6 +69,7 @@ export class UserProfileService {
                     createdAt: true,
                     updatedAt: true,
                     weightUnit: true,
+                    weightIncrement: true,
                     workoutGoals: true,
                     nutritionGoals: true,
                 },
@@ -100,6 +102,7 @@ export class UserProfileService {
                     createdAt: true,
                     updatedAt: true,
                     weightUnit: true,
+                    weightIncrement: true,
                     workoutGoals: true,
                     nutritionGoals: true,
                 },
@@ -107,10 +110,10 @@ export class UserProfileService {
             return newProfile;
         }
         catch (error) {
-            console.error('[UserProfileService.getOrCreate]', error);
+            logger.error('[UserProfileService.getOrCreate]', error);
             if (error instanceof Error) {
-                console.error('[UserProfileService.getOrCreate] Error message:', error.message);
-                console.error('[UserProfileService.getOrCreate] Error stack:', error.stack);
+                logger.error('[UserProfileService.getOrCreate] Error message:', error.message);
+                logger.error('[UserProfileService.getOrCreate] Error stack:', error.stack);
             }
             throw error;
         }
@@ -120,13 +123,13 @@ export class UserProfileService {
             const profile = await this.getOrCreate(userId);
             const serialized = serializeProfile(profile);
             if (!serialized) {
-                console.error('[UserProfileService.getSerialized] Serialization returned null');
+                logger.error('[UserProfileService.getSerialized] Serialization returned null');
                 throw new Error('Impossibile serializzare il profilo');
             }
             return serialized;
         }
         catch (error) {
-            console.error('[UserProfileService.getSerialized]', error);
+            logger.error('[UserProfileService.getSerialized]', error);
             throw error;
         }
     }
@@ -149,6 +152,9 @@ export class UserProfileService {
             }
             if (input.weightUnit !== undefined && input.weightUnit !== null) {
                 updateData.weightUnit = input.weightUnit;
+            }
+            if (input.weightIncrement !== undefined) {
+                updateData.weightIncrement = input.weightIncrement !== null ? input.weightIncrement : null;
             }
             if (input.activityLevel !== undefined) {
                 updateData.activityLevel = input.activityLevel !== null ? input.activityLevel : null;
@@ -188,10 +194,10 @@ export class UserProfileService {
             return updated;
         }
         catch (error) {
-            console.error('[UserProfileService.update]', error);
+            logger.error('[UserProfileService.update]', error);
             if (error instanceof Error) {
-                console.error('[UserProfileService.update] Error message:', error.message);
-                console.error('[UserProfileService.update] Error stack:', error.stack);
+                logger.error('[UserProfileService.update] Error message:', error.message);
+                logger.error('[UserProfileService.update] Error stack:', error.stack);
             }
             throw error;
         }

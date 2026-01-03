@@ -16,10 +16,8 @@ import { resolveFoodReferences } from '@onecoach/lib-nutrition/helpers/plan-serv
 import {
   buildUserProfileData,
   USER_PROFILE_SELECT,
-  type UserProfileData,
 } from './user-profile-builder';
 import { userMemoryService } from '@onecoach/lib-core';
-import type { NutritionPlan } from '@onecoach/types';
 import type { WorkoutProgram } from '@onecoach/types';
 
 const CHAT_CONSTANTS = {
@@ -29,91 +27,7 @@ const CHAT_CONSTANTS = {
 /**
  * Recent exercise structure for context
  */
-export interface RecentExercise {
-  id: string;
-  slug: string;
-  name: string;
-  muscles: Array<{
-    id: string;
-    name: string;
-    role: string;
-  }>;
-  equipment: Array<{
-    id: string;
-    name: string;
-  }>;
-}
-
-export interface CopilotContext {
-  currentPlan?: NutritionPlan | WorkoutProgram;
-  userProfile: UserProfileData;
-  recentPlans?: NutritionPlan[];
-  recentPrograms?: WorkoutProgram[];
-  recentExercises?: RecentExercise[];
-  // User memory for personalization
-  userMemory?: {
-    patterns: Array<{
-      type: string;
-      description: string;
-      confidence: number;
-      suggestions?: string[];
-    }>;
-    insights: Array<{
-      category: string;
-      insight: string;
-      basedOn: string;
-      confidence: number;
-    }>;
-    recommendations: Array<{
-      type: string;
-      message: string;
-      priority: number;
-    }>;
-  };
-  // Analytics-specific properties (optional, only present when built from buildAnalyticsContext)
-  latestBodyMeasurement?: unknown;
-  currentSnapshot?: unknown;
-  recentWorkoutSessions?: Array<{
-    id: string;
-    programId: string;
-    weekNumber: number;
-    dayNumber: number;
-    startedAt: string;
-    completedAt: string | null;
-    completed: boolean;
-  }>;
-  recentNutritionLogs?: Array<{
-    id: string;
-    planId: string;
-    date: string;
-    weekNumber: number;
-    dayNumber: number;
-    actualDailyMacros: unknown;
-    waterIntake: number | null;
-  }>;
-  activeGoals?: unknown[];
-  activeNutritionPlan?: {
-    id: string;
-    name: string;
-    goals: string[];
-    targetMacros: unknown;
-    durationWeeks: number;
-  } | null;
-  activeWorkoutProgram?: {
-    id: string;
-    name: string;
-    goals: string[];
-    difficulty: string;
-    durationWeeks: number;
-  } | null;
-  metadata: {
-    planVersion?: number;
-    planCreatedAt?: string;
-    planUpdatedAt?: string;
-    contextType?: string;
-    timestamp?: string;
-  };
-}
+import type { CopilotContext } from './types';
 
 /**
  * Costruisce il contesto per il copilot nutrizionale

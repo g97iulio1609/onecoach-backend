@@ -28,6 +28,7 @@ interface CopilotCapabilities {
   canChat: boolean;
   canUseCamera: boolean;
   canAccessHealth: boolean;
+  canCoach?: boolean; // NEW: for live workout coaching
   suggestedPrompts?: string[];
 }
 import { buildNutritionContext, buildWorkoutContext, buildChatContext } from './context-builder';
@@ -299,6 +300,38 @@ class ScreenContextRegistry {
               'Crea un piano nutrizionale',
               'Genera un programma di allenamento',
               'Consigli su alimentazione',
+            ],
+          },
+        };
+      },
+    });
+
+    // Live Workout Session - Real-time coaching
+    this.register({
+      screen: 'workout_session',
+      domain: 'workout',
+      pattern: /^\/workout\/session\/([^/]+)$/,
+      builder: async (userId: string, params?: Record<string, unknown>) => {
+        const sessionId = params?.sessionId as string;
+        // Use chat context - live session data comes from LiveSessionContext store
+        const context = await buildChatContext(userId);
+        return {
+          context: {
+            ...context,
+            sessionId,
+            isLiveSession: true,
+          } as unknown as Record<string, unknown>,
+          capabilities: {
+            ...DEFAULT_CAPABILITIES,
+            canModify: false, // No structural modifications during live session
+            canAnalyze: true,
+            canChat: true,
+            canCoach: true, // New capability for live coaching
+            suggestedPrompts: [
+              'Come sta andando questo esercizio?',
+              'Suggeriscimi il peso per il prossimo set',
+              'Quanto riposo mi serve?',
+              'Posso aumentare il carico?',
             ],
           },
         };

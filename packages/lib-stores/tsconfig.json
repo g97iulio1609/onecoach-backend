@@ -9,7 +9,8 @@
   },
   "references": [
     { "path": "../lib-core" },
-    { "path": "../../../onecoach-shared/packages/types" }
+    { "path": "../../../onecoach-shared/packages/types" },
+    { "path": "../../../onecoach-shared/packages/constants" }
   ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

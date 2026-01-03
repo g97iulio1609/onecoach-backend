@@ -719,9 +719,9 @@ export function UnifiedChat({
                   <div className="h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-600" />
                 </div>
 
-                <div className="flex max-h-[calc(85vh-3rem)] flex-col">
+                <div className="flex max-h-[calc(85vh-3rem)] flex-col overflow-hidden">
                   {renderHeader()}
-                  <div className="flex-1 overflow-y-auto bg-neutral-50 dark:bg-neutral-950">
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-neutral-50 dark:bg-neutral-950">
                     {renderMessages()}
                   </div>
                   {renderInput()}
@@ -813,9 +813,9 @@ export function UnifiedChat({
               <div className="h-1.5 w-12 rounded-full bg-neutral-300 dark:bg-neutral-600" />
             </div>
 
-            <div className="flex max-h-[calc(85vh-3rem)] flex-col">
+            <div className="flex max-h-[calc(85vh-3rem)] flex-col overflow-hidden">
               {renderHeader()}
-              <div className="flex-1 overflow-y-auto bg-neutral-50 dark:bg-neutral-950">
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-neutral-50 dark:bg-neutral-950">
                 {renderMessages()}
               </div>
               {renderInput()}

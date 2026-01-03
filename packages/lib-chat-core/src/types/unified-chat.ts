@@ -7,7 +7,7 @@
 
 import type { ReactNode } from 'react';
 import type { UIMessage } from '@ai-sdk/react';
-import type { ChatConversation } from './index';
+import type { ChatConversation } from './conversation';
 
 // ============================================================================
 // Screen Context Types

@@ -7,8 +7,8 @@
  * @module lib-body-measurements/services/body-measurements-import.service
  */
 
-import { BaseImportService } from '@onecoach/lib-import-core/base-import.service';
-import type { ImportOptions, BaseImportResult } from '@onecoach/lib-import-core/types';
+import { BaseImportService } from '@onecoach/lib-import-core';
+import type { ImportOptions, BaseImportResult } from '@onecoach/lib-import-core';
 import { prisma } from '@onecoach/lib-core/prisma';
 import type { ImportedBodyMeasurements, ImportedMeasurement } from '../schemas/imported-body-measurements.schema';
 
@@ -16,7 +16,7 @@ export interface BodyMeasurementsImportResult extends BaseImportResult {
   measurementsImported: number;
 }
 
-export class BodyMeasurementsImportService extends BaseImportService<ImportedBodyMeasurements, BodyMeasurementsImportResult> {
+export class BodyMeasurementsImportService extends BaseImportService<ImportedBodyMeasurements, ImportedMeasurement[], BodyMeasurementsImportResult> {
   protected getLoggerName(): string {
     return 'BodyMeasurementsImport';
   }

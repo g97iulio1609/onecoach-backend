@@ -5,8 +5,9 @@
  * Converte il contenuto in ImportedWorkoutProgram standardizzato.
  *
  * @module lib-workout/services/file-parser
- */import { logger } from '@onecoach/lib-core';
-
+ */
+import { logger } from '@onecoach/lib-core';
+import type { AIParseContext } from '@onecoach/lib-import-core';
 
 import {
   ImportedWorkoutProgramSchema,
@@ -56,18 +57,6 @@ export interface FileParseResult {
   fileType: string;
   /** Nome del file */
   fileName: string;
-}
-
-/**
- * Contesto per il parsing AI (immagini e documenti)
- */
-export interface AIParseContext {
-  /** Chiama l'AI per estrarre dati strutturati */
-  parseWithAI: (
-    content: string,
-    mimeType: string,
-    prompt: string
-  ) => Promise<ImportedWorkoutProgram>;
 }
 
 /**

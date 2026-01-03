@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-import { logger } from '@onecoach/lib-core';
+import { logger } from '@onecoach/lib-shared/utils/logger';
 /**
  * Session data stored securely
  */

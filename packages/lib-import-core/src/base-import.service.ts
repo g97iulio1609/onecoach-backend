@@ -21,8 +21,6 @@ import type {
 import { IMPORT_LIMITS } from './types';
 import { createMimeRouter } from './mime-router';
 
-// ==================== ABSTRACT BASE CLASS ====================
-
 /**
  * Abstract base class for domain-specific import services.
  *
@@ -30,26 +28,33 @@ import { createMimeRouter } from './mime-router';
  * - Shared logic: validation, parsing orchestration, progress emission
  * - Abstract methods: domain-specific prompt, processing, persistence
  *
- * @template TParsed - The parsed AI output type
+ * @template TAIRaw - The raw type returned by AI parsing (what parseWithAI returns)
+ * @template TParsed - The internal parsed/wrapped data type after processing (defaults to TAIRaw)
  * @template TResult - The final import result type
+ *
+ * For most services, TAIRaw and TParsed are the same type. Use different types only when
+ * you need to wrap the raw AI output in a richer structure (e.g., adding warnings/stats).
  *
  * @example
  * ```typescript
- * class NutritionImportService extends BaseImportService<ImportedNutritionPlan, NutritionImportResult> {
- *   protected buildPrompt(): string { ... }
- *   protected async processParsed(parsed, userId): Promise<ProcessedPlan> { ... }
- *   protected async persist(processed, userId): Promise<Partial<NutritionImportResult>> { ... }
- *   protected createErrorResult(errors): Partial<NutritionImportResult> { ... }
+ * // Simple case: TAIRaw = TParsed
+ * class NutritionImportService extends BaseImportService<ImportedNutritionPlan, ImportedNutritionPlan, NutritionImportResult> {
+ *   // processParsed receives ImportedNutritionPlan, returns ImportedNutritionPlan
+ * }
+ *
+ * // Advanced case: TAIRaw !== TParsed
+ * class WorkoutImportService extends BaseImportService<ImportedWorkoutProgram, ParsedWorkoutData, WorkoutImportResult> {
+ *   // processParsed receives ImportedWorkoutProgram, returns ParsedWorkoutData
  * }
  * ```
  */
-export abstract class BaseImportService<TParsed, TResult extends BaseImportResult> {
-    protected readonly aiContext: AIParseContext<TParsed>;
+export abstract class BaseImportService<TAIRaw extends object, TParsed extends object = TAIRaw, TResult extends BaseImportResult = BaseImportResult> {
+    protected readonly aiContext: AIParseContext<TAIRaw>;
     protected readonly onProgress?: (progress: ImportProgress) => void;
     protected readonly context: ImportContext;
     protected readonly logger;
 
-    constructor(config: ImportServiceConfig<TParsed>) {
+    constructor(config: ImportServiceConfig<TAIRaw>) {
         this.aiContext = config.aiContext;
         this.onProgress = config.onProgress;
         this.context = config.context;
@@ -63,8 +68,8 @@ export abstract class BaseImportService<TParsed, TResult extends BaseImportResul
      *
      * Steps:
      * 1. Validate files (shared)
-     * 2. Parse with AI (shared routing, domain prompt)
-     * 3. Process parsed data (domain-specific)
+     * 2. Parse with AI (shared routing, domain prompt) -> TAIRaw
+     * 3. Process parsed data (domain-specific) -> TParsed
      * 4. Persist to database (domain-specific)
      */
     async import(
@@ -79,26 +84,26 @@ export abstract class BaseImportService<TParsed, TResult extends BaseImportResul
             // Step 1: Validation
             this.emit({
                 step: 'validating',
-                message: 'Validazione file in corso...',
-                progress: 0,
+                message: 'Validazione files...',
+                progress: 0.1,
             });
             this.validateFiles(files);
 
-            // Step 2: Parsing
+            // Step 2: Parsing with AI -> returns TAIRaw
             this.emit({
                 step: 'parsing',
                 message: 'Parsing con AI...',
                 progress: 0.25,
             });
-            const parsed = await this.parseFiles(files, options);
+            const rawParsed = await this.parseFiles(files, options);
 
-            // Step 3: Domain-specific processing
+            // Step 3: Processing -> transforms TAIRaw to TParsed
             this.emit({
                 step: 'matching',
                 message: 'Elaborazione dati...',
                 progress: 0.5,
             });
-            const processed = await this.processParsed(parsed, userId, options);
+            const processed = await this.processParsed(rawParsed, userId, options);
 
             // Step 4: Persistence
             this.emit({
@@ -131,64 +136,83 @@ export abstract class BaseImportService<TParsed, TResult extends BaseImportResul
                 progress: 0,
             });
 
-            return this.createErrorResult(errors) as TResult;
+            return {
+                ...this.createErrorResult(errors),
+                success: false,
+                errors,
+            } as TResult;
         }
     }
 
-    // ==================== SHARED IMPLEMENTATIONS ====================
+    // ==================== ABSTRACT METHODS ====================
+
+    /** Get logger name for this service */
+    protected abstract getLoggerName(): string;
+
+    /** Build the AI prompt for parsing */
+    protected abstract buildPrompt(options?: Partial<ImportOptions>): string;
 
     /**
-     * Emit progress update
+     * Process the raw parsed AI data (domain-specific transformations)
+     * Transforms TAIRaw -> TParsed
      */
-    protected emit(progress: Partial<ImportProgress> & { step: ImportProgressStep; message: string }): void {
-        if (this.onProgress) {
-            this.onProgress({
-                step: progress.step,
-                message: progress.message,
-                progress: progress.progress,
-                stepNumber: progress.stepNumber,
-                totalSteps: progress.totalSteps,
-                metadata: progress.metadata,
-            });
-        }
-    }
+    protected abstract processParsed(
+        parsed: TAIRaw,
+        userId: string,
+        options?: Partial<ImportOptions>
+    ): Promise<TParsed>;
 
     /**
-     * Validate files against common limits
+     * Persist the processed data to database
+     */
+    protected abstract persist(
+        processed: TParsed,
+        userId: string
+    ): Promise<Partial<TResult>>;
+
+    /**
+     * Create an error result for failures
+     */
+    protected abstract createErrorResult(errors: string[]): Partial<TResult>;
+
+    // ==================== SHARED LOGIC ====================
+
+    /**
+     * Validate files before processing
      */
     protected validateFiles(files: ImportFile[]): void {
         if (!files || files.length === 0) {
-            throw new Error('Almeno un file richiesto');
+            throw new Error('Nessun file fornito');
         }
 
         if (files.length > IMPORT_LIMITS.MAX_FILES) {
-            throw new Error(`Massimo ${IMPORT_LIMITS.MAX_FILES} file consentiti`);
+            throw new Error(`Massimo ${IMPORT_LIMITS.MAX_FILES} files permessi`);
         }
 
         for (const file of files) {
-            if (file.size && file.size > IMPORT_LIMITS.MAX_FILE_SIZE) {
-                const maxMB = Math.round(IMPORT_LIMITS.MAX_FILE_SIZE / (1024 * 1024));
-                throw new Error(`File troppo grande: ${file.name} (max ${maxMB}MB)`);
+            if (file.content.length > IMPORT_LIMITS.MAX_FILE_SIZE) {
+                throw new Error(`File ${file.name} supera il limite di ${IMPORT_LIMITS.MAX_FILE_SIZE / 1024 / 1024}MB`);
             }
         }
     }
 
     /**
      * Parse files using AI with MIME routing
+     * @returns TAIRaw - the raw AI output
      */
     protected async parseFiles(
         files: ImportFile[],
         options?: Partial<ImportOptions>
-    ): Promise<TParsed> {
+    ): Promise<TAIRaw> {
         const prompt = this.buildPrompt(options);
 
         // Create unified handler that uses AI context
-        const handler = async (content: string, mimeType: string): Promise<TParsed> => {
+        const handler = async (content: string, mimeType: string): Promise<TAIRaw> => {
             return this.aiContext.parseWithAI(content, mimeType, prompt);
         };
 
-        // Build MIME router
-        const router = createMimeRouter<TParsed>({
+        // Build MIME router with TAIRaw type
+        const router = createMimeRouter<TAIRaw>({
             image: handler,
             pdf: handler,
             spreadsheet: handler,
@@ -199,52 +223,17 @@ export abstract class BaseImportService<TParsed, TResult extends BaseImportResul
         // Parse first file (multi-file support can be added per-domain)
         const file = files[0];
         if (!file) {
-            throw new Error('Nessun file valido fornito');
+            throw new Error('Nessun file valido da processare');
         }
 
-        return router(file.content, file.mimeType || 'application/octet-stream');
+        const mimeType = file.mimeType || 'application/octet-stream';
+        return router(file.content, mimeType);
     }
 
-    // ==================== ABSTRACT METHODS (Domain-specific) ====================
-
     /**
-     * Get logger name for this domain
+     * Emit progress update
      */
-    protected abstract getLoggerName(): string;
-
-    /**
-     * Build the AI prompt for this domain
-     */
-    protected abstract buildPrompt(options?: Partial<ImportOptions>): string;
-
-    /**
-     * Process parsed data (matching, normalization, transformation)
-     *
-     * @param parsed - Raw AI output
-     * @param userId - User ID
-     * @param options - Import options
-     * @returns Processed data ready for persistence
-     */
-    protected abstract processParsed(
-        parsed: TParsed,
-        userId: string,
-        options?: Partial<ImportOptions>
-    ): Promise<unknown>;
-
-    /**
-     * Persist processed data to database
-     *
-     * @param processed - Processed data from processParsed
-     * @param userId - User ID
-     * @returns Partial result with domain-specific IDs/data
-     */
-    protected abstract persist(
-        processed: unknown,
-        userId: string
-    ): Promise<Partial<TResult>>;
-
-    /**
-     * Create error result with domain-specific shape
-     */
-    protected abstract createErrorResult(errors: string[]): Partial<TResult>;
+    protected emit(progress: { step: ImportProgressStep; message: string; progress: number }): void {
+        this.onProgress?.(progress);
+    }
 }

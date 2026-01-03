@@ -35,7 +35,11 @@ export type ImportProgress = {
   metadata?: Record<string, unknown>;
 };
 
-export type AIParseContext<TParsed = unknown> = {
+/**
+ * AI Parse Context interface for domain-specific AI parsing.
+ * @template TParsed - The parsed output type (must be an object to support spread)
+ */
+export type AIParseContext<TParsed extends object = Record<string, unknown>> = {
   parseWithAI: (content: string, mimeType: string, prompt: string) => Promise<TParsed>;
 };
 
@@ -49,13 +53,25 @@ export type MimeRouterHandlers<TParsed> = {
   fallback?: MimeHandler<TParsed>;
 };
 
+export type ImportFileType = 'image' | 'pdf' | 'document' | 'spreadsheet';
+
 export type VisionParseParams<T> = {
   contentBase64: string;
   mimeType: string;
   prompt: string;
   schema: z.ZodSchema<T>;
+  /** User ID for credit handling */
+  userId: string;
+  /** File type for model selection and credit cost */
+  fileType: ImportFileType;
+  /** Override model ID (optional, uses config if not provided) */
   modelId?: string;
+  /** Override API key (optional, uses config if not provided) */
   apiKey?: string;
+  /** Custom credit cost (optional, uses config if not provided) */
+  creditCost?: number;
+  /** Progress callback for streaming updates */
+  onProgress?: (message: string, progress: number) => void;
 };
 
 export const IMPORT_LIMITS = {
@@ -101,10 +117,11 @@ export interface BaseImportResult {
 
 /**
  * Configuration for import services
+ * @template TAIRaw - The raw type returned by AI parsing (must be an object)
  */
-export interface ImportServiceConfig<TParsed> {
+export interface ImportServiceConfig<TAIRaw extends object> {
   /** AI context for parsing files */
-  aiContext: AIParseContext<TParsed>;
+  aiContext: AIParseContext<TAIRaw>;
   /** Optional progress callback */
   onProgress?: (progress: ImportProgress) => void;
   /** Request context for logging */

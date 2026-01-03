@@ -5,6 +5,7 @@
   "scripts": {
     "type-check": "pnpm -r type-check",
     "lint": "pnpm -r lint",
+    "lint:circular": "npx -y madge --circular --extensions ts,tsx packages/*/src",
     "test": "pnpm -r test"
   }
 }

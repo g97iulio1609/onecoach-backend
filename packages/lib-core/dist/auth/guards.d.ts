@@ -8,21 +8,21 @@ import { NextResponse } from 'next/server';
  * Guard per verificare autenticazione
  * Ritorna user se autenticato, altrimenti NextResponse con errore 401
  */
-export declare function requireAuth(): Promise<import("./session").AuthenticatedUser | NextResponse<{
+export declare function requireAuth(): Promise<import("@onecoach/lib-core").AuthenticatedUser | NextResponse<{
     error: string;
 }>>;
 /**
  * Guard per verificare che l'utente sia admin o super admin
  * Ritorna user se admin/super admin, altrimenti NextResponse con errore 403
  */
-export declare function requireAdmin(): Promise<import("./session").AuthenticatedUser | NextResponse<{
+export declare function requireAdmin(): Promise<import("@onecoach/lib-core").AuthenticatedUser | NextResponse<{
     error: string;
 }>>;
 /**
  * Guard per verificare che l'utente sia super admin
  * Ritorna user se super admin, altrimenti NextResponse con errore 403
  */
-export declare function requireSuperAdmin(): Promise<import("./session").AuthenticatedUser | NextResponse<{
+export declare function requireSuperAdmin(): Promise<import("@onecoach/lib-core").AuthenticatedUser | NextResponse<{
     error: string;
 }>>;
 /**
@@ -33,7 +33,7 @@ export declare function canAccessResource(resourceUserId: string): Promise<boole
 /**
  * Guard che verifica se l'utente può accedere alla risorsa
  */
-export declare function requireResourceAccess(resourceUserId: string): Promise<import("./session").AuthenticatedUser | NextResponse<{
+export declare function requireResourceAccess(resourceUserId: string): Promise<import("@onecoach/lib-core").AuthenticatedUser | NextResponse<{
     error: string;
 }>>;
 /**

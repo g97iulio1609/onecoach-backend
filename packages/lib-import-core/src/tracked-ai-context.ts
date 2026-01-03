@@ -33,7 +33,7 @@ export interface TrackedAIContextOptions {
  *   { requestId, userId, loggerPrefix: 'WorkoutImportAI' }
  * );
  */
-export function createTrackedAIContext<T>(
+export function createTrackedAIContext<T extends object>(
   delegate: AIParseContext<T>,
   options: TrackedAIContextOptions
 ): AIParseContext<T> {

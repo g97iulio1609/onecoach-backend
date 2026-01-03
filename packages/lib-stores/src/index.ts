@@ -265,13 +265,17 @@ export {
   bodyMeasurementsKeys,
 } from './body-measurements.hooks';
 
-// Copilot Active Context Store (Event-driven context for AI tools)
 export {
   useCopilotActiveContextStore,
   selectActiveDomain,
   selectWorkoutContext as selectActiveWorkoutContext,
   selectNutritionContext as selectActiveNutritionContext,
   selectOneAgendaContext as selectActiveOneAgendaContext,
+  selectLiveSessionContext,
+  selectLiveSessionStatus,
+  selectLiveSessionProgress,
+  selectLastCompletedSet,
+  selectRestTimerState,
   selectSelectedExercise,
   selectSelectedSetGroup,
   selectSelectedMeal,
@@ -290,6 +294,11 @@ export type {
   WorkoutActiveContext,
   NutritionActiveContext,
   OneAgendaActiveContext,
+  LiveSessionContext,
   ActiveDomain,
   CopilotActiveContextStore,
 } from './copilot-active-context.store';
+
+// Live Session Sync Hook
+export { useLiveSessionSync } from './hooks/useLiveSessionSync';
+export type { UseLiveSessionSyncOptions, LiveSessionSetData } from './hooks/useLiveSessionSync';

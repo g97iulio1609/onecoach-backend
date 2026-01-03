@@ -7,7 +7,7 @@
 
 import { prisma } from '@onecoach/lib-core/prisma';
 import { buildUserProfileData, USER_PROFILE_SELECT } from './user-profile-builder';
-import type { CopilotContext } from './context-builder';
+import type { CopilotContext } from './types';
 
 const CHAT_CONSTANTS = {
   RECENT_ITEMS_TAKE: 3,

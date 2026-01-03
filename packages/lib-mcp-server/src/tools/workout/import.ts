@@ -15,10 +15,9 @@ import {
   ImportOptionsSchema,
   IMPORT_LIMITS,
   SUPPORTED_MIME_TYPES,
+  WorkoutVisionService,
   type ImportProgress,
-  type AIParseContext,
 } from '@onecoach/lib-workout';
-import { WorkoutVisionService } from '@onecoach/lib-ai-agents';
 import {
   type ImportedWorkoutProgram,
 } from '@onecoach/schemas';
@@ -42,7 +41,7 @@ type WorkoutImportParams = z.infer<typeof workoutImportParamsSchema>;
  * Crea il context AI per il parsing di documenti e immagini
  * Usa WorkoutVisionService per parsing reale con Gemini/Claude
  */
-function createAIContext(userId: string): AIParseContext {
+function createAIContext(userId: string) {
   return {
     parseWithAI: async (
       content: string,
@@ -130,7 +129,7 @@ Cost: ${IMPORT_LIMITS.DEFAULT_CREDIT_COST} credits per import (configurable by a
     const result = await importService.import(files, context.userId, options);
 
     if (!result.success) {
-      throw new Error(result.errors.join('\n'));
+      throw new Error(result.errors?.join('\n') || 'Import failed');
     }
 
     return {

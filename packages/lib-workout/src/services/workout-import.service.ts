@@ -20,7 +20,7 @@ import type {
 import { ImportOptionsSchema, IMPORT_LIMITS as WORKOUT_LIMITS } from '../schemas/imported-workout.schema';
 
 import { FileValidatorService } from './file-validator.service';
-import { FileParserService, type AIParseContext } from './file-parser.service';
+import { FileParserService } from './file-parser.service';
 import { ExerciseMatcherService } from './exercise-matcher.service';
 import type { BaseImportResult } from '@onecoach/lib-import-core';
 import { BaseImportService } from '@onecoach/lib-import-core';
@@ -57,21 +57,49 @@ export interface ImportConfig {
   matchThreshold: number;
 }
 
+/**
+ * Internal type for parsed workout data after processing.
+ * Contains both raw imported program and converted workout program.
+ */
 type ParsedWorkoutData = {
+  /** Raw imported program from AI */
   combinedProgram: ImportedWorkoutProgram;
+  /** Converted workout program for persistence */
+  workoutProgram?: WorkoutProgram;
+  /** Parsing warnings */
   warnings: string[];
+  /** Parsing errors */
   errors: string[];
+  /** Parsing stats */
   stats: {
     filesProcessed: number;
     parsingWarnings: number;
     parsingErrors: number;
   };
+  /** Import stats (set after processing) */
+  importStats?: {
+    exercisesTotal: number;
+    exercisesMatched: number;
+    exercisesCreated: number;
+    weeksImported: number;
+    daysImported: number;
+    creditsUsed: number;
+  };
+  /** Flag for review mode */
+  needsReview?: boolean;
+  /** Parse result for review */
+  parseResult?: any;
 };
 
 /**
  * Workout Import Service
+ * 
+ * Extends BaseImportService with:
+ * - TAIRaw = ImportedWorkoutProgram (what AI returns)
+ * - TParsed = ParsedWorkoutData (wrapped with warnings/stats)
+ * - TResult = WorkoutImportResult
  */
-export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, WorkoutImportResult> {
+export class WorkoutImportService extends BaseImportService<ImportedWorkoutProgram, ParsedWorkoutData, WorkoutImportResult> {
   protected getLoggerName(): string {
     return 'WorkoutImportService';
   }
@@ -100,11 +128,17 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
     });
   }
 
+  // Cache for parsing stats to pass to processParsed
+  private parsingWarnings: string[] = [];
+  private parsingErrors: string[] = [];
+  private parsingStats = { filesProcessed: 0, parsingWarnings: 0, parsingErrors: 0 };
+
   // Override parseFiles to handle multiple files and use FileParserService
+  // Returns ImportedWorkoutProgram (TAIRaw) - the raw combined program
   protected override async parseFiles(
     files: ImportFile[],
     options?: Partial<ImportOptions>
-  ): Promise<ParsedWorkoutData> {
+  ): Promise<ImportedWorkoutProgram> {
     const importOptions = ImportOptionsSchema.parse({
       ...options,
       matchThreshold: options?.matchThreshold ?? 0.8,
@@ -113,17 +147,18 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
     const parseResults = await FileParserService.parseFiles(
       files,
       importOptions,
-      this.aiContext as unknown as AIParseContext
+      this.aiContext as unknown as any  // FileParserService uses its own AIContext format
     );
 
-    const warnings: string[] = [];
-    const errors: string[] = [];
+    // Reset and populate parsing warnings/errors for processParsed
+    this.parsingWarnings = [];
+    this.parsingErrors = [];
 
     for (const error of parseResults.errors) {
-      errors.push(`${error.fileName}: ${error.error}`);
+      this.parsingErrors.push(`${error.fileName}: ${error.error}`);
     }
     for (const warning of parseResults.warnings) {
-      warnings.push(...warning.warnings.map((w: any) => `${warning.fileName}: ${w}`));
+      this.parsingWarnings.push(...warning.warnings.map((w: any) => `${warning.fileName}: ${w}`));
     }
 
     if (parseResults.programs.length === 0) {
@@ -131,17 +166,16 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
     }
 
     const combinedProgram = FileParserService.combinePrograms(parseResults.programs);
-
-    return {
-      combinedProgram,
-      warnings,
-      errors,
-      stats: {
-        filesProcessed: parseResults.programs.length,
-        parsingWarnings: warnings.length,
-        parsingErrors: errors.length,
-      },
+    
+    // Cache stats for processParsed
+    this.parsingStats = {
+      filesProcessed: parseResults.programs.length,
+      parsingWarnings: this.parsingWarnings.length,
+      parsingErrors: this.parsingErrors.length,
     };
+
+    // Return raw ImportedWorkoutProgram (TAIRaw)
+    return combinedProgram;
   }
 
   // Implementation is unused due to override
@@ -150,11 +184,13 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
   }
 
   protected async processParsed(
-    parsed: ParsedWorkoutData,
+    parsed: ImportedWorkoutProgram,  // TAIRaw - raw AI output
     userId: string,
     options?: Partial<ImportOptions>
-  ): Promise<any> {
-    const { combinedProgram } = parsed;
+  ): Promise<ParsedWorkoutData> {  // Returns TParsed
+    // parsed is the raw ImportedWorkoutProgram from parseFiles
+    // We wrap it into ParsedWorkoutData using cached warnings/errors
+    const combinedProgram = parsed;
     const importOptions = ImportOptionsSchema.parse(options || {});
 
     // Step 3: Matching esercizi
@@ -201,19 +237,21 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
     if (needsReview) {
       // We package the data needed for review response
       return {
+        combinedProgram,
+        warnings: this.parsingWarnings,
+        errors: this.parsingErrors,
+        stats: this.parsingStats,
         needsReview: true,
         parseResult: {
           program: combinedProgram,
-          warnings: parsed.warnings,
+          warnings: this.parsingWarnings,
           unmatchedExercises: unmatchedNames.map(name => ({
             name,
             suggestions: matches.get(name)?.suggestions || []
           })),
-          stats: { ...parsed.stats, matchedExercises: matchedCount, unmatchedExercises: unmatchedCount }
+          stats: { ...this.parsingStats, matchedExercises: matchedCount, unmatchedExercises: unmatchedCount }
         },
-        warnings: parsed.warnings,
-        errors: parsed.errors
-      };
+      } as any;  // Extended for review mode
     }
 
     // Step 5: Create missing
@@ -243,7 +281,7 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
           exercisesCreated++;
         } catch (err) {
           const msg = `Impossibile creare esercizio "${name}": ${err}`;
-          parsed.warnings.push(msg);
+          this.parsingWarnings.push(msg);
           this.logger.warn(msg);
         }
       }
@@ -263,18 +301,23 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
     const workoutProgram = this.convert(combinedProgram, userId);
 
     return {
+      combinedProgram,
       workoutProgram,
+      warnings: this.parsingWarnings,
+      errors: this.parsingErrors,
       stats: {
-        filesProcessed: parsed.stats.filesProcessed,
+        filesProcessed: this.parsingStats.filesProcessed,
+        parsingWarnings: this.parsingStats.parsingWarnings,
+        parsingErrors: this.parsingStats.parsingErrors,
+      },
+      importStats: {
         exercisesTotal: allExercises.length,
         exercisesMatched: matchedCount,
         exercisesCreated,
         weeksImported: workoutProgram.weeks.length,
         daysImported: workoutProgram.weeks.reduce((sum: any, w: any) => sum + w.days.length, 0),
-        creditsUsed: WORKOUT_LIMITS.DEFAULT_CREDIT_COST, // simplificied
+        creditsUsed: WORKOUT_LIMITS.DEFAULT_CREDIT_COST,
       },
-      warnings: parsed.warnings,
-      errors: parsed.errors
     };
   }
 
@@ -379,6 +422,7 @@ export class WorkoutImportService extends BaseImportService<ParsedWorkoutData, W
   private convertDay(imported: ImportedDay): WorkoutDay {
     return {
       dayNumber: imported.dayNumber,
+      dayName: imported.name || `Day ${imported.dayNumber}`,
       name: imported.name || `Day ${imported.dayNumber}`,
       exercises: imported.exercises.map((ex: any) => this.convertExercise(ex)),
       totalDuration: imported.duration,
