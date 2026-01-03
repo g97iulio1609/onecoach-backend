@@ -17,15 +17,15 @@ import {
   ensureArrayOfStrings,
   ensureNumber,
   ensureString,
-} from '@onecoach/lib-workout/utils/type-helpers';
+} from './utils';
 import { convertWorkoutGoalNamesToIds } from '@onecoach/lib-metadata/metadata-translation.service';
 import {
   normalizeDifficulty,
   normalizeStatus,
   normalizeWeek,
   normalizeMetadata,
-} from '@onecoach/lib-workout/normalizers/workout-normalizer';
-import { createEmptyWeek } from '@onecoach/lib-workout/program-transform';
+} from './normalizers';
+import { createEmptyWeek } from './program-transform';
 
 type RawJson = Record<string, unknown>;
 
@@ -105,7 +105,7 @@ export async function normalizeAgentWorkoutPayload(
   const goalIds = await convertWorkoutGoalNamesToIds(normalizedGoals);
 
   return {
-    id: base?.id ?? createId('workout_agent'),
+    id: base?.id ?? createId(),
     name: ensureString(raw.name ?? base?.name ?? 'Workout Program'),
     description: ensureString(raw.description ?? base?.description ?? ''),
     difficulty: raw.difficulty

@@ -6,7 +6,7 @@
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { FoodAdminService } from '@onecoach/lib-food-admin.service';
+import { FoodAdminService } from '@onecoach/lib-food';
 import { createStreamingHandler } from '@onecoach/lib-api/utils/streaming-handler';
 
 interface FoodStreamInput {

@@ -9,7 +9,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core/auth/guards';
 import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai';
-import type { ProviderName } from '@onecoach/lib-ai-agents/core/providers/types';
+import type { ProviderName } from '@onecoach/lib-ai';
 import { deleteEnvVar, getEnvVarByKey } from '@onecoach/lib-vercel-admin';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 

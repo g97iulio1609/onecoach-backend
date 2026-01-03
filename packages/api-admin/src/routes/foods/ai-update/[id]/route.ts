@@ -13,7 +13,7 @@ import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/erro
 import { createFoodSchema } from '@onecoach/schemas/food.schema';
 import { ensureMacrosArePer100g } from '@onecoach/lib-shared/utils/macro-normalization';
 import type { Macros } from '@onecoach/types';
-import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
+import { AIProviderConfigService } from '@onecoach/lib-ai';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
 import { logger } from '@onecoach/lib-core';

@@ -1,4 +1,4 @@
-import { FoodAdminService } from '@onecoach/lib-food-admin.service';
+import { FoodAdminService } from '@onecoach/lib-food';
 import { createGenerationHandler } from '@onecoach/lib-api/utils/generation-handler';
 import { z } from 'zod';
 

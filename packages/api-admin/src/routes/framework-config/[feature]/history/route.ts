@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 import {
   AIFrameworkConfigService,
   FrameworkFeature,
-} from '@onecoach/lib-ai/ai-framework-config.service';
+} from '@onecoach/lib-ai';
 
 type RouteParams = Promise<{ feature: string }>;
 

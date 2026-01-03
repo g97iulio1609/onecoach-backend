@@ -8,7 +8,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core/auth/guards';
 import { prisma } from '@onecoach/lib-core/prisma';
-import { OpenRouterSubkeyService } from '@onecoach/lib-ai/openrouter-subkey.service';
+import { OpenRouterSubkeyService } from '@onecoach/lib-ai';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
 export const dynamic = 'force-dynamic';

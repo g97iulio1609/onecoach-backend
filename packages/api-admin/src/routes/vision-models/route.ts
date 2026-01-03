@@ -7,8 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
-import { updateVisionModelConfig } from '@onecoach/lib-food-vision.service';
+import { AIProviderConfigService } from '@onecoach/lib-ai';
+import { updateVisionModelConfig } from '@onecoach/lib-food';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
 export const dynamic = 'force-dynamic';

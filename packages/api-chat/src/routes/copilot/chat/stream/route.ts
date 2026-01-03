@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@onecoach/lib-core/auth/session';
 import { getAgentRegistry } from '@onecoach/one-agent';
-import { initializeAgentRegistryWithDB } from '@onecoach/lib-ai/agents/initialize-with-db';
+import { initializeAgentRegistryWithDB } from '@onecoach/lib-ai-agents';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { logger } from '@onecoach/lib-shared/utils/logger';
 

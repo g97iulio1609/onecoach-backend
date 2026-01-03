@@ -11,3 +11,4 @@ export * from './program-transform';
 export * from './template-helpers';
 export * from './workout-operations';
 export * from './utils';
+export * from './normalizers';

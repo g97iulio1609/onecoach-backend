@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createAgentCoordinator } from '@onecoach/lib-ai/agents';
+import { createAgentCoordinator } from '@onecoach/lib-ai-agents';
 import { createAIModel } from '../../../lib/services/ai/model-factory';
 import { auth } from '@onecoach/lib-core/auth';
 

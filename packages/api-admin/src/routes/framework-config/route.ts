@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 import {
   AIFrameworkConfigService,
   FrameworkFeature,
-} from '@onecoach/lib-ai/ai-framework-config.service';
+} from '@onecoach/lib-ai';
 
 export async function GET(_request: NextRequest) {
   try {

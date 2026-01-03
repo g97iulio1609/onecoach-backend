@@ -151,3 +151,46 @@ export class FoodVisionService {
     };
   }
 }
+
+/**
+ * Update vision model configuration in OpenRouter metadata
+ */
+export async function updateVisionModelConfig(
+  labelExtraction?: string,
+  dishSegmentation?: string
+): Promise<void> {
+  // Import dynamically to avoid circular dependencies
+  const { prisma } = await import('@onecoach/lib-core/prisma');
+  const { AIProvider } = await import('@prisma/client');
+  
+  const currentConfig = await prisma.ai_provider_configs.findUnique({
+    where: { provider: AIProvider.OPENROUTER },
+  });
+  
+  const currentMetadata = (currentConfig?.metadata as Record<string, unknown>) || {};
+  const currentVisionModels = (currentMetadata.visionModels as Record<string, string>) || {};
+  
+  const updatedVisionModels = {
+    ...currentVisionModels,
+    ...(labelExtraction && { labelExtraction }),
+    ...(dishSegmentation && { dishSegmentation }),
+  };
+  
+  await prisma.ai_provider_configs.upsert({
+    where: { provider: AIProvider.OPENROUTER },
+    update: {
+      metadata: {
+        ...currentMetadata,
+        visionModels: updatedVisionModels,
+      },
+    },
+    create: {
+      provider: AIProvider.OPENROUTER,
+      isEnabled: true,
+      updatedAt: new Date(),
+      metadata: {
+        visionModels: updatedVisionModels,
+      },
+    },
+  });
+}

@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import { generateText, Output } from 'ai';
 import { getModelByTier, createCustomModel } from './utils/model-factory';
-import { AIProviderConfigService } from '@onecoach/lib-ai/ai-provider-config.service';
+import { AIProviderConfigService } from '@onecoach/lib-ai';
 import { TOKEN_LIMITS } from '@onecoach/constants/models';
 
 interface ExtractionContext {

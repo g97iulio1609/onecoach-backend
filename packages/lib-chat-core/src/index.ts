@@ -89,3 +89,4 @@ export * from './components';
 
 // Utils
 export * from './utils';
+export * from './conversation.service';

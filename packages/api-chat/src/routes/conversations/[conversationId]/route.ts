@@ -4,7 +4,7 @@ import { AIProvider } from '@prisma/client';
 
 import { requireAuth } from '@onecoach/lib-core/auth/guards';
 import { isAdminRole } from '@onecoach/lib-core/auth/roles';
-import { ConversationService } from '@onecoach/lib-ai/chat/conversation.service';
+import { ConversationService } from '@onecoach/lib-chat-core';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 
 export const dynamic = 'force-dynamic';

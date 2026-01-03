@@ -489,53 +489,53 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
 ../lib-ai-agents/src/base-agent.ts(6,29): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via './utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-exercise/src/exercise-admin.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-exercise/src/exercise-admin.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
     Imported via './utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-import-core/src/vision.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-import-core/src/vision.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/base-agent.ts(6,29): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-exercise/src/exercise-admin.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-exercise/src/exercise-admin.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
     Imported via './utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-import-core/src/vision.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/utils/model-factory' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-import-core/src/vision.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/utils/model-factory.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/core/providers/config.ts(124,52): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider-config.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts'
     Imported via './ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-model.service.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/ai-agent-setup.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/ai-agent-setup.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
     Imported via '../ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/agent-orchestrator/fallback-executor.service.ts'
     Imported via './ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/index.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
 ../lib-ai-agents/src/core/providers/config.ts(124,52): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider-config.service.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts'
     Imported via './ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-model.service.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/ai-agent-setup.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/ai-agent-setup.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
     Imported via '../ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/agent-orchestrator/fallback-executor.service.ts'
     Imported via './ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/index.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai/ai-provider-config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-food/src/food-vision.service.ts' with packageId '@onecoach/lib-ai/src/ai-provider-config.service.ts@0.0.0'
 ../lib-ai-agents/src/core/providers/config.ts(172,11): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/models/types.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via '../models/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts'
@@ -552,18 +552,18 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
     Imported via '../providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/models/types.ts'
     Imported via '../providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/models/types.ts'
     Imported via './types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/provider-options.service.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/agent-factory.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/intent-detection.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/intent-detection.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/exercise-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/core/providers/index.ts(7,51): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/types.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/index.ts'
@@ -572,38 +572,38 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
     Imported via '../providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/models/types.ts'
     Imported via '../providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/models/types.ts'
     Imported via './types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/provider-options.service.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/utils/model-factory.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/agent-factory.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/intent-detector.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/intent-detection.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/intent-detection.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
     Imported via './core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/exercise-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/types' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/oneagenda-core/src/agents/base-oneagenda-agent.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/types.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/core/providers/index.ts(159,65): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via './config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/index.ts'
     Imported via './core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
     Imported via '../core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/core/providers/index.ts(159,65): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/config.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/core/providers/index.ts'
     Imported via './core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/base-agent.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-provider.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/helpers/macro-recalculator.ts' with packageId '@onecoach/lib-ai-agents/src/core/providers/config.ts@0.0.0'
     Imported via '../core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
-    Imported via '@onecoach/lib-ai-agents/core/providers/config' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/one-agenda/src/agentic/agentic-planner.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/user-memory/analyzer.ts'
 ../lib-ai-agents/src/orchestration/agent.ts(445,13): error TS2322: Type '{} | undefined' is not assignable to type 'Record<string, Tool> | undefined'.
   Type '{}' is not assignable to type 'Record<string, Tool>'.
     Index signature for type 'string' is missing in type '{}'.
@@ -685,11 +685,11 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
 ../lib-ai/src/index.ts(13,15): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-config.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via './ai-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/index.ts'
-    Imported via '@onecoach/lib-ai/ai-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts' with packageId '@onecoach/lib-ai/src/ai-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts' with packageId '@onecoach/lib-ai/src/ai-config.service.ts@0.0.0'
 ../lib-ai/src/index.ts(13,15): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-config.service.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './ai-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/index.ts'
-    Imported via '@onecoach/lib-ai/ai-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts' with packageId '@onecoach/lib-ai/src/ai-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/complexity-evaluator.ts' with packageId '@onecoach/lib-ai/src/ai-config.service.ts@0.0.0'
 ../lib-ai/src/index.ts(15,15): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/chat.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
 ../lib-ai/src/index.ts(15,15): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/chat.service.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
 ../lib-ai/src/index.ts(16,15): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/modification-ai.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
@@ -2040,27 +2040,27 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
     Imported via '../utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/workout-normalizer.ts'
     Imported via '../utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/exercise-normalizer.ts'
     Imported via './type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/utils/index.ts'
-    Imported via '@onecoach/lib-workout/utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/utils/type-helpers.ts@0.0.0'
+    Imported via '@onecoach/lib-workout' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/utils/type-helpers.ts@0.0.0'
 ../lib-workout/src/helpers/program-transform.ts(12,66): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/utils/type-helpers.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-transform.ts'
     Imported via '../utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/workout-normalizer.ts'
     Imported via '../utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/exercise-normalizer.ts'
     Imported via './type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/utils/index.ts'
-    Imported via '@onecoach/lib-workout/utils/type-helpers' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/utils/type-helpers.ts@0.0.0'
+    Imported via '@onecoach/lib-workout' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/utils/type-helpers.ts@0.0.0'
 ../lib-workout/src/helpers/program-transform.ts(13,33): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/weight-converter.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
 ../lib-workout/src/helpers/program-transform.ts(13,33): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-shared/src/utils/weight-converter.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
 ../lib-workout/src/helpers/program-transform.ts(19,8): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/workout-normalizer.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via './normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-transform.ts'
     Imported via './helpers/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/workout-weight-calculator.service.ts'
-    Imported via '@onecoach/lib-workout/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/normalizers/workout-normalizer.ts@0.0.0'
+    Imported via '@onecoach/lib-workout' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/normalizers/workout-normalizer.ts@0.0.0'
     Imported via '@onecoach/lib-workout/helpers/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/modification.service.ts'
 ../lib-workout/src/helpers/program-transform.ts(19,8): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/normalizers/workout-normalizer.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
     Imported via './normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-transform.ts'
     Imported via './helpers/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/workout-weight-calculator.service.ts'
-    Imported via '@onecoach/lib-workout/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/normalizers/workout-normalizer.ts@0.0.0'
+    Imported via '@onecoach/lib-workout' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/program-server-transform.ts' with packageId '@onecoach/lib-workout/src/helpers/normalizers/workout-normalizer.ts@0.0.0'
     Imported via '@onecoach/lib-workout/helpers/normalizers/workout-normalizer' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-nutrition/src/modification.service.ts'
 ../lib-workout/src/helpers/utils/index.ts(7,15): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/utils/formatting.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
 ../lib-workout/src/helpers/utils/index.ts(7,15): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/helpers/utils/formatting.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
@@ -2176,12 +2176,12 @@ src/routes/subscriptions/setup-intent/route.ts(31,51): error TS2339: Property 'c
 ../lib-workout/src/services/workout-progression.service.ts(192,18): error TS6133: 'updateSetCount' is declared but its value is never read.
 ../lib-workout/src/services/workout-vision.service.ts(23,8): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-framework-config.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
-    Imported via '@onecoach/lib-ai/ai-framework-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts'
-    Imported via '@onecoach/lib-ai/ai-framework-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/ai-task-orchestrator.ts' with packageId '@onecoach/lib-ai/src/ai-framework-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/ai-task-orchestrator.ts' with packageId '@onecoach/lib-ai/src/ai-framework-config.service.ts@0.0.0'
 ../lib-workout/src/services/workout-vision.service.ts(23,8): error TS6307: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai/src/ai-framework-config.service.ts' is not listed within the file list of project '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/tsconfig.json'. Projects must list all files or use an 'include' pattern.
   The file is in the program because:
-    Imported via '@onecoach/lib-ai/ai-framework-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts'
-    Imported via '@onecoach/lib-ai/ai-framework-config.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/ai-task-orchestrator.ts' with packageId '@onecoach/lib-ai/src/ai-framework-config.service.ts@0.0.0'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts'
+    Imported via '@onecoach/lib-ai' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-ai-agents/src/orchestrator/ai-task-orchestrator.ts' with packageId '@onecoach/lib-ai/src/ai-framework-config.service.ts@0.0.0'
 ../lib-workout/src/services/workout-vision.service.ts(24,31): error TS6059: File '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-core/src/credit.service.ts' is not under 'rootDir' '/Users/giulioleone/Sviluppo/CoachOne/packages/api-core/src'. 'rootDir' is expected to contain all source files.
   The file is in the program because:
     Imported via '@onecoach/lib-core/credit.service' from file '/Users/giulioleone/Sviluppo/CoachOne/packages/lib-workout/src/services/workout-vision.service.ts'
