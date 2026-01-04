@@ -302,3 +302,18 @@ export type {
 // Live Session Sync Hook
 export { useLiveSessionSync } from './hooks/useLiveSessionSync';
 export type { UseLiveSessionSyncOptions, LiveSessionSetData } from './hooks/useLiveSessionSync';
+
+// Versioning Store (for undo/redo and version history)
+export {
+  createVersioningStore,
+  useVersioningSelectors,
+  computeDiff,
+} from './versioning.store';
+export type {
+  VersionSnapshot,
+  StateChange,
+  StateDiff,
+  VersioningStoreConfig,
+  VersioningState,
+  VersioningStore,
+} from './versioning.store';
