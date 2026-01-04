@@ -91,6 +91,7 @@ export interface VersioningState<T> {
   clearHistory: () => void;
   reset: () => void;
   getDiff: (fromIndex: number, toIndex: number) => StateDiff;
+  hydrateHistory: (history: VersionSnapshot<T>[]) => void;
 }
 
 /** Type alias for the versioning store */
@@ -228,6 +229,10 @@ export function createVersioningStore<T>(
         isInitialized: true,
       });
       prevState = state;
+    },
+
+    hydrateHistory: (history: VersionSnapshot<T>[]) => {
+      set({ history });
     },
 
     // Set state with immediate undo snapshot
@@ -407,6 +412,7 @@ export function useVersioningSelectors<T>(
   const clearHistory = store((s) => s.clearHistory);
   const reset = store((s) => s.reset);
   const getDiff = store((s) => s.getDiff);
+  const hydrateHistory = store((s) => s.hydrateHistory);
 
   return {
     state: current,
@@ -423,5 +429,6 @@ export function useVersioningSelectors<T>(
     reset,
     initialize,
     isInitialized,
+    hydrateHistory,
   };
 }
