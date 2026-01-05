@@ -318,3 +318,44 @@ export type {
   VersioningState,
   VersioningStore,
 } from './versioning.store';
+
+// ============================================================================
+// Copilot Context Framework (New - Domain-Agnostic)
+// ============================================================================
+// Generic framework for copilot context management.
+// ~150 LOC instead of 800+, 7 actions instead of 30+.
+// Domains register themselves - no hardcoding required.
+
+export {
+  // Store
+  useCopilotContextStore,
+  registerDomain,
+  getDomainConfig,
+  getRegisteredDomains,
+  selectActiveDomain as selectActiveDomainV2,
+  selectContext,
+  selectData,
+  // Hooks
+  useCopilotContext,
+  useCopilotToolNotification,
+  useRegisteredDomains,
+  // Domains
+  workoutDomain,
+  nutritionDomain,
+  oneAgendaDomain,
+  liveSessionDomain,
+  registerAllDomains,
+} from './copilot-context';
+
+export type {
+  DomainConfig,
+  CopilotContextState,
+  CopilotContextActions,
+  CopilotContextStore as CopilotContextStoreV2, // Avoid conflict with legacy
+  // Domain Context Types (V2 = new framework)
+  WorkoutContext as WorkoutContextV2,
+  NutritionContext as NutritionContextV2,
+  OneAgendaContext as OneAgendaContextV2,
+  LiveSessionContext as LiveSessionContextV2,
+} from './copilot-context';
+
