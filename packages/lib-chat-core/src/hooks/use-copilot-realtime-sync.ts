@@ -38,6 +38,12 @@ export interface UseCopilotRealtimeSyncConfig<T> {
    * Whether the hook is enabled (default: true)
    */
   enabled?: boolean;
+  
+  /**
+   * Debounce delay in ms to batch rapid updates and prevent race conditions.
+   * Default: 300ms. Set to 0 for immediate updates.
+   */
+  debounceMs?: number;
 }
 
 // ============================================================================
@@ -64,7 +70,14 @@ export interface UseCopilotRealtimeSyncConfig<T> {
  * ```
  */
 export function useCopilotRealtimeSync<T>(config: UseCopilotRealtimeSyncConfig<T>): void {
-  const { table, recordId, fetchFn, updateStore, enabled = true } = config;
+  const { 
+    table, 
+    recordId, 
+    fetchFn, 
+    updateStore, 
+    enabled = true,
+    debounceMs = 300, // Debounce to avoid rapid consecutive fetches
+  } = config;
 
   // Refs for stable callbacks
   const fetchFnRef = useRef(fetchFn);
@@ -72,30 +85,51 @@ export function useCopilotRealtimeSync<T>(config: UseCopilotRealtimeSyncConfig<T
   fetchFnRef.current = fetchFn;
   updateStoreRef.current = updateStore;
 
-  // Track if we're currently fetching to avoid duplicates
+  // Track state for race condition prevention
   const isFetchingRef = useRef(false);
+  const lastUpdateTimestampRef = useRef(0);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Subscribe to realtime updates
   useRealtimeSubscription<Record<string, unknown>>({
     table,
     filter: recordId ? `id=eq.${recordId}` : undefined,
     enabled: enabled && !!recordId,
-    onUpdate: () => {
-      // Debounce: skip if already fetching
-      if (isFetchingRef.current) return;
+    onUpdate: (record) => {
+      // Extract timestamp from record if available (updated_at column)
+      const recordUpdatedAt = record?.updated_at 
+        ? new Date(record.updated_at as string).getTime() 
+        : Date.now();
       
-      isFetchingRef.current = true;
+      // Skip if this update is older than our last processed update
+      if (recordUpdatedAt < lastUpdateTimestampRef.current) {
+        return;
+      }
       
-      // Fetch full transformed data and update store
-      fetchFnRef.current()
-        .then((data) => {
-          const store = useCopilotActiveContextStore.getState();
-          updateStoreRef.current(store, data);
-        })
-        .catch(() => { /* Silent fail */ })
-        .finally(() => {
-          isFetchingRef.current = false;
-        });
+      // Clear any pending debounce timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      
+      // Debounce: wait before fetching to batch rapid updates
+      debounceTimerRef.current = setTimeout(() => {
+        // Skip if already fetching
+        if (isFetchingRef.current) return;
+        
+        isFetchingRef.current = true;
+        lastUpdateTimestampRef.current = Date.now();
+        
+        // Fetch full transformed data and update store
+        fetchFnRef.current()
+          .then((data) => {
+            const store = useCopilotActiveContextStore.getState();
+            updateStoreRef.current(store, data);
+          })
+          .catch(() => { /* Silent fail */ })
+          .finally(() => {
+            isFetchingRef.current = false;
+          });
+      }, debounceMs);
     },
   });
 }
