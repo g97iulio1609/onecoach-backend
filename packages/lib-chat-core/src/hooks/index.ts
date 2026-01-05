@@ -22,3 +22,11 @@ export {
   useOneAgendaCopilotSync,
   type UseCopilotSyncConfig,
 } from './use-copilot-refresh';
+
+// Copilot Realtime Sync - Supabase Realtime → Copilot Context
+export {
+  useCopilotRealtimeSync,
+  useWorkoutCopilotRealtimeSync,
+  useNutritionCopilotRealtimeSync,
+  type UseCopilotRealtimeSyncConfig,
+} from './use-copilot-realtime-sync';
