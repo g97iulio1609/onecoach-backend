@@ -28,5 +28,6 @@ export {
   useCopilotRealtimeSync,
   useWorkoutCopilotRealtimeSync,
   useNutritionCopilotRealtimeSync,
+  useOneAgendaCopilotRealtimeSync,
   type UseCopilotRealtimeSyncConfig,
 } from './use-copilot-realtime-sync';

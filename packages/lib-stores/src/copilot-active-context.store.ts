@@ -18,6 +18,7 @@ import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import type { WorkoutProgram } from '@onecoach/types';
 import type { NutritionPlan } from '@onecoach/types';
+import type { Project, Task, Milestone } from '@onecoach/types';
 
 // ============================================================================
 // Domain-Specific Context Types
@@ -139,6 +140,11 @@ export interface SelectedMilestone {
 export interface OneAgendaActiveContext {
   projectId: string;
   
+  // Full project data for realtime sync (mirrors Workout/Nutrition pattern)
+  project: Project | null;
+  tasks: Task[];
+  milestones: Milestone[];
+  
   // Selection state
   selectedTask: SelectedTask | null;
   selectedMilestone: SelectedMilestone | null;
@@ -250,6 +256,7 @@ interface CopilotActiveContextActions {
   selectTask: (task: SelectedTask | null) => void;
   selectMilestone: (milestone: SelectedMilestone | null) => void;
   setRelatedTasks: (subtasks: string[], parallelTasks: string[]) => void;
+  updateOneAgendaProject: (project: Project, tasks: Task[], milestones: Milestone[]) => void;
   
   // === Live Session Actions ===
   initLiveSessionContext: (sessionId: string, programId: string, totalSets: number) => void;
@@ -501,6 +508,9 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
             domain: 'oneagenda',
             oneAgenda: {
               projectId,
+              project: null,
+              tasks: [],
+              milestones: [],
               selectedTask: null,
               selectedMilestone: null,
               subtasks: [],
@@ -549,7 +559,18 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
           'setRelatedTasks'
         ),
 
-      // === Live Session Actions ===
+      updateOneAgendaProject: (project, tasks, milestones) =>
+        set(
+          (state) => ({
+            oneAgenda: state.oneAgenda
+              ? { ...state.oneAgenda, project, tasks, milestones }
+              : null,
+            lastUpdated: Date.now(),
+          }),
+          false,
+          'updateOneAgendaProject'
+        ),
+
       initLiveSessionContext: (sessionId, programId, totalSets) => {
         console.warn('[CopilotActiveContextStore] 🚀 initLiveSessionContext called', {
           sessionId,

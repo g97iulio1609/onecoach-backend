@@ -150,4 +150,25 @@ export function useNutritionCopilotRealtimeSync(config: {
   });
 }
 
-// Note: OneAgenda would need similar treatment once store supports project data
+/**
+ * Realtime sync for OneAgenda projects → copilot-active-context.
+ * 
+ * When the oneagenda_projects table updates, fetches fresh data and updates the store.
+ */
+export function useOneAgendaCopilotRealtimeSync(config: {
+  projectId: string | undefined | null;
+  enabled?: boolean;
+}): void {
+  useCopilotRealtimeSync({
+    table: 'oneagenda_projects',
+    recordId: config.projectId,
+    enabled: config.enabled,
+    fetchFn: async () => {
+      const response = await fetch(`/api/projects/${config.projectId}`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      return { project: data.project, tasks: data.tasks ?? [], milestones: data.milestones ?? [] };
+    },
+    updateStore: (store, data) => store.updateOneAgendaProject(data.project, data.tasks, data.milestones),
+  });
+}
