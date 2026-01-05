@@ -211,6 +211,15 @@ interface CopilotActiveContextState {
   
   // Last update timestamp (for debugging/staleness checks)
   lastUpdated: number;
+  
+  // === Tool Modification Tracking (for UI refresh) ===
+  /** Last tool modification event - UI components can subscribe to trigger refresh */
+  lastToolModification: {
+    domain: 'workout' | 'nutrition' | 'oneagenda';
+    resourceId: string;
+    toolName: string;
+    timestamp: number;
+  } | null;
 }
 
 interface CopilotActiveContextActions {
@@ -256,6 +265,10 @@ interface CopilotActiveContextActions {
   getWorkoutForTools: () => WorkoutProgram | null;
   getNutritionForTools: () => NutritionPlan | null;
   getLiveSessionForTools: () => LiveSessionContext | null;
+  
+  // === Tool Modification Notification ===
+  /** Notify that an MCP tool modified a resource - UI components can subscribe to refresh */
+  notifyToolModification: (domain: 'workout' | 'nutrition' | 'oneagenda', resourceId: string, toolName: string) => void;
 }
 
 export type CopilotActiveContextStore = CopilotActiveContextState & CopilotActiveContextActions;
@@ -271,6 +284,7 @@ const initialState: CopilotActiveContextState = {
   oneAgenda: null,
   liveSession: null,
   lastUpdated: 0,
+  lastToolModification: null,
 };
 
 // ============================================================================
@@ -661,6 +675,21 @@ export const useCopilotActiveContextStore = create<CopilotActiveContextStore>()(
       getWorkoutForTools: () => get().workout?.program ?? null,
       getNutritionForTools: () => get().nutrition?.plan ?? null,
       getLiveSessionForTools: () => get().liveSession ?? null,
+
+      // Tool modification notification for UI refresh
+      notifyToolModification: (domain, resourceId, toolName) =>
+        set(
+          {
+            lastToolModification: {
+              domain,
+              resourceId,
+              toolName,
+              timestamp: Date.now(),
+            },
+          },
+          false,
+          'notifyToolModification'
+        ),
     })),
     { name: 'copilot-active-context' }
   )
@@ -675,6 +704,7 @@ export const selectWorkoutContext = (state: CopilotActiveContextStore) => state.
 export const selectNutritionContext = (state: CopilotActiveContextStore) => state.nutrition;
 export const selectOneAgendaContext = (state: CopilotActiveContextStore) => state.oneAgenda;
 export const selectLiveSessionContext = (state: CopilotActiveContextStore) => state.liveSession;
+export const selectLastToolModification = (state: CopilotActiveContextStore) => state.lastToolModification;
 
 export const selectSelectedExercise = (state: CopilotActiveContextStore) => 
   state.workout?.selectedExercise ?? null;

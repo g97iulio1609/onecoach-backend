@@ -92,6 +92,8 @@ export interface VersioningState<T> {
   reset: () => void;
   getDiff: (fromIndex: number, toIndex: number) => StateDiff;
   hydrateHistory: (history: VersionSnapshot<T>[]) => void;
+  /** Replace state from external source (e.g., realtime sync) without creating undo/redo entries */
+  replaceStateFromExternal: (newState: T) => void;
 }
 
 /** Type alias for the versioning store */
@@ -387,6 +389,12 @@ export function createVersioningStore<T>(
 
       return computeDiff(fromState, toState);
     },
+
+    // Replace state from external source (realtime sync) without creating undo/redo entries
+    replaceStateFromExternal: (newState: T) => {
+      set({ current: newState });
+      prevState = newState;
+    },
   }));
 }
 
@@ -413,6 +421,7 @@ export function useVersioningSelectors<T>(
   const reset = store((s) => s.reset);
   const getDiff = store((s) => s.getDiff);
   const hydrateHistory = store((s) => s.hydrateHistory);
+  const replaceStateFromExternal = store((s) => s.replaceStateFromExternal);
 
   return {
     state: current,
@@ -430,5 +439,6 @@ export function useVersioningSelectors<T>(
     initialize,
     isInitialized,
     hydrateHistory,
+    replaceStateFromExternal,
   };
 }

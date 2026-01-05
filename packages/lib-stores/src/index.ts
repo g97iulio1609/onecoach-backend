@@ -282,6 +282,7 @@ export {
   selectSelectedFood,
   selectSelectedTask,
   selectMcpActiveContext,
+  selectLastToolModification,
 } from './copilot-active-context.store';
 export type {
   SelectedExercise,

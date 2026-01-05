@@ -31,6 +31,9 @@ import {
   useCopilotActiveContextStore,
 } from '@onecoach/lib-stores';
 
+// Note: Status-based notification doesn't require parsing tool result structures
+// The active context already has the resource IDs we need
+
 // ============================================================================
 // Hook
 // ============================================================================
@@ -341,6 +344,42 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       }
     }
   }, [newConversationId]);
+
+  // ============================================================================
+  // Chat Completion Notification - Domain Agnostic
+  // When chat finishes streaming, notify all active contexts to refresh.
+  // This is like pressing a "refresh" button - simple and reliable.
+  // ============================================================================
+  const notifyToolModification = useCopilotActiveContextStore((s) => s.notifyToolModification);
+  const previousStatusRef = useRef<typeof status | null>(null);
+  
+  useEffect(() => {
+    // Detect when chat finishes: streaming → ready
+    const wasStreaming = previousStatusRef.current === 'streaming';
+    const isNowReady = status === 'ready';
+    
+    if (wasStreaming && isNowReady) {
+      // Get current active context directly from store to avoid stale closures
+      const ctx = useCopilotActiveContextStore.getState();
+      
+      // Notify workout context if active
+      if (ctx.workout?.programId) {
+        notifyToolModification('workout', ctx.workout.programId, 'chat-completed');
+      }
+      
+      // Notify nutrition context if active
+      if (ctx.nutrition?.planId) {
+        notifyToolModification('nutrition', ctx.nutrition.planId, 'chat-completed');
+      }
+      
+      // Notify oneagenda context if active
+      if (ctx.oneAgenda?.projectId) {
+        notifyToolModification('oneagenda', ctx.oneAgenda.projectId, 'chat-completed');
+      }
+    }
+    
+    previousStatusRef.current = status;
+  }, [status, notifyToolModification]);
 
   // Actions
   const setInput = useCallback(
