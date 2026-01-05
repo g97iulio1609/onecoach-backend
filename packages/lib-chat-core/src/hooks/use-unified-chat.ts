@@ -346,11 +346,12 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
   }, [newConversationId]);
 
   // ============================================================================
-  // Chat Completion Notification - Domain Agnostic
-  // When chat finishes streaming, notify all active contexts to refresh.
-  // This is like pressing a "refresh" button - simple and reliable.
+  // Chat Completion → Fetch Updated Data → Update Store
+  // When chat finishes streaming, fetch fresh data and update copilot-active-context.
+  // This triggers sync hooks in visual builders for instant UI updates.
   // ============================================================================
-  const notifyToolModification = useCopilotActiveContextStore((s) => s.notifyToolModification);
+  const updateWorkoutProgram = useCopilotActiveContextStore((s) => s.updateWorkoutProgram);
+  const updateNutritionPlan = useCopilotActiveContextStore((s) => s.updateNutritionPlan);
   const previousStatusRef = useRef<typeof status | null>(null);
   
   useEffect(() => {
@@ -362,24 +363,35 @@ export function useUnifiedChat(options: UseUnifiedChatOptions = {}): UseUnifiedC
       // Get current active context directly from store to avoid stale closures
       const ctx = useCopilotActiveContextStore.getState();
       
-      // Notify workout context if active
+      // Fetch and update workout if active
       if (ctx.workout?.programId) {
-        notifyToolModification('workout', ctx.workout.programId, 'chat-completed');
+        fetch(`/api/workout/${ctx.workout.programId}`)
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => {
+            if (data?.program) {
+              updateWorkoutProgram(data.program);
+            }
+          })
+          .catch(() => { /* Silent fail - UI will stay unchanged */ });
       }
       
-      // Notify nutrition context if active
+      // Fetch and update nutrition if active
       if (ctx.nutrition?.planId) {
-        notifyToolModification('nutrition', ctx.nutrition.planId, 'chat-completed');
+        fetch(`/api/nutrition/${ctx.nutrition.planId}`)
+          .then((res) => res.ok ? res.json() : null)
+          .then((data) => {
+            if (data?.plan) {
+              updateNutritionPlan(data.plan);
+            }
+          })
+          .catch(() => { /* Silent fail */ });
       }
       
-      // Notify oneagenda context if active
-      if (ctx.oneAgenda?.projectId) {
-        notifyToolModification('oneagenda', ctx.oneAgenda.projectId, 'chat-completed');
-      }
+      // Note: OneAgenda would need similar treatment once store is extended
     }
     
     previousStatusRef.current = status;
-  }, [status, notifyToolModification]);
+  }, [status, updateWorkoutProgram, updateNutritionPlan]);
 
   // Actions
   const setInput = useCallback(

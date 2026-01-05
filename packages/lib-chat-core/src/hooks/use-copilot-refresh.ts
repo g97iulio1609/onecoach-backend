@@ -1,219 +1,192 @@
 import { useEffect, useRef } from 'react';
 import {
   useCopilotActiveContextStore,
-  selectLastToolModification,
+  type CopilotActiveContextStore,
 } from '@onecoach/lib-stores';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type CopilotDomain = 'workout' | 'nutrition' | 'oneagenda';
-
-export interface UseCopilotRefreshConfig<T> {
+/**
+ * Configuration for domain-agnostic store sync
+ */
+export interface UseCopilotSyncConfig<T> {
   /**
-   * The domain this component is interested in (workout, nutrition, oneagenda)
+   * Selector function to extract relevant data from copilot-active-context store.
+   * Return undefined/null if no relevant data exists.
+   * 
+   * @example
+   * selector: (state) => state.workout?.program
    */
-  domain: CopilotDomain;
+  selector: (state: CopilotActiveContextStore) => T | undefined | null;
   
   /**
-   * The resource ID to watch for modifications
-   * If undefined/null, the hook will not trigger refreshes
+   * Callback called when the selected data changes.
+   * Use this to sync with your local state (e.g., versioning store)
    */
-  resourceId: string | undefined | null;
-  
-  /**
-   * Function to fetch the updated data from the server
-   * Should return a promise that resolves to the new data
-   */
-  fetchFn: () => Promise<T>;
-  
-  /**
-   * Callback called when new data is received
-   * Use this to update your local state (e.g., Zustand store)
-   */
-  onDataReceived: (data: T) => void;
-  
-  /**
-   * Optional callback for error handling
-   */
-  onError?: (error: Error) => void;
+  onDataChanged: (data: T) => void;
   
   /**
    * Whether the hook is enabled (default: true)
-   * Set to false to temporarily disable refresh logic
    */
   enabled?: boolean;
 }
 
 // ============================================================================
-// Hook
+// Core Hook - Domain Agnostic
 // ============================================================================
 
 /**
- * Generic hook for refreshing data after Copilot AI modifications.
+ * Domain-agnostic hook for instant sync between copilot-active-context and visual builder stores.
  * 
- * This hook subscribes to the Copilot's `lastToolModification` state and
- * triggers a refetch when the chat completes for the specified domain/resource.
+ * This hook subscribes directly to the copilot-active-context store using a user-provided
+ * selector function. When the selected data changes, onDataChanged is called immediately.
+ * 
+ * Benefits:
+ * - No API fetch required (instant updates)
+ * - No hardcoded domain logic
+ * - Works with any future domain that stores data in copilot-active-context
  * 
  * @example
  * ```tsx
- * // In a Visual Builder component
- * useCopilotRefresh({
- *   domain: 'workout',
- *   resourceId: programId,
- *   fetchFn: () => fetch(`/api/workout/${programId}`).then(r => r.json()),
- *   onDataReceived: (data) => replaceStateFromExternal(data.program),
- *   onError: (error) => toast.error('Failed to refresh'),
+ * // Any domain - just provide a selector
+ * useCopilotSync<WorkoutProgram>({
+ *   selector: (state) => state.workout?.program,
+ *   onDataChanged: replaceStateFromExternal,
  * });
  * ```
  */
-export function useCopilotRefresh<T>(config: UseCopilotRefreshConfig<T>): void {
-  const {
-    domain,
-    resourceId,
-    fetchFn,
-    onDataReceived,
-    onError,
-    enabled = true,
-  } = config;
+export function useCopilotSync<T>(config: UseCopilotSyncConfig<T>): void {
+  const { selector, onDataChanged, enabled = true } = config;
 
-  // Subscribe to modification notifications
-  const lastModification = useCopilotActiveContextStore(selectLastToolModification);
+  // Stable refs to avoid dependency issues
+  const selectorRef = useRef(selector);
+  const onDataChangedRef = useRef(onDataChanged);
+  selectorRef.current = selector;
+  onDataChangedRef.current = onDataChanged;
   
-  // Track if we're currently fetching to prevent duplicate requests
-  const isFetchingRef = useRef(false);
-  
-  // Stable callback refs to avoid dependency issues
-  const fetchFnRef = useRef(fetchFn);
-  const onDataReceivedRef = useRef(onDataReceived);
-  const onErrorRef = useRef(onError);
-  
-  // Update refs on each render
-  fetchFnRef.current = fetchFn;
-  onDataReceivedRef.current = onDataReceived;
-  onErrorRef.current = onError;
+  // Track last synced data to avoid duplicate updates (by reference)
+  const lastSyncedRef = useRef<T | null>(null);
 
   useEffect(() => {
-    // Skip if disabled or no resource ID
-    if (!enabled || !resourceId) {
+    if (!enabled) {
       return;
     }
 
-    // Only react to modifications for this domain and resource
-    if (
-      !lastModification ||
-      lastModification.domain !== domain ||
-      lastModification.resourceId !== resourceId
-    ) {
-      return;
-    }
-
-    // Prevent duplicate fetches
-    if (isFetchingRef.current) {
-      return;
-    }
-
-    // Perform the refresh
-    const performRefresh = async () => {
-      isFetchingRef.current = true;
-      
-      try {
-        const data = await fetchFnRef.current();
-        onDataReceivedRef.current(data);
-      } catch (error) {
-        if (onErrorRef.current) {
-          onErrorRef.current(error instanceof Error ? error : new Error(String(error)));
-        } else {
-          console.error(`[useCopilotRefresh] Failed to refresh ${domain}:`, error);
+    // Subscribe to store changes
+    const unsubscribe = useCopilotActiveContextStore.subscribe(
+      (state) => {
+        const currentData = selectorRef.current(state);
+        
+        // Only sync if:
+        // 1. We have data
+        // 2. It's different from last synced (reference equality)
+        if (
+          currentData !== undefined &&
+          currentData !== null &&
+          currentData !== lastSyncedRef.current
+        ) {
+          lastSyncedRef.current = currentData;
+          onDataChangedRef.current(currentData);
         }
-      } finally {
-        isFetchingRef.current = false;
       }
-    };
+    );
 
-    performRefresh();
-  }, [lastModification, domain, resourceId, enabled]);
+    return () => unsubscribe();
+  }, [enabled]);
 }
 
 // ============================================================================
-// Convenience Hooks (Optional - for specific domains)
+// Convenience Hooks - Type-safe wrappers for specific domains
 // ============================================================================
 
 /**
- * Convenience hook specifically for workout program refresh
+ * Instant sync for workout visual builder.
+ * 
+ * @example
+ * ```tsx
+ * useWorkoutCopilotSync<WorkoutProgram>({
+ *   programId: initialProgram?.id,
+ *   onDataChanged: replaceStateFromExternal,
+ * });
+ * ```
  */
-export function useWorkoutCopilotRefresh<T = unknown>(config: {
+export function useWorkoutCopilotSync<T = unknown>(config: {
   programId: string | undefined | null;
-  onProgramUpdated: (program: T) => void;
-  onError?: (error: Error) => void;
+  onDataChanged: (program: T) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh<T>({
-    domain: 'workout',
-    resourceId: config.programId,
-    fetchFn: async () => {
-      const response = await fetch(`/api/workout/${config.programId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch workout: ${response.status}`);
+  useCopilotSync<T>({
+    selector: (state) => {
+      if (state.workout?.programId === config.programId) {
+        return state.workout?.program as T | undefined;
       }
-      const data = await response.json();
-      return data.program as T;
+      return undefined;
     },
-    onDataReceived: config.onProgramUpdated,
-    onError: config.onError,
-    enabled: config.enabled,
+    onDataChanged: config.onDataChanged,
+    enabled: config.enabled !== false && !!config.programId,
   });
 }
 
 /**
- * Convenience hook specifically for nutrition plan refresh
+ * Instant sync for nutrition visual builder.
+ * 
+ * @example
+ * ```tsx
+ * useNutritionCopilotSync<NutritionPlan>({
+ *   planId: initialPlan?.id,
+ *   onDataChanged: replaceStateFromExternal,
+ * });
+ * ```
  */
-export function useNutritionCopilotRefresh<T = unknown>(config: {
+export function useNutritionCopilotSync<T = unknown>(config: {
   planId: string | undefined | null;
-  onPlanUpdated: (plan: T) => void;
-  onError?: (error: Error) => void;
+  onDataChanged: (plan: T) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh<T>({
-    domain: 'nutrition',
-    resourceId: config.planId,
-    fetchFn: async () => {
-      const response = await fetch(`/api/nutrition/${config.planId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch nutrition plan: ${response.status}`);
+  useCopilotSync<T>({
+    selector: (state) => {
+      if (state.nutrition?.planId === config.planId) {
+        return state.nutrition?.plan as T | undefined;
       }
-      const data = await response.json();
-      return data.plan as T;
+      return undefined;
     },
-    onDataReceived: config.onPlanUpdated,
-    onError: config.onError,
-    enabled: config.enabled,
+    onDataChanged: config.onDataChanged,
+    enabled: config.enabled !== false && !!config.planId,
   });
 }
 
 /**
- * Convenience hook specifically for OneAgenda project refresh
+ * Instant sync for OneAgenda projects.
+ * 
+ * NOTE: Requires extending copilot-active-context to store the full project.
+ * Currently OneAgenda context only stores projectId, not the full data.
+ * Once extended, use this pattern:
+ * 
+ * @example
+ * ```tsx
+ * useOneAgendaCopilotSync<Project>({
+ *   projectId: initialProject?.id,
+ *   onDataChanged: replaceStateFromExternal,
+ * });
+ * ```
  */
-export function useOneAgendaCopilotRefresh<T = unknown>(config: {
+export function useOneAgendaCopilotSync<T = unknown>(config: {
   projectId: string | undefined | null;
-  onProjectUpdated: (project: T) => void;
-  onError?: (error: Error) => void;
+  onDataChanged: (project: T) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh<T>({
-    domain: 'oneagenda',
-    resourceId: config.projectId,
-    fetchFn: async () => {
-      const response = await fetch(`/api/oneagenda/${config.projectId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch project: ${response.status}`);
+  useCopilotSync<T>({
+    selector: (state) => {
+      if (state.oneAgenda?.projectId === config.projectId) {
+        // TODO: Add project data to OneAgendaActiveContext
+        // return state.oneAgenda?.project as T | undefined;
+        return undefined; // Not yet available
       }
-      const data = await response.json();
-      return data.project as T;
+      return undefined;
     },
-    onDataReceived: config.onProjectUpdated,
-    onError: config.onError,
-    enabled: config.enabled,
+    onDataChanged: config.onDataChanged,
+    enabled: config.enabled !== false && !!config.projectId,
   });
 }

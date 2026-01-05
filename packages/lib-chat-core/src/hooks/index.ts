@@ -14,11 +14,11 @@ export {
 
 export { useUnifiedChat } from './use-unified-chat';
 
+// Copilot Sync - Domain agnostic store subscription
 export {
-  useCopilotRefresh,
-  useWorkoutCopilotRefresh,
-  useNutritionCopilotRefresh,
-  useOneAgendaCopilotRefresh,
-  type CopilotDomain,
-  type UseCopilotRefreshConfig,
+  useCopilotSync,
+  useWorkoutCopilotSync,
+  useNutritionCopilotSync,
+  useOneAgendaCopilotSync,
+  type UseCopilotSyncConfig,
 } from './use-copilot-refresh';
