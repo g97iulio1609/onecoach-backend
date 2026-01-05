@@ -26,6 +26,7 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, User, Bot, RefreshCw, Pencil } from 'lucide-react';
+import remarkGfm from 'remark-gfm';
 import type { MessageBubbleProps, ChatVariant } from '../types';
 
 // ============================================================================
@@ -339,7 +340,10 @@ export const MessageBubble = memo(function MessageBubble({
             {renderContent ? (
               renderContent(message.content)
             ) : (
-              <ReactMarkdown components={markdownComponents as Record<string, React.ComponentType>}>
+              <ReactMarkdown 
+                components={markdownComponents as Record<string, React.ComponentType>}
+                remarkPlugins={[remarkGfm]}
+              >
                 {message.content}
               </ReactMarkdown>
             )}

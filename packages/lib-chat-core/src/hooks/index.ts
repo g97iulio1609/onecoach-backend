@@ -13,3 +13,12 @@ export {
 } from './use-chat-realtime';
 
 export { useUnifiedChat } from './use-unified-chat';
+
+export {
+  useCopilotRefresh,
+  useWorkoutCopilotRefresh,
+  useNutritionCopilotRefresh,
+  useOneAgendaCopilotRefresh,
+  type CopilotDomain,
+  type UseCopilotRefreshConfig,
+} from './use-copilot-refresh';
