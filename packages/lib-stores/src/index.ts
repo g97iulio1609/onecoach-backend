@@ -359,3 +359,15 @@ export type {
   LiveSessionContext as LiveSessionContextV2,
 } from './copilot-context';
 
+// Catalog Store (cached exercises/foods for Copilot)
+export {
+  useCatalogStore,
+  selectExercises,
+  selectFoods,
+  selectIsLoadingCatalog,
+  getCatalogForAI,
+} from './catalog.store';
+export type {
+  CatalogExercise,
+  CatalogFood,
+} from './catalog.store';

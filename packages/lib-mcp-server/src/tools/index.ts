@@ -25,6 +25,7 @@ import { memoryToolsRecord } from './memory';
 import { profileToolsRecord } from './profile';
 import * as bodyMeasurementsTools from './body-measurements';
 import { kiwiSearchFlightTool } from './flight';
+import { catalogTools } from './catalog';
 import type { McpTool } from '../types';
 import { arrayToToolRecord } from '../utils/helpers';
 
@@ -101,6 +102,8 @@ export const allTools: Record<string, McpTool> = {
   ) as Record<string, McpTool>),
   // Flight domain tools
   [kiwiSearchFlightTool.name]: kiwiSearchFlightTool,
+  // Catalog search tools (for AI to find exercises/foods)
+  ...catalogTools,
 };
 
 /**

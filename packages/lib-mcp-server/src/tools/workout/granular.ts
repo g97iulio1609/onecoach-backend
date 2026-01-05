@@ -733,56 +733,169 @@ const ModificationTargetSchema = z.object({
 });
 
 /**
- * Single modification specification
- * Uses .refine() to ensure changes is not empty for update actions
+ * Strict Input Schemas for newData
  */
-const singleModificationSchema = z.object({
-  action: ModificationActionSchema.describe('The type of modification to apply'),
-  target: ModificationTargetSchema.describe('Where to apply the modification'),
-  // Use explicit SetGroupUpdateSchema for documented, typed changes
-  changes: SetGroupUpdateSchema.optional().describe(
-    'The changes to apply. For update_setgroup use: sets (number), reps (number), weight (kg), intensityPercent (0-100), rest (seconds), rpe (1-10). Example for 5x5 at 80%: { "count": 5, "reps": 5, "intensityPercent": 80 }'
-  ),
-  newData: z.any().optional().describe('New data to add (for add actions like add_exercise, add_setgroup)'),
-}).refine(
-  (data) => {
-    // For update actions, changes must have at least one field
-    if (data.action.startsWith('update_')) {
-      return data.changes && Object.keys(data.changes).length > 0;
-    }
-    return true;
-  },
-  { message: 'For update actions, you MUST provide at least one field in changes (e.g., count, reps, weight, intensityPercent)' }
-);
+const SetDetailsRequiredSchema = z.object({
+  reps: z.number().int().positive().describe('Reps per set. REQUIRED. For ranges like "6-8", use 6 here.'),
+  repsMax: z.number().int().positive().optional().describe('Max reps for ranges. For "6-8", use 8 here.'),
+  rest: z.number().int().positive().describe('Rest time in seconds. REQUIRED.'),
+  intensityPercent: z.number().min(0).max(100).describe('Intensity % of 1RM. REQUIRED. For "70-80%", use 70.'),
+  intensityPercentMax: z.number().min(0).max(100).optional().describe('Max intensity % for ranges. For "70-80%", use 80.'),
+  rpe: z.number().min(1).max(10).optional().describe('RPE 1-10. For "RPE 7-8", use 7.'),
+  rpeMax: z.number().min(1).max(10).optional().describe('Max RPE for ranges. For "RPE 7-8", use 8.'),
+  weight: z.number().optional().describe('Weight in kg. For "80-100kg", use 80.'),
+  weightMax: z.number().optional().describe('Max weight in kg for ranges. For "80-100kg", use 100.'),
+});
+
+const SetGroupInputSchema = z.object({
+  id: z.string().optional(),
+  count: z.number().int().positive().describe('Number of sets. REQUIRED.'),
+  baseSet: SetDetailsRequiredSchema.describe('Details for the sets. REQUIRED. Must include reps, intensityPercent, and rest at minimum.'),
+  sets: z
+    .array(
+      SetDetailsRequiredSchema.partial().extend({
+        setNumber: z.number().int().positive().optional(),
+      })
+    )
+    .optional(),
+});
+
+const AddExerciseInputSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().describe('Exercise name'),
+  catalogExerciseId: z.string().optional().describe('Catalog ID if known'),
+  notes: z.string().optional(),
+  videoUrl: z.string().optional(),
+  description: z.string().optional(),
+  muscleGroups: z.array(z.string()).optional(),
+  equipment: z.array(z.string()).optional(),
+  category: z.string().optional(),
+  typeLabel: z.string().optional(),
+  repRange: z.string().optional(),
+  formCues: z.array(z.string()).optional(),
+  // STRICTLY REQUIRED for add_exercise
+  setGroups: z
+    .array(
+      SetGroupInputSchema.extend({
+        // Allow pre-built sets array to be passed
+        sets: z
+          .array(
+            SetDetailsRequiredSchema.partial().extend({
+              setNumber: z.number().int().positive().optional(),
+            })
+          )
+          .optional(),
+      })
+    )
+    .min(1)
+    .describe('List of set groups. REQUIRED for add_exercise! You must define at least one set group (e.g. 3x10).'),
+});
+
+const AddSetGroupInputSchema = z.object({
+  id: z.string().optional(),
+  count: z.number().int().positive().optional(),
+  baseSet: SetDetailsRequiredSchema.partial().optional(),
+  sets: z
+    .array(
+      SetDetailsRequiredSchema.partial().extend({
+        setNumber: z.number().int().positive().optional(),
+      })
+    )
+    .optional(),
+});
+
+const ensureAddExercisePayload = (payload: unknown, ctx: z.RefinementCtx): void => {
+  if (!payload) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['newData'],
+      message: 'For add_exercise you must provide newData with setGroups, each with count and baseSet {reps, intensityPercent, rest}.',
+    });
+    return;
+  }
+
+  const parsed = AddExerciseInputSchema.safeParse(payload);
+  if (!parsed.success) {
+    parsed.error.issues.forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['newData', ...issue.path],
+        message: `Invalid add_exercise payload: ${issue.message}`,
+      });
+    });
+  }
+};
 
 /**
- * The modification parameters - supports single or batch operations
- * Includes .refine() validation to prevent empty changes for update actions
+ * Single modification specification
+ * Uses .superRefine() to ensure changes is not empty for update actions
+ * and add_exercise always includes the required setGroups payload.
  */
-const applyModificationParams = z.object({
-  programId: z.string().describe('The ID of the program to modify'),
-  // Single modification (backward compatible)
-  action: ModificationActionSchema.optional().describe('The type of modification to apply'),
-  target: ModificationTargetSchema.optional().describe('Where to apply the modification'),
-  // Use explicit SetGroupUpdateSchema with detailed description
-  changes: SetGroupUpdateSchema.optional().describe(
-    'REQUIRED for update actions! For "5x5 at 80%": { "count": 5, "reps": 5, "intensityPercent": 80 }. CRITICAL: "5x5" means count=5 AND reps=5, you MUST include BOTH!'
-  ),
-  newData: z.any().optional().describe('New data to add (for add actions)'),
-  // Batch modifications: array of modifications to apply in sequence
-  batch: z.array(singleModificationSchema).optional().describe('Array of modifications to apply in sequence (for batch operations)'),
-}).refine(
-  (data) => {
-    // Skip validation if using batch mode
-    if (data.batch && data.batch.length > 0) return true;
-    // For single update actions, changes must have at least one field
-    if (data.action?.startsWith('update_')) {
-      return data.changes && Object.keys(data.changes).length > 0;
+const singleModificationSchema = z
+  .object({
+    action: ModificationActionSchema.describe('The type of modification to apply'),
+    target: ModificationTargetSchema.describe('Where to apply the modification'),
+    // Use explicit SetGroupUpdateSchema for documented, typed changes
+    changes: SetGroupUpdateSchema.optional().describe(
+      'The changes to apply. For update_setgroup use: sets (number), reps (number), weight (kg), intensityPercent (0-100), rest (seconds), rpe (1-10). Example for 5x5 at 80%: { "count": 5, "reps": 5, "intensityPercent": 80 }'
+    ),
+    newData: z
+      .union([AddExerciseInputSchema, AddSetGroupInputSchema])
+      .optional()
+      .describe('New data to add. For add_exercise MUST include: { name: string, catalogExerciseId: string, setGroups: [{ count: number, baseSet: { reps: number, intensityPercent: number, rest: number } }] }. Example: { name: "Panca piana", catalogExerciseId: "abc123", setGroups: [{ count: 3, baseSet: { reps: 10, intensityPercent: 70, rest: 90 } }] }'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.action.startsWith('update_') && (!data.changes || Object.keys(data.changes).length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['changes'],
+        message: 'For update actions, you MUST provide at least one field in changes (e.g., count, reps, weight, intensityPercent)',
+      });
     }
-    return true;
-  },
-  { message: 'For update actions, you MUST provide at least one field in changes. Valid fields: count, reps, weight, intensityPercent, rest, rpe. Example: { "count": 5, "reps": 5, "intensityPercent": 80 }' }
-);
+
+    if (data.action === 'add_exercise') {
+      ensureAddExercisePayload(data.newData, ctx);
+    }
+  });
+
+const applyModificationParams = z
+  .object({
+    programId: z.string().describe('The ID of the program to modify'),
+    // Single modification (backward compatible)
+    action: ModificationActionSchema.optional().describe('The type of modification to apply'),
+    target: ModificationTargetSchema.optional().describe('Where to apply the modification'),
+    // Use explicit SetGroupUpdateSchema with detailed description
+    changes: SetGroupUpdateSchema.optional().describe(
+      'REQUIRED for update actions! For "5x5 at 80%": { "count": 5, "reps": 5, "intensityPercent": 80 }. CRITICAL: "5x5" means count=5 AND reps=5, you MUST include BOTH!'
+    ),
+    newData: z.union([AddExerciseInputSchema, AddSetGroupInputSchema]).optional().describe('Data for creation actions. For add_exercise, setGroups is MANDATORY.'),
+    // Batch modifications: array of modifications to apply in sequence
+    batch: z.array(singleModificationSchema).optional().describe('Array of modifications to apply in sequence (for batch operations)'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.batch && data.batch.length > 0) return;
+
+    if (data.action?.startsWith('update_') && (!data.changes || Object.keys(data.changes).length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['changes'],
+        message: 'For update actions, you MUST provide at least one field in changes. Valid fields: count, reps, weight, intensityPercent, rest, rpe. Example: { "count": 5, "reps": 5, "intensityPercent": 80 }',
+      });
+    }
+
+    if (data.action === 'add_exercise') {
+      ensureAddExercisePayload(data.newData, ctx);
+    }
+  });
+
+type AddExerciseInput = z.infer<typeof AddExerciseInputSchema>;
+type AddSetGroupInput = z.infer<typeof AddSetGroupInputSchema>;
+
+const isAddExerciseInput = (payload: unknown): payload is AddExerciseInput =>
+  !!payload && typeof payload === 'object' && 'setGroups' in (payload as Record<string, unknown>);
+
+const isAddSetGroupInput = (payload: unknown): payload is AddSetGroupInput =>
+  !!payload && typeof payload === 'object' && !('setGroups' in (payload as Record<string, unknown>));
 
 type ApplyModificationParams = z.infer<typeof applyModificationParams>;
 
@@ -1073,10 +1186,25 @@ EXAMPLE - Change squat to 5x5 at 80%:
             results.push('❌ Exercise target required for add_setgroup');
             continue;
           }
+          const payload = isAddSetGroupInput(newData) ? newData : undefined;
           if (!weeks[weekIndex].days[dayIndex].exercises[targetExerciseIndex].setGroups) {
             weeks[weekIndex].days[dayIndex].exercises[targetExerciseIndex].setGroups = [];
           }
-          const newSetGroup = newData || { sets: 3, reps: 10, intensity: 70 };
+          
+          const newSetGroup = {
+            id: payload?.id || `sg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            count: payload?.count || 3,
+            baseSet: {
+              reps: 10,
+              weight: null,
+              rest: 90,
+              intensityPercent: 70,
+              ...(payload?.baseSet || {})
+            },
+            sets: payload?.sets || [],
+            ...payload
+          };
+          
           weeks[weekIndex].days[dayIndex].exercises[targetExerciseIndex].setGroups.push(newSetGroup);
           results.push(`✅ Added setgroup to "${targetExercise.name || 'exercise'}"`);
           break;
@@ -1111,15 +1239,126 @@ EXAMPLE - Change squat to 5x5 at 80%:
         }
 
         case 'add_exercise': {
-          if (!newData) {
+          if (!isAddExerciseInput(newData)) {
             results.push('❌ newData required for add_exercise');
             continue;
           }
+          const payload = newData;
+          
+          // Import exercise catalog utils for fuzzy resolution
+          const { resolveExerciseByName } = await import('../../utils/exercise-catalog.utils');
+          
+          // FUZZY RESOLUTION: If only name is provided (no catalogExerciseId), resolve it
+          let exerciseName = payload.name || 'New Exercise';
+          let catalogExerciseId = payload.catalogExerciseId || '';
+          let muscleGroups = payload.muscleGroups || [];
+          let equipment = payload.equipment || [];
+          let category = payload.category || 'strength';
+          
+          if (!catalogExerciseId && exerciseName && exerciseName !== 'New Exercise') {
+            console.log('[add_exercise] 🔍 Resolving exercise by name:', exerciseName);
+            const resolved = await resolveExerciseByName(exerciseName);
+            
+            if (resolved) {
+              catalogExerciseId = resolved.catalogExerciseId;
+              exerciseName = resolved.nameIt || resolved.name; // Prefer Italian name
+              muscleGroups = resolved.muscleGroups;
+              equipment = resolved.equipment;
+              category = resolved.category;
+              console.log('[add_exercise] ✅ Resolved to:', { 
+                catalogExerciseId, 
+                name: exerciseName 
+              });
+            } else {
+              console.log('[add_exercise] ⚠️ Could not resolve exercise, using provided name');
+            }
+          }
+          
+          // REQUIRE setGroups from AI - no silent fallback
+          if (!payload.setGroups || payload.setGroups.length === 0) {
+            results.push('❌ setGroups required for add_exercise. AI must provide [{ count, baseSet: { reps, intensityPercent, rest } }]');
+            continue;
+          }
+          
+          // Normalize setGroups - ensure required fields exist
+          const rawSetGroups = payload.setGroups;
+          
+          // Parse repRange from payload (e.g., "6-8" -> reps: 6, repsMax: 8)
+          const parseRepRange = (range: string | undefined): { reps?: number; repsMax?: number } => {
+            if (!range) return {};
+            const rangeMatch = range.match(/(\d+)\s*[-–]\s*(\d+)/);
+            if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
+              return { reps: parseInt(rangeMatch[1], 10), repsMax: parseInt(rangeMatch[2], 10) };
+            }
+            const singleMatch = range.match(/^(\d+)$/);
+            if (singleMatch && singleMatch[1]) {
+              return { reps: parseInt(singleMatch[1], 10) };
+            }
+            return {};
+          };
+          
+          const exerciseRepRange = parseRepRange(payload.repRange);
+
+          const exerciseToAdd = {
+            id: payload.id || `ex_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            name: exerciseName,
+            description: payload.description || '',
+            category,
+            muscleGroups,
+            setGroups: rawSetGroups.map((sg: any) => {
+              // Determine reps/repsMax: prefer setGroup-level, fallback to exercise-level repRange
+              const baseReps = sg.baseSet?.reps ?? exerciseRepRange.reps ?? 10;
+              const baseRepsMax = sg.baseSet?.repsMax ?? exerciseRepRange.repsMax ?? null;
+              
+              const baseSet = {
+                reps: baseReps,
+                repsMax: baseRepsMax,
+                weight: sg.baseSet?.weight ?? null,
+                rest: sg.baseSet?.rest ?? 90,
+                intensityPercent: sg.baseSet?.intensityPercent ?? 70,
+                rpe: sg.baseSet?.rpe ?? null,
+                ...sg.baseSet, // Allow override
+                // Ensure parsed values are used if baseSet didn't explicitly set them
+                ...(sg.baseSet?.reps === undefined && exerciseRepRange.reps ? { reps: exerciseRepRange.reps } : {}),
+                ...(sg.baseSet?.repsMax === undefined && exerciseRepRange.repsMax ? { repsMax: exerciseRepRange.repsMax } : {}),
+              };
+              
+              // Build individual sets if count is provided but sets array is empty
+              const count = sg.count || 3;
+              let sets = sg.sets && sg.sets.length > 0 ? sg.sets : [];
+              if (sets.length === 0 && count > 0) {
+                sets = Array.from({ length: count }, (_, i) => ({
+                  setNumber: i + 1,
+                  reps: baseSet.reps,
+                  repsMax: baseSet.repsMax,
+                  weight: baseSet.weight,
+                  intensityPercent: baseSet.intensityPercent,
+                  rest: baseSet.rest,
+                  rpe: baseSet.rpe,
+                }));
+              }
+              
+              return {
+                ...sg,
+                id: sg.id || `sg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                count,
+                baseSet,
+                sets,
+              };
+            }),
+            notes: payload.notes || '',
+            typeLabel: payload.typeLabel || '',
+            repRange: payload.repRange || '8-12',
+            formCues: payload.formCues || [],
+            equipment,
+            catalogExerciseId,
+          };
+          
           if (!weeks[weekIndex].days[dayIndex].exercises) {
             weeks[weekIndex].days[dayIndex].exercises = [];
           }
-          weeks[weekIndex].days[dayIndex].exercises.push(newData);
-          results.push(`✅ Added exercise "${newData.name || 'new exercise'}" to W${weekIndex + 1}D${dayIndex + 1}`);
+          weeks[weekIndex].days[dayIndex].exercises.push(exerciseToAdd);
+          results.push(`✅ Added exercise "${exerciseToAdd.name}" to W${weekIndex + 1}D${dayIndex + 1} with ${exerciseToAdd.setGroups.length} set group(s)`);
           break;
         }
 
@@ -1186,4 +1425,3 @@ EXAMPLE - Change squat to 5x5 at 80%:
 // del namespace MCP. Se serve un array di tool, usare
 // l'import * as granularTools from './granular' e filtrare.
 // =====================================================
-
