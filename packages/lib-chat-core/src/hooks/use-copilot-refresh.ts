@@ -143,13 +143,13 @@ export function useCopilotRefresh<T>(config: UseCopilotRefreshConfig<T>): void {
 /**
  * Convenience hook specifically for workout program refresh
  */
-export function useWorkoutCopilotRefresh(config: {
+export function useWorkoutCopilotRefresh<T = unknown>(config: {
   programId: string | undefined | null;
-  onProgramUpdated: (program: unknown) => void;
+  onProgramUpdated: (program: T) => void;
   onError?: (error: Error) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh({
+  useCopilotRefresh<T>({
     domain: 'workout',
     resourceId: config.programId,
     fetchFn: async () => {
@@ -158,7 +158,7 @@ export function useWorkoutCopilotRefresh(config: {
         throw new Error(`Failed to fetch workout: ${response.status}`);
       }
       const data = await response.json();
-      return data.program;
+      return data.program as T;
     },
     onDataReceived: config.onProgramUpdated,
     onError: config.onError,
@@ -169,13 +169,13 @@ export function useWorkoutCopilotRefresh(config: {
 /**
  * Convenience hook specifically for nutrition plan refresh
  */
-export function useNutritionCopilotRefresh(config: {
+export function useNutritionCopilotRefresh<T = unknown>(config: {
   planId: string | undefined | null;
-  onPlanUpdated: (plan: unknown) => void;
+  onPlanUpdated: (plan: T) => void;
   onError?: (error: Error) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh({
+  useCopilotRefresh<T>({
     domain: 'nutrition',
     resourceId: config.planId,
     fetchFn: async () => {
@@ -184,7 +184,7 @@ export function useNutritionCopilotRefresh(config: {
         throw new Error(`Failed to fetch nutrition plan: ${response.status}`);
       }
       const data = await response.json();
-      return data.plan;
+      return data.plan as T;
     },
     onDataReceived: config.onPlanUpdated,
     onError: config.onError,
@@ -195,13 +195,13 @@ export function useNutritionCopilotRefresh(config: {
 /**
  * Convenience hook specifically for OneAgenda project refresh
  */
-export function useOneAgendaCopilotRefresh(config: {
+export function useOneAgendaCopilotRefresh<T = unknown>(config: {
   projectId: string | undefined | null;
-  onProjectUpdated: (project: unknown) => void;
+  onProjectUpdated: (project: T) => void;
   onError?: (error: Error) => void;
   enabled?: boolean;
 }): void {
-  useCopilotRefresh({
+  useCopilotRefresh<T>({
     domain: 'oneagenda',
     resourceId: config.projectId,
     fetchFn: async () => {
@@ -210,7 +210,7 @@ export function useOneAgendaCopilotRefresh(config: {
         throw new Error(`Failed to fetch project: ${response.status}`);
       }
       const data = await response.json();
-      return data.project;
+      return data.project as T;
     },
     onDataReceived: config.onProjectUpdated,
     onError: config.onError,
