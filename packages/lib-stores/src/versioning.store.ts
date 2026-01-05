@@ -81,6 +81,9 @@ export interface VersioningState<T> {
   // UI Flags
   isInitialized: boolean;
   
+  /** Timestamp of last external update (realtime sync). Used to skip autosave. */
+  lastExternalUpdate: number;
+  
   // Actions
   initialize: (initialState: T) => void;
   setState: (update: T | ((prev: T) => T)) => void;
@@ -220,6 +223,7 @@ export function createVersioningStore<T>(
     redoStack: [],
     history: [],
     isInitialized: initialState !== null,
+    lastExternalUpdate: 0,
 
     // Initialize with new state
     initialize: (state: T) => {
@@ -392,7 +396,7 @@ export function createVersioningStore<T>(
 
     // Replace state from external source (realtime sync) without creating undo/redo entries
     replaceStateFromExternal: (newState: T) => {
-      set({ current: newState });
+      set({ current: newState, lastExternalUpdate: Date.now() });
       prevState = newState;
     },
   }));
@@ -410,6 +414,7 @@ export function useVersioningSelectors<T>(
   const redoStack = store((s) => s.redoStack);
   const history = store((s) => s.history);
   const isInitialized = store((s) => s.isInitialized);
+  const lastExternalUpdate = store((s) => s.lastExternalUpdate);
   
   const initialize = store((s) => s.initialize);
   const setState = store((s) => s.setState);
@@ -440,5 +445,7 @@ export function useVersioningSelectors<T>(
     isInitialized,
     hydrateHistory,
     replaceStateFromExternal,
+    /** Timestamp of last external update - use to skip autosave */
+    lastExternalUpdate,
   };
 }

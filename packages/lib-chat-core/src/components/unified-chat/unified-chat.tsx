@@ -33,6 +33,8 @@ import {
   Lightbulb,
   Paperclip,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { useUnifiedChat } from '../../hooks/use-unified-chat';
 import type { UnifiedChatProps, ScreenContextType } from '../../types/unified-chat';
@@ -223,7 +225,7 @@ export function UnifiedChat({
       return (
         <div key={index} className="group relative">
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <p className="whitespace-pre-wrap">{text}</p>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
           </div>
           {/* Message actions */}
           <div className="absolute right-0 -bottom-6 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
