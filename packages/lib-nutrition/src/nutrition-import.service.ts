@@ -4,12 +4,13 @@ import type {
   AIParseContext,
   ImportOptions,
   BaseImportResult,
+  ImportFileType,
 } from '@onecoach/lib-import-core';
 import {
   BaseImportService,
   parseWithVisionAI,
 } from '@onecoach/lib-import-core';
-import { normalizeAgentPayload, preparePlanForPersistence } from './helpers/plan-transform';
+import { normalizeAgentPayload, preparePlanForPersistence } from './core/transformers/plan-transform';
 import type { nutrition_plans } from '@prisma/client';
 import {
   toPrismaJsonAdaptations,
@@ -38,11 +39,17 @@ export interface NutritionImportResult extends BaseImportResult {
   parseResult?: ImportedNutritionPlan;
 }
 
+export interface NutritionImportProcessed {
+  normalized: ReturnType<typeof normalizeAgentPayload>;
+  persistenceData: ReturnType<typeof preparePlanForPersistence>;
+  parseResult: ImportedNutritionPlan;
+}
+
 /**
  * Service for importing nutrition plans.
  * Extends BaseImportService to use shared orchestration logic.
  */
-export class NutritionImportService extends BaseImportService<ImportedNutritionPlan, NutritionImportResult> {
+export class NutritionImportService extends BaseImportService<ImportedNutritionPlan, NutritionImportProcessed, NutritionImportResult> {
   protected getLoggerName(): string {
     return 'NutritionImport';
   }
@@ -99,7 +106,7 @@ Regole:
     parsed: ImportedNutritionPlan,
     userId: string,
     options?: Partial<ImportOptions>
-  ): Promise<unknown> {
+  ): Promise<NutritionImportProcessed> {
     NutritionImportOptionsSchema.parse(options ?? {});
 
     const normalized = normalizeAgentPayload(parsed, {
@@ -115,14 +122,10 @@ Regole:
   }
 
   protected async persist(
-    processed: unknown,
+    processed: NutritionImportProcessed,
     userId: string
   ): Promise<Partial<NutritionImportResult>> {
-    const { normalized, persistenceData, parseResult } = processed as {
-      normalized: ReturnType<typeof normalizeAgentPayload>;
-      persistenceData: ReturnType<typeof preparePlanForPersistence>;
-      parseResult: ImportedNutritionPlan;
-    };
+    const { normalized, persistenceData, parseResult } = processed;
 
     const plan = await prisma.nutrition_plans.create({
       data: {
@@ -163,12 +166,22 @@ Regole:
 
 export function createNutritionAIContext(): AIParseContext<ImportedNutritionPlan> {
   return {
-    parseWithAI: (content: string, mimeType: string, prompt: string) =>
-      parseWithVisionAI<ImportedNutritionPlan>({
+    parseWithAI: (content: string, mimeType: string, prompt: string, userId?: string) => {
+      let fileType: ImportFileType = 'document';
+      if (mimeType.startsWith('image/')) fileType = 'image';
+      if (mimeType === 'application/pdf') fileType = 'pdf';
+      if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) fileType = 'spreadsheet';
+
+      if (!userId) throw new Error('UserId richiesto per il parsing AI');
+
+      return parseWithVisionAI<ImportedNutritionPlan>({
         contentBase64: content,
         mimeType,
         prompt,
         schema: ImportedNutritionPlanSchema,
-      }),
+        userId,
+        fileType,
+      });
+    },
   };
 }

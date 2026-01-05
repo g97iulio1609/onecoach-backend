@@ -1,7 +1,8 @@
 /**
  * Utility pure per calcoli di intensità, peso e 1RM
  */
-import { kgToLbs, roundToPlateIncrement } from '@onecoach/lib-shared';
+import { kgToLbs } from '@onecoach/lib-shared/utils/weight-converter';
+import { roundToPlateIncrement } from '../utils';
 
 // =====================================================
 // RPE to Intensity Lookup Table

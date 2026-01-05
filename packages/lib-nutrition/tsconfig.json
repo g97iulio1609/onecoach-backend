@@ -19,9 +19,9 @@
   "references": [
     { "path": "../../../onecoach-shared/packages/contracts" },
     { "path": "../lib-core" },
-    { "path": "../../../onecoach-shared/packages/constants" },
-    { "path": "../../../onecoach-shared/packages/schemas" },
-    { "path": "../../../onecoach-shared/packages/types" },
+    { "path": "../../../onecoach-constants" },
+    { "path": "../../../onecoach-schemas" },
+    { "path": "../../../onecoach-types" },
     { "path": "../../../onecoach-shared/packages/lib-shared" }
   ]
 }

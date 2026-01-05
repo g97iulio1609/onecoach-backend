@@ -72,7 +72,7 @@ export function parseJsonIfString<T>(value: unknown): T | null {
     try {
       return JSON.parse(value) as T;
     } catch (_error: unknown) {
-      logger.warn('Failed to parse JSON string value', _error);
+      logger.warn('Failed to parse JSON string value', { error: _error });
       return null;
     }
   }

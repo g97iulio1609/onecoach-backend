@@ -10,10 +10,10 @@ import {
   normalizeNutritionPlan,
   preparePlanForPersistence,
   normalizeAgentPayload,
-} from './helpers/plan-transform';
-import { prepareProgramForPersistence } from '@onecoach/lib-workout/helpers/program-transform';
-import { normalizeWorkoutProgram } from '@onecoach/lib-workout/helpers/normalizers/workout-normalizer';
-import { normalizeAgentWorkoutPayload } from '@onecoach/lib-workout/helpers/program-server-transform';
+} from './core/transformers/plan-transform';
+import { prepareProgramForPersistence } from '@onecoach/lib-workout/core/transformers/program-transform';
+import { normalizeWorkoutProgram } from '@onecoach/lib-workout/core/normalizers/workout-normalizer';
+import { normalizeAgentWorkoutPayload } from '@onecoach/lib-workout/core/transformers/program-server-transform';
 import type { NutritionPlan, Macros, Meal, NutritionWeek, NutritionDay, WorkoutProgram, WorkoutWeek } from '@onecoach/types';
 import { Prisma } from '@prisma/client';
 

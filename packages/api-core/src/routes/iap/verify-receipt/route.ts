@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     } else {
       await db.subscriptions.create({
         data: {
-          id: createId('sub'),
+          id: createId(),
           userId: session.user.id,
           status: 'ACTIVE',
           plan,

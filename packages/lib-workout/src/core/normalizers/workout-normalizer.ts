@@ -60,7 +60,7 @@ export function normalizeDay(rawDay: unknown, index: number): WorkoutDay {
 
   return {
     dayNumber,
-    // Use 'name' directly (aligned with schema), with fallback to dayName for backward compatibility
+    dayName: ensureString(raw.dayName ?? raw.name ?? `Giorno ${dayNumber}`),
     name: ensureString(raw.name ?? raw.dayName ?? `Giorno ${dayNumber}`),
     notes: ensureString(raw.notes ?? ''),
     // Use 'totalDuration' directly (aligned with schema), with estimatedDurationMinutes as AI alias
@@ -116,6 +116,7 @@ export function normalizeWeek(rawWeek: unknown, index: number): WorkoutWeek {
         : [
           {
             dayNumber: 1,
+            dayName: 'Giorno 1',
             name: `Giorno 1`,
             exercises: [],
             notes: '',
@@ -181,6 +182,7 @@ export function normalizeWorkoutProgram(
           days: [
             {
               dayNumber: 1,
+              dayName: 'Giorno 1',
               name: `Giorno 1`,
               exercises: [],
               notes: '',

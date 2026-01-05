@@ -301,14 +301,14 @@ export class FoodService {
       const brand =
         existing ||
         (await prisma.food_brands.create({
-          data: { id: createId('brand'), name: data.brandName, nameNormalized: nameNorm },
+          data: { id: createId(), name: data.brandName, nameNormalized: nameNorm },
         }));
       resolvedBrandId = brand.id;
     }
 
     const food = await prisma.food_items.create({
       data: {
-        id: createId('food'),
+        id: createId(),
         name: data.name,
         nameNormalized,
         barcode: data.barcode,
@@ -324,7 +324,7 @@ export class FoodService {
         fatPct,
         food_item_translations: {
           create: SUPPORTED_FOOD_LOCALES.map((locale: string) => ({
-            id: createId('food_trans'),
+            id: createId(),
             locale,
             name: data.name, // Same name for all locales
             description: data.description, // Same description for all locales (can be enhanced later with AI translation)
@@ -412,7 +412,7 @@ export class FoodService {
         const brand =
           existing ||
           (await prisma.food_brands.create({
-            data: { id: createId('brand'), name: data.brandName, nameNormalized: nameNorm },
+            data: { id: createId(), name: data.brandName, nameNormalized: nameNorm },
           }));
         resolvedBrandId = brand.id;
       }

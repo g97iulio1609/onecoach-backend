@@ -432,7 +432,7 @@ export class GranularSessionService {
 
     // Create default setGroup if not provided
     const newSetGroup: SetGroup = {
-      id: setGroup.id || createId('setgroup'),
+      id: setGroup.id || createId(),
       count: setGroup.count || 3,
       baseSet: setGroup.baseSet || {
         reps: 10,
@@ -511,7 +511,7 @@ export class GranularSessionService {
     if (!setGroup) return { success: false, error: 'SetGroup not found' };
 
     const newSetGroup = deepClone(setGroup);
-    newSetGroup.id = createId('setgroup');
+    newSetGroup.id = createId();
 
     return this.addSetGroup(program, target, newSetGroup);
   }

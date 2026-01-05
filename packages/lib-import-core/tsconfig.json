@@ -6,17 +6,15 @@
     "baseUrl": "..",
     "noEmit": false,
     "skipLibCheck": true,
-    "paths": {
-      "@onecoach/lib-shared": [
-        "../../onecoach-shared/packages/lib-shared/src/index.ts"
-      ],
-      "@onecoach/lib-shared/*": [
-        "../../onecoach-shared/packages/lib-shared/src/*"
-      ]
-    }
+
   },
   "include": [
     "src/**/*"
+  ],
+  "references": [
+    { "path": "../lib-core" },
+    { "path": "../../../onecoach-shared/packages/lib-shared" },
+    { "path": "../../../lib-ai" }
   ],
   "exclude": [
     "node_modules",

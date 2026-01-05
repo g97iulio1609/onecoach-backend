@@ -6,7 +6,7 @@
  */
 
 import { NutritionStatus } from '@onecoach/types/client';
-import { parseNutritionStatus } from '../plan-transform';
+import { parseNutritionStatus } from '../transformers/plan-transform';
 
 /**
  * Interfaccia per il riepilogo del piano nutrizionale

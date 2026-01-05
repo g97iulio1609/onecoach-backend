@@ -10,7 +10,7 @@ import {
   calculateMacros,
   aggregateMealMacros,
   normalizeMacros,
-} from '@onecoach/lib-shared/utils/macro-calculations';
+} from '../core/utils/macro-calculations';
 
 /**
  * Sincronizza piano per il salvataggio

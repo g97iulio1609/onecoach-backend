@@ -100,15 +100,18 @@ export async function resolveExerciseByName(name: string): Promise<ResolvedExerc
   }
 
   // Score each exercise
-  const scored = translations.map(trans => {
+  const rawScored = translations.map((trans: typeof translations[number]) => {
     const exercise = trans.exercises;
-    if (!exercise) return { exercise: null, score: 0, translation: trans };
+    if (!exercise) return null;
     
     const allNames = exercise.exercise_translations.map((t: { name: string }) => t.name);
-    const maxScore = Math.max(...allNames.map(n => similarityScore(n, name)));
+    const maxScore = Math.max(...allNames.map((n: string) => similarityScore(n, name)));
     
     return { exercise, score: maxScore, translation: trans };
-  }).filter(s => s.exercise !== null);
+  });
+  
+  type ScoredItem = NonNullable<typeof rawScored[number]>;
+  const scored = rawScored.filter((s: typeof rawScored[number]): s is ScoredItem => s !== null);
 
   if (scored.length === 0) {
     console.log('[ExerciseCatalog] ❌ No valid exercises found');
@@ -116,7 +119,7 @@ export async function resolveExerciseByName(name: string): Promise<ResolvedExerc
   }
 
   // Sort by score descending
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a: typeof scored[number], b: typeof scored[number]) => b.score - a.score);
 
   const best = scored[0];
   

@@ -37,14 +37,14 @@ export function buildWorkoutExerciseFromCatalog(exercise: LocalizedExercise): Ex
 
   // Crea un setGroup di default
   const defaultSetGroup: SetGroup = {
-    id: createId('setgroup'),
+    id: createId(),
     count: 3,
     baseSet: { ...DEFAULT_SET },
     sets: [{ ...DEFAULT_SET }, { ...DEFAULT_SET }, { ...DEFAULT_SET }],
   };
 
   return {
-    id: createId('exercise_catalog'),
+    id: createId(),
     name: exercise.translation?.name ?? exercise.slug,
     description: exercise.translation?.description ?? exercise.overview ?? '',
     category: 'strength',

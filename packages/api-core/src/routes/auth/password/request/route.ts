@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     // Create new reset token
     await prisma.password_reset_tokens.create({
       data: {
-        id: createId('reset'),
+        id: createId(),
         userId: user.id,
         token: hashedToken,
         expiresAt,

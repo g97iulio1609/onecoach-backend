@@ -98,7 +98,7 @@ export class WorkoutTemplateService {
 
     const template = await prisma.workout_templates.create({
       data: {
-        id: createId('workout_template'),
+        id: createId(),
         userId,
         type: data.type,
         name: data.name.trim(),

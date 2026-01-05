@@ -29,11 +29,11 @@
     "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0",
     "ai": "6.0.5",
-    "zod": "4.3.4",
+    "zod": "4.3.5",
     "zod-to-json-schema": "^3.25.1"
   },
   "peerDependencies": {
-    "zod": "^4.1.13"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

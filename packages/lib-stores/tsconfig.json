@@ -5,12 +5,13 @@
     "composite": true,
     "noEmit": false,
     "strict": true,
-    "rootDir": "./src"
+    "rootDir": "../../../.."
   },
   "references": [
     { "path": "../lib-core" },
-    { "path": "../../../onecoach-shared/packages/types" },
-    { "path": "../../../onecoach-shared/packages/constants" }
+    { "path": "../../../onecoach-types" },
+    { "path": "../../../onecoach-constants" },
+    { "path": "../../../onecoach-shared/packages/lib-shared" }
   ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

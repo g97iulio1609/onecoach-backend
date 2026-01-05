@@ -8,6 +8,7 @@ import type {
   UpdateExerciseInput,
 } from '@onecoach/schemas/exercise.schema';
 import { ExerciseApprovalStatus, ExerciseRelationType, MuscleRole, Prisma } from '@prisma/client';
+import type { LocalizedExercise, ExerciseTranslationView } from '@onecoach/types';
 import type { Operation } from 'fast-json-patch';
 import { compare } from 'fast-json-patch';
 import { SimpleCache } from '@onecoach/lib-shared';
@@ -142,45 +143,9 @@ interface ExerciseSnapshot {
   }>;
 }
 
-export interface ExerciseTranslationView {
-  locale: string;
-  name: string;
-  shortName?: string | null;
-  description?: string | null;
-  searchTerms: string[];
-}
-
-export interface LocalizedExercise {
-  id: string;
-  slug: string;
-  name: string;
-  exerciseTypeId: string | null;
-  exerciseTypeName: string | null;
-  overview: string | null;
-  imageUrl: string | null;
-  videoUrl: string | null;
-  keywords: string[];
-  instructions: string[];
-  exerciseTips: string[];
-  variations: string[];
-  approvalStatus: ExerciseApprovalStatus;
-  approvedAt: Date | null;
-  isUserGenerated: boolean;
-  version: number;
-  locale: string;
-  translation: ExerciseTranslationView | null;
-  fallbackLocale: string | null;
-  translations?: ExerciseTranslationView[];
-  muscles: Array<{ id: string; name: string; slug: string; role: MuscleRole }>;
-  bodyParts: Array<{ id: string; name: string; slug: string }>;
-  equipments: Array<{ id: string; name: string; slug: string }>;
-  related: Array<{
-    id: string;
-    slug: string;
-    relation: ExerciseRelationType;
-    direction: 'inbound' | 'outbound';
-  }>;
-}
+// Remote local interfaces in favor of @onecoach/types equivalents
+// export interface ExerciseTranslationView { ... }
+// export interface LocalizedExercise { ... }
 
 // SSOT: Usa direttamente ExercisesResponse<LocalizedExercise> da lib-api
 // Nessuna duplicazione - tutti i service devono usare i tipi da lib-api come unica fonte di verità

@@ -28,7 +28,7 @@ export class WorkoutService implements IWorkoutService {
       const now = getCurrentTimestamp();
       const newWorkout: WorkoutProgram = {
         ...workout,
-        id: createId('workout'),
+        id: createId(),
         createdAt: now,
         updatedAt: now,
       };

@@ -34,7 +34,7 @@ export class MealTemplateService {
 
     const template = await prisma.meal_templates.create({
       data: {
-        id: createId('meal_template'),
+        id: createId(),
         userId,
         name: data.name.trim(),
         description: data.description?.trim() || null,

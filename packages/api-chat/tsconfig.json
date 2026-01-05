@@ -11,7 +11,7 @@
     { "path": "../../../one-agent" },
     { "path": "../lib-core" },
     { "path": "../../../onecoach-shared/packages/contracts" },
-    { "path": "../../../onecoach-shared/packages/schemas" },
-    { "path": "../../../onecoach-shared/packages/types" }
+    { "path": "../../../onecoach-schemas" },
+    { "path": "../../../onecoach-types" }
   ]
 }

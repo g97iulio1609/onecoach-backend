@@ -15,8 +15,8 @@ export * from './modification.service';
 export * from './helpers';
 export * from './nutrition-import.service';
 
-// SSOT - Nutrition Calculator
-export * from './nutrition-calculator';
+// Core domain logic (Pure functions, Calculators, Operations, Transformers)
+export * from './core';
 
 // Food auto-creation service
 export * from './food-auto-creation.service';

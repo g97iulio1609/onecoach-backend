@@ -29,7 +29,7 @@ const DEFAULT_MACROS = {
  */
 export async function resolveFoodReferences(plan: NutritionPlan): Promise<NutritionPlan> {
   try {
-    logger.warn('[resolveFoodReferences] Starting resolution for plan:', plan.id);
+    logger.warn('[resolveFoodReferences] Starting resolution for plan:', { id: plan.id });
 
     // Estrai tutti i foodItemId unici dal piano
     const foodItemIds = new Set<string>();
@@ -91,7 +91,7 @@ export async function resolveFoodReferences(plan: NutritionPlan): Promise<Nutrit
 
             if (!foodItem) {
               // Se alimento non trovato, mantieni struttura base
-              logger.warn('[resolveFoodReferences] Food not found in catalog:', food.foodItemId);
+              logger.warn('[resolveFoodReferences] Food not found in catalog:', { foodItemId: food.foodItemId });
               return {
                 ...food,
                 name: food.name || 'Unknown Food',

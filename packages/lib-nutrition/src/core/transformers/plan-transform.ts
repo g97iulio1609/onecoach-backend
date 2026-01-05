@@ -57,7 +57,7 @@ import {
   aggregateMealMacros,
   normalizeMacros,
   normalizeMacroValue,
-} from '@onecoach/lib-shared/utils/macro-calculations';
+} from '../utils/macro-calculations';
 import {
   parseCompleteMacrosSafe,
   isNutritionWeek,
@@ -290,7 +290,7 @@ export function parseNutritionStatus(value: unknown): NutritionStatus {
 export function normalizeNutritionPlan(plan: PrismaNutritionPlan): NutritionPlan {
   try {
     if (IS_DEV) {
-      logger.warn('[normalizeNutritionPlan] Starting normalization for plan:', plan.id);
+      logger.warn('[normalizeNutritionPlan] Starting normalization for plan:', { planId: plan.id });
     }
 
     const weeks = Array.isArray(plan.weeks) ? plan.weeks : [];
@@ -370,7 +370,7 @@ function normalizeWeek(week: unknown, index: number): NutritionWeek {
   }
 
   return {
-    id: rawWeek.id || createId(`week_${index}`),
+    id: rawWeek.id || createId(),
     weekNumber: rawWeek.weekNumber ?? index + 1,
     days: normalizedDays,
     weeklyAverageMacros,
@@ -399,7 +399,7 @@ function normalizeDay(day: unknown, index: number): NutritionDay {
     : aggregateMealMacros(normalizedMeals);
 
   return {
-    id: rawDay.id || createId(`day_${index}`),
+    id: rawDay.id || createId(),
     dayNumber: rawDay.dayNumber ?? index + 1,
     dayName: rawDay.dayName || `Day ${index + 1}`,
     meals: normalizedMeals,
@@ -408,7 +408,7 @@ function normalizeDay(day: unknown, index: number): NutritionDay {
   };
 }
 
-function normalizeMeal(meal: unknown, dayNumber: number, index: number): Meal {
+function normalizeMeal(meal: unknown, _dayNumber: number, index: number): Meal {
   const zodResult = MealSchema.safeParse(meal);
   if (zodResult.success) {
     return zodResult.data;
@@ -420,8 +420,8 @@ function normalizeMeal(meal: unknown, dayNumber: number, index: number): Meal {
 
   const rawMeal = meal as RawMeal;
   const foods = Array.isArray(rawMeal.foods) ? rawMeal.foods : [];
-  const normalizedFoods = foods.map((f: unknown, i: number) =>
-    normalizeFood(f, createId(`food_${dayNumber}_${index}_${i}`))
+  const normalizedFoods = foods.map((f: unknown, _i: number) =>
+    normalizeFood(f, createId())
   );
 
   const totalMacros = rawMeal.totalMacros
@@ -429,7 +429,7 @@ function normalizeMeal(meal: unknown, dayNumber: number, index: number): Meal {
     : calculateMacros(normalizedFoods);
 
   return {
-    id: rawMeal.id || createId(`meal_${dayNumber}_${index}`),
+    id: rawMeal.id || createId(),
     name: rawMeal.name || `Meal ${index + 1}`,
     type: (rawMeal.type || 'lunch') as MealType,
     time: rawMeal.time,
@@ -652,12 +652,12 @@ export function preparePlanForPersistence(plan: NutritionPlan): {
 
 export function createEmptyDay(dayNumber: number): NutritionDay {
   return {
-    id: createId(`day_${dayNumber}`),
+    id: createId(),
     dayNumber,
     dayName: `Day ${dayNumber}`,
     meals: [
       {
-        id: createId('meal_default'),
+        id: createId(),
         name: 'Breakfast',
         type: 'breakfast',
         foods: [],
@@ -670,7 +670,7 @@ export function createEmptyDay(dayNumber: number): NutritionDay {
 
 export function createEmptyWeek(weekNumber: number): NutritionWeek {
   return {
-    id: createId(`week_${weekNumber}`),
+    id: createId(),
     weekNumber,
     days: Array.from({ length: 7 }, (_, i) => createEmptyDay(i + 1)),
     weeklyAverageMacros: { ...DEFAULT_MACROS },
@@ -679,7 +679,7 @@ export function createEmptyWeek(weekNumber: number): NutritionWeek {
 
 export function createEmptyPlan(userId?: string): NutritionPlan {
   return {
-    id: createId('nutrition_temp'),
+    id: createId(),
     name: 'New Nutrition Plan',
     description: '',
     goals: ['MAINTENANCE'], // Use standard enum value instead of internal key
@@ -772,7 +772,7 @@ export function normalizeAgentPayload(
 
   // Build the plan object
   const planData = {
-    id: base?.id ?? createId('nutrition_agent'),
+    id: base?.id ?? createId(),
     name: raw.name || base?.name || 'Nutrition Plan',
     description: raw.description || base?.description || '',
     goals: parseGoals(normalizedGoals),

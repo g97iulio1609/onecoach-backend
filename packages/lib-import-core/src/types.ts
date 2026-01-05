@@ -40,7 +40,7 @@ export type ImportProgress = {
  * @template TParsed - The parsed output type (must be an object to support spread)
  */
 export type AIParseContext<TParsed extends object = Record<string, unknown>> = {
-  parseWithAI: (content: string, mimeType: string, prompt: string) => Promise<TParsed>;
+  parseWithAI: (content: string, mimeType: string, prompt: string, userId?: string) => Promise<TParsed>;
 };
 
 export type MimeHandler<TParsed> = (content: string, mimeType: string) => Promise<TParsed>;

@@ -13,14 +13,14 @@ import type {
   SetGroup,
   ExerciseSet,
 } from '@onecoach/types';
-import { createEmptyWeek, createEmptyDay, createEmptyExercise } from './program-transform';
+import { createEmptyWeek, createEmptyDay, createEmptyExercise } from '../transformers/program-transform';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
-import { DEFAULT_SET } from './constants';
+import { DEFAULT_SET } from '../constants';
 import { kgToLbs } from '@onecoach/lib-shared';
 import {
   getWorkoutProgramWeek,
   getWorkoutProgramDayByWeek,
-} from '@onecoach/lib-shared/utils/workout-program-helpers';
+} from '../utils/workout-program-helpers';
 
 /**
  * Aggiunge una nuova settimana al programma
@@ -281,7 +281,7 @@ export function addSetGroupToExercise(
   count: number
 ): WorkoutProgram {
   const newGroup: SetGroup = {
-    id: createId('setgroup'),
+    id: createId(),
     count,
     baseSet,
     sets: Array.from({ length: count }, () => ({ ...baseSet })),
@@ -369,7 +369,7 @@ export function groupSelectedSets(
   };
 
   const newGroup: SetGroup = {
-    id: createId('setgroup'),
+    id: createId(),
     count: setIndices.length,
     baseSet,
     sets: selectedSets,
@@ -383,7 +383,7 @@ export function groupSelectedSets(
   if (remainingSets.length > 0) {
     // Crea un gruppo per le serie rimanenti
     updatedSetGroups.push({
-      id: createId('setgroup'),
+      id: createId(),
       count: remainingSets.length,
       baseSet: remainingSets[0] || DEFAULT_SET,
       sets: remainingSets,
@@ -427,7 +427,7 @@ export function splitSetGroup(
   let newGroups: SetGroup[];
   if (freedSets.length > 0) {
     const freedGroup: SetGroup = {
-      id: createId('setgroup'),
+      id: createId(),
       count: freedSets.length,
       baseSet: freedSets[0] || DEFAULT_SET,
       sets: freedSets,
@@ -490,7 +490,7 @@ export function duplicateSetGroup(
 
   const duplicatedGroup: SetGroup = {
     ...group,
-    id: createId('setgroup'),
+    id: createId(),
     sets: group.sets.map((s: ExerciseSet) => ({ ...s })),
   };
 

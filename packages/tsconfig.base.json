@@ -30,16 +30,16 @@
     "baseUrl": "..",
     "paths": {
       "@onecoach/constants": [
-        "../onecoach-shared/packages/constants/src/index.ts"
+        "../onecoach-constants/src/index.ts"
       ],
       "@onecoach/constants/*": [
-        "../onecoach-shared/packages/constants/src/*"
+        "../onecoach-constants/src/*"
       ],
       "@onecoach/schemas": [
-        "../onecoach-shared/packages/schemas/src/index.ts"
+        "../onecoach-schemas/src/index.ts"
       ],
       "@onecoach/schemas/*": [
-        "../onecoach-shared/packages/schemas/src/*"
+        "../onecoach-schemas/src/*"
       ],
       "@onecoach/contracts": [
         "../onecoach-shared/packages/contracts/src/index.ts"
@@ -288,10 +288,10 @@
         "../../one-agent/src/*"
       ],
       "@onecoach/types": [
-        "../onecoach-shared/packages/types/src/index.ts"
+        "../onecoach-types/src/index.ts"
       ],
       "@onecoach/types/*": [
-        "../onecoach-shared/packages/types/src/*"
+        "../onecoach-types/src/*"
       ],
       "@onecoach/features/analytics": [
         "./packages/features/analytics/index.ts"

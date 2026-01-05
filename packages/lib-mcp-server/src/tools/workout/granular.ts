@@ -17,8 +17,7 @@ import type { McpTool } from '../../types';
 import { GranularSessionService } from '@onecoach/lib-workout';
 import { workoutProgramSchema } from '@onecoach/schemas';
 import { normalizeWorkoutProgram } from './program-normalizer';
-import { prisma } from '@onecoach/lib-core';
-import { Prisma } from '@prisma/client';
+import { prisma, type Prisma } from '@onecoach/lib-core';
 
 // =====================================================
 // MCP-Safe Schema (JSON-compatible for AI SDK)

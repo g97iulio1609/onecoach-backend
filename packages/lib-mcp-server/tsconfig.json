@@ -11,16 +11,16 @@
     "baseUrl": ".",
     "paths": {
       "@onecoach/types": [
-        "../types/dist/index.d.ts"
+        "../../../onecoach-types/dist/index.d.ts"
       ],
       "@onecoach/types/*": [
-        "../types/dist/*.d.ts"
+        "../../../onecoach-types/dist/*.d.ts"
       ],
       "@onecoach/schemas": [
-        "../schemas/dist/index.d.ts"
+        "../../../onecoach-schemas/dist/index.d.ts"
       ],
       "@onecoach/schemas/*": [
-        "../schemas/dist/*"
+        "../../../onecoach-schemas/dist/*"
       ],
       "@onecoach/lib-core": [
         "../lib-core/dist/index.d.ts"
@@ -63,6 +63,12 @@
       ],
       "@onecoach/lib-exercise/*": [
         "./src/stubs/lib-exercise.d.ts"
+      ],
+      "@onecoach/lib-copilot-framework": [
+        "../../../../submodules/lib-copilot-framework/src/index.ts"
+      ],
+      "@onecoach/lib-copilot-framework/*": [
+        "../../../../submodules/lib-copilot-framework/src/*"
       ]
     }
   },
@@ -72,5 +78,8 @@
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "references": [
+    { "path": "../../../../submodules/lib-copilot-framework" }
   ]
 }

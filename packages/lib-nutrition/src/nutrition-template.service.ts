@@ -95,7 +95,7 @@ export class NutritionTemplateService {
 
     const template = await prisma.nutrition_templates.create({
       data: {
-        id: createId('nutrition_template'),
+        id: createId(),
         userId,
         type: data.type,
         name: data.name.trim(),

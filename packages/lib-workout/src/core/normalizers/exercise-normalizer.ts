@@ -13,9 +13,9 @@ import {
   ensureString,
   parseFirstNumber,
 } from '../utils/type-helpers';
-import { getMuscleGroupFromName } from '../utils/muscle-group';
+import { getMuscleGroupFromName } from '../../helpers/utils/muscle-group';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
-import { kgToLbs, lbsToKg } from '@onecoach/lib-shared';
+import { kgToLbs, lbsToKg } from '@onecoach/lib-shared/utils/weight-converter';
 
 type RawJson = Record<string, unknown>;
 
@@ -165,7 +165,7 @@ export function normalizeSetGroup(raw: unknown): SetGroup | null {
   if (!raw || typeof raw !== 'object') return null;
 
   const group = raw as RawJson;
-  const id = typeof group.id === 'string' ? group.id : createId('setgroup');
+  const id = typeof group.id === 'string' ? group.id : createId();
   const count = ensureNumber(group.count, 1);
   const baseSet = normalizeExerciseSets([group.baseSet])[0] || { ...DEFAULT_SET };
   const progression = normalizeSetProgression(group.progression);
@@ -194,14 +194,13 @@ export function normalizeSetGroup(raw: unknown): SetGroup | null {
  */
 export function normalizeExercise(
   rawExercise: unknown,
-  dayNumber: number,
+  _dayNumber: number,
   index: number
 ): Exercise {
   const raw =
     rawExercise && typeof rawExercise === 'object' ? (rawExercise as RawJson) : ({} as RawJson);
 
-  const baseId = `exercise_${dayNumber}_${index + 1}`;
-  const id = typeof raw.id === 'string' && raw.id.length > 0 ? raw.id : createId(baseId);
+  const id = typeof raw.id === 'string' && raw.id.length > 0 ? raw.id : createId();
 
   // Il nome viene da raw.name o exerciseName (AI output) o risolto dal frontend se exerciseId è presente
   const name = ensureString(
@@ -376,7 +375,7 @@ export function normalizeExercise(
 
         return [
           {
-            id: createId('setgroup'),
+            id: createId(),
             count: sets.length,
             baseSet: cleanBaseSet,
             sets: sets,

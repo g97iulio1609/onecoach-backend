@@ -269,7 +269,7 @@ export class FoodAutoCreationService {
   private static async createFoodInDatabase(
     food: FoodToProcess
   ): Promise<{ id: string; name: string }> {
-    const foodId = createId('food');
+    const foodId = createId();
     const nameNormalized = normalizeFoodName(food.name);
 
     // Calcola percentuali macro (REQUIRED dal DB)
@@ -317,7 +317,7 @@ export class FoodAutoCreationService {
       ...(food.barcode && String(food.barcode).trim() !== '' && { barcode: food.barcode }),
       food_item_translations: {
         create: SUPPORTED_FOOD_LOCALES.map((locale: string) => ({
-          id: createId('food_trans'),
+          id: createId(),
           locale,
           name: food.name,
           description: description,
@@ -366,7 +366,7 @@ export class FoodAutoCreationService {
 
       const newBrand = await prisma.food_brands.create({
         data: {
-          id: createId('brand'),
+          id: createId(),
           name: brandName,
           nameNormalized: brandNameNormalized,
         },
@@ -669,7 +669,7 @@ export class FoodAutoCreationService {
         // Log warning ma processa comunque con defaults
         logger.warn(
           `[FoodAutoCreation] AIFood validation failed for "${aiFood.name}":`,
-          validation.error.issues.map((i: any) => i.message).join(', ')
+          { errors: validation.error.issues.map((i: any) => i.message).join(', ') }
         );
 
         // Processa con defaults

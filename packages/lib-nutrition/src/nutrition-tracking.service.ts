@@ -59,7 +59,7 @@ function toNutritionDayLog(record: NutritionDayLogRecord): NutritionDayLog {
 import {
   normalizeNutritionPlan,
   type PrismaNutritionPlan,
-} from '@onecoach/lib-nutrition/helpers/plan-transform';
+} from './core/transformers/plan-transform';
 
 /**
  * Create a new nutrition day log
@@ -326,7 +326,7 @@ export async function getNutritionPlanStats(
   const { getNutritionPlanTotalDays } =
     await import('@onecoach/lib-shared/utils/nutrition-plan-helpers');
   const { normalizeNutritionPlan: normalizePlanDynamic } =
-    await import('@onecoach/lib-nutrition/helpers/plan-transform');
+    await import('./core/transformers/plan-transform');
   const normalizedPlan = normalizePlanDynamic(plan as unknown as PrismaNutritionPlan);
   const totalDays = getNutritionPlanTotalDays(normalizedPlan);
 
@@ -405,7 +405,7 @@ export function calculateActualDailyMacros(meals: Array<Record<string, unknown>>
         protein: dailyTotal.protein + mealMacros.protein,
         carbs: dailyTotal.carbs + mealMacros.carbs,
         fats: dailyTotal.fats + mealMacros.fats,
-        fiber: (dailyTotal.fiber || 0) + mealMacros.fiber,
+        fiber: (dailyTotal.fiber || 0) + (mealMacros.fiber || 0),
       };
     },
     { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 }

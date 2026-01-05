@@ -8,19 +8,19 @@ import type {
   SetGroup,
 } from '@onecoach/types';
 import { createId } from '@onecoach/lib-shared/utils/id-generator';
-import { DEFAULT_SET } from './constants';
-import { ensureArrayOfStrings, ensureNumber, ensureString } from './utils/type-helpers';
+import { DEFAULT_SET } from '../constants';
+import { ensureArrayOfStrings, ensureNumber, ensureString } from '../utils/type-helpers';
 import { syncWeightUnits } from '@onecoach/lib-shared/utils/weight-converter';
 import {
   normalizeDifficulty,
   normalizeStatus,
   normalizeWeek,
   normalizeMetadata,
-} from './normalizers/workout-normalizer';
+} from '../normalizers/workout-normalizer';
 
 export function createEmptyExercise(): Exercise {
   return {
-    id: createId('exercise'),
+    id: createId(),
     catalogExerciseId: '', // Will be set when selecting from catalog
     name: 'Nuovo esercizio',
     description: '',
@@ -28,7 +28,7 @@ export function createEmptyExercise(): Exercise {
     muscleGroups: [],
     setGroups: [
       {
-        id: createId('setgroup'),
+        id: createId(),
         count: 1,
         baseSet: { ...DEFAULT_SET },
         sets: [{ ...DEFAULT_SET }],
@@ -45,6 +45,7 @@ export function createEmptyExercise(): Exercise {
 export function createEmptyDay(_weekNumber: number, dayNumber: number): WorkoutDay {
   return {
     dayNumber,
+    dayName: `Giorno ${dayNumber}`,
     name: `Giorno ${dayNumber}`,
     exercises: [],
     notes: '',
@@ -98,7 +99,7 @@ export function reconstructSetGroups(exercise: Exercise): Exercise {
 export function createEmptyProgram(): WorkoutProgram {
   const now = new Date().toISOString();
   return {
-    id: createId('workout_temp'),
+    id: createId(),
     name: 'Nuovo programma di allenamento',
     description: '',
     difficulty: DifficultyLevel.BEGINNER,
@@ -138,10 +139,10 @@ export function prepareProgramForPersistence(program: WorkoutProgram) {
         targetMuscles: day.targetMuscles ?? [],
         warmup: day.warmup,
         cooldown: day.cooldown,
-        exercises: day.exercises.map((exercise, exerciseIndex) => ({
+        exercises: day.exercises.map((exercise) => ({
           id:
             exercise.id ||
-            createId(`exercise_${weekIndex + 1}_${dayIndex + 1}_${exerciseIndex + 1}`),
+            createId(),
           name: exercise.name,
           description: exercise.description,
           category: exercise.category,
@@ -291,7 +292,7 @@ export function normalizeAgentWorkoutPayloadSync(
   }
 
   return {
-    id: base?.id ?? createId('workout_agent'),
+    id: base?.id ?? createId(),
     name: ensureString(raw.name ?? base?.name ?? 'Workout Program'),
     description: ensureString(raw.description ?? base?.description ?? ''),
     difficulty: raw.difficulty

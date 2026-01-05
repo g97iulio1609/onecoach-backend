@@ -13,72 +13,15 @@ import type {
   ExerciseSet,
   SetGroup,
 } from '@onecoach/types';
-import {
-  calculateWeightFromIntensity,
-  calculateIntensityFromWeight,
-} from './helpers/intensity-calculator';
-import { kgToLbs, roundToPlateIncrement } from '@onecoach/lib-shared';
 import { OneRepMaxService } from '@onecoach/lib-exercise/one-rep-max.service';
 import { prisma } from '@onecoach/lib-core/prisma';
 import { userProfileService } from '@onecoach/lib-core/user-profile.service';
-import { prepareProgramForPersistence } from './helpers/program-transform';
-import { normalizeWorkoutProgram } from './helpers/normalizers/workout-normalizer';
+import { prepareProgramForPersistence } from './core/transformers/program-transform';
+import { normalizeWorkoutProgram } from './core/normalizers/workout-normalizer';
+import { calculateSetWeights } from './core/calculators/weight-calculator';
 import { Prisma } from '@prisma/client';
 
 import { logger } from '@onecoach/lib-core';
-/**
- * Calculate weights for a single set based on 1RM
- * Extracted common logic for reuse (DRY principle)
- * @param set - Exercise set to calculate weights for
- * @param oneRepMaxKg - User's 1RM for the exercise in kg
- * @param weightIncrement - Plate increment for rounding (default 2.5)
- * @returns Updated set with calculated weight, weightLbs, and intensityPercent
- */
-export function calculateSetWeights(
-  set: ExerciseSet,
-  oneRepMaxKg: number,
-  weightIncrement: number = 2.5
-): ExerciseSet {
-  let newWeight: number | null = set.weight ?? null;
-  let newWeightLbs: number | null = set.weightLbs ?? null;
-  let newIntensityPercent: number | null = set.intensityPercent ?? null;
-
-  // Priority: use intensityPercent to calculate weight if available
-  if (set.intensityPercent !== null && set.intensityPercent !== undefined && oneRepMaxKg > 0) {
-    newWeight = calculateWeightFromIntensity(oneRepMaxKg, set.intensityPercent);
-    // Apply plate rounding
-    newWeight = roundToPlateIncrement(newWeight, weightIncrement);
-    newWeightLbs = kgToLbs(newWeight);
-  }
-  // Fallback: calculate intensityPercent from weight
-  else if (
-    set.weight !== null &&
-    set.weight !== undefined &&
-    (newIntensityPercent === null || newIntensityPercent === undefined) &&
-    oneRepMaxKg > 0
-  ) {
-    newIntensityPercent = calculateIntensityFromWeight(set.weight, oneRepMaxKg);
-    if ((newWeightLbs === null || newWeightLbs === undefined) && newWeight !== null) {
-      newWeightLbs = kgToLbs(newWeight);
-    }
-  }
-  // Ensure weightLbs is calculated if weight exists
-  else if (
-    set.weight !== null &&
-    set.weight !== undefined &&
-    (newWeightLbs === null || newWeightLbs === undefined)
-  ) {
-    newWeightLbs = kgToLbs(set.weight);
-  }
-
-  return {
-    ...set,
-    weight: newWeight,
-    weightLbs: newWeightLbs,
-    intensityPercent: newIntensityPercent,
-    rpe: set.rpe ?? null,
-  };
-}
 
 /**
  * Calcola i pesi in un programma basandosi sugli 1RM dell'utente

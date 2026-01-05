@@ -8,8 +8,7 @@
 
 import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
-import { prisma } from '@onecoach/lib-core';
-import type { Prisma } from '@prisma/client';
+import { prisma, type Prisma } from '@onecoach/lib-core';
 
 // ============================================================================
 // TYPE DEFINITIONS

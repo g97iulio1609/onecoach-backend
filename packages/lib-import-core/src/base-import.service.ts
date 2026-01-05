@@ -95,7 +95,7 @@ export abstract class BaseImportService<TAIRaw extends object, TParsed extends o
                 message: 'Parsing con AI...',
                 progress: 0.25,
             });
-            const rawParsed = await this.parseFiles(files, options);
+            const rawParsed = await this.parseFiles(files, userId, options);
 
             // Step 3: Processing -> transforms TAIRaw to TParsed
             this.emit({
@@ -202,13 +202,14 @@ export abstract class BaseImportService<TAIRaw extends object, TParsed extends o
      */
     protected async parseFiles(
         files: ImportFile[],
+        userId: string,
         options?: Partial<ImportOptions>
     ): Promise<TAIRaw> {
         const prompt = this.buildPrompt(options);
 
         // Create unified handler that uses AI context
         const handler = async (content: string, mimeType: string): Promise<TAIRaw> => {
-            return this.aiContext.parseWithAI(content, mimeType, prompt);
+            return this.aiContext.parseWithAI(content, mimeType, prompt, userId);
         };
 
         // Build MIME router with TAIRaw type

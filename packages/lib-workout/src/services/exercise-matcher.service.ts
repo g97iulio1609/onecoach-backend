@@ -787,7 +787,7 @@ export class ExerciseMatcherService {
     }
 
     // Crea l'esercizio con flag isImported
-    const exerciseId = createId('exr');
+    const exerciseId = createId();
     const slug = name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -804,7 +804,7 @@ export class ExerciseMatcherService {
         updatedAt: new Date(),
         exercise_translations: {
           create: {
-            id: createId('ext'),
+            id: createId(),
             locale: locale,
             name: name,
             searchTerms: [name.toLowerCase()],

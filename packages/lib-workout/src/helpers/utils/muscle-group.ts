@@ -5,7 +5,7 @@
  */
 
 import type { MuscleGroup } from '@onecoach/types';
-import { ALLOWED_MUSCLE_GROUPS, MUSCLE_GROUP_ALIASES } from '../constants';
+import { ALLOWED_MUSCLE_GROUPS, MUSCLE_GROUP_ALIASES } from '../../core/constants';
 
 /**
  * Normalizza un nome di gruppo muscolare al valore standard

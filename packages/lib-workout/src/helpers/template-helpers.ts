@@ -40,10 +40,10 @@ export function reIdTemplateData<T extends Exercise | WorkoutDay | WorkoutWeek>(
       // SSOT: Solo setGroups, non exercise.sets
       return {
         ...exercise,
-        id: createId('exercise'),
+        id: createId(),
         setGroups: exercise.setGroups?.map((group: SetGroup) => ({
           ...group,
-          id: createId('setgroup'),
+          id: createId(),
           sets: group.sets.map((set: ExerciseSet) => ({ ...set })),
         })),
       } as T;
@@ -55,10 +55,10 @@ export function reIdTemplateData<T extends Exercise | WorkoutDay | WorkoutWeek>(
         ...day,
         exercises: day.exercises.map((exercise: Exercise) => ({
           ...exercise,
-          id: createId('exercise'),
+          id: createId(),
           setGroups: exercise.setGroups?.map((group: SetGroup) => ({
             ...group,
-            id: createId('setgroup'),
+            id: createId(),
             sets: group.sets.map((set: ExerciseSet) => ({ ...set })),
           })),
         })),
@@ -73,10 +73,10 @@ export function reIdTemplateData<T extends Exercise | WorkoutDay | WorkoutWeek>(
           ...day,
           exercises: day.exercises.map((exercise: Exercise) => ({
             ...exercise,
-            id: createId('exercise'),
+            id: createId(),
             setGroups: exercise.setGroups?.map((group: SetGroup) => ({
               ...group,
-              id: createId('setgroup'),
+              id: createId(),
               sets: group.sets.map((set: ExerciseSet) => ({ ...set })),
             })),
           })),

@@ -29,7 +29,7 @@ export class NutritionService implements INutritionService {
       const now = getCurrentTimestamp();
       const newPlan: NutritionPlan = {
         ...plan,
-        id: createId('nutrition'),
+        id: createId(),
         createdAt: now,
         updatedAt: now,
         status: plan.status ?? ('DRAFT' as NutritionPlan['status']),

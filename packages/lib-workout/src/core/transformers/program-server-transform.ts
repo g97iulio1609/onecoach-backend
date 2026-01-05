@@ -17,14 +17,14 @@ import {
   ensureArrayOfStrings,
   ensureNumber,
   ensureString,
-} from './utils';
+} from '../utils';
 import { convertWorkoutGoalNamesToIds } from '@onecoach/lib-metadata/metadata-translation.service';
 import {
   normalizeDifficulty,
   normalizeStatus,
   normalizeWeek,
   normalizeMetadata,
-} from './normalizers';
+} from '../normalizers';
 import { createEmptyWeek } from './program-transform';
 
 type RawJson = Record<string, unknown>;
