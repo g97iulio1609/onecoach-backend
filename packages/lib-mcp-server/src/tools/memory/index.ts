@@ -7,9 +7,8 @@
  */
 
 import { z } from 'zod';
-import type { McpTool, McpContext } from '../../types';
-import { userMemoryService, timelineService } from '@onecoach/lib-core';
-import type { MemoryDomain } from '@onecoach/lib-core';
+import { type MemoryDomain, userMemoryService, timelineService } from '@onecoach/lib-core';
+import type { McpTool, McpContext } from '../../types'; // Assuming types are here or widely available
 
 // ============================================================================
 // GET MEMORY TOOL

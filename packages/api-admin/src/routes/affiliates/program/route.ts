@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { prisma } from '@onecoach/lib-core';
+import { requireAdmin } from '@onecoach/lib-core';
 import type { Prisma as PrismaTypes } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
@@ -77,8 +77,8 @@ export async function PUT(_req: Request) {
     const sanitizedPendingDays = Math.max(0, Math.floor(sanitizeNumber(rewardPendingDays, 14)));
     const sanitizedGraceDays = Math.max(0, Math.floor(sanitizeNumber(subscriptionGraceDays, 3)));
 
-    const normalizedLevels = levels
-      .map((level: AffiliateLevelInput) => ({
+    const normalizedLevels = (levels as AffiliateLevelInput[])
+      .map((level) => ({
         level: Math.max(1, Math.floor(sanitizeNumber(level.level))),
         commissionRate: Math.max(0, sanitizeNumber(level.commissionRate)),
         creditReward: Math.max(0, Math.floor(sanitizeNumber(level.creditReward))),
@@ -86,7 +86,7 @@ export async function PUT(_req: Request) {
       .sort((a, b) => a.level - b.level)
       .slice(0, sanitizedMaxLevels);
 
-    const levelIds = normalizedLevels.map((level: unknown) => level.level);
+    const levelIds = normalizedLevels.map((level) => level.level);
     const existingProgram = id
       ? await prisma.affiliate_programs.findUnique({
           where: { id },
@@ -161,7 +161,7 @@ export async function PUT(_req: Request) {
           subscriptionGraceDays: sanitizedGraceDays,
           lifetimeCommissions: Boolean(lifetimeCommissions),
           affiliate_program_levels: {
-            create: normalizedLevels.map((level: unknown) => ({
+            create: normalizedLevels.map((level) => ({
               level: level.level,
               commissionRate: new Prisma.Decimal(level.commissionRate),
               creditReward: level.creditReward,

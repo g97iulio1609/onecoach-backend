@@ -5,10 +5,10 @@
  * Segue principi KISS, SOLID, DRY
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { getStripe } from '@onecoach/lib-core/stripe';
 import { creditService } from '@onecoach/lib-core/credit.service';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared';
 import type { PromotionType, DiscountType } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import type Stripe from 'stripe';

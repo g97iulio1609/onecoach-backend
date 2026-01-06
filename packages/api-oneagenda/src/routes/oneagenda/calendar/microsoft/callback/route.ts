@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID || '';
 const MICROSOFT_CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || '';

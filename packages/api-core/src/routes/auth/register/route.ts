@@ -6,12 +6,12 @@
 
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type { RegisterData } from '@onecoach/types';
-import { AffiliateService } from '@onecoach/lib-marketplace/affiliate.service';
+import { AffiliateService } from '@onecoach/lib-marketplace';
 import { InvitationService } from '@onecoach/lib-core/invitation.service';
 import { ConsentService } from '@onecoach/lib-core/consent.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';

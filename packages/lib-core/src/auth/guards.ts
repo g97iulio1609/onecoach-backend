@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from './session';
 import { isAdminRole, isSuperAdminRole } from './roles';
 
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 /**
  * Guard per verificare autenticazione
  * Ritorna user se autenticato, altrimenti NextResponse con errore 401

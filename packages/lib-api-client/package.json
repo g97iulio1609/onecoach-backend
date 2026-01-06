@@ -36,6 +36,10 @@
     "./memory": {
       "types": "./src/memory.ts",
       "default": "./src/memory.ts"
+    },
+    "./native": {
+      "types": "./src/native.ts",
+      "default": "./src/native.ts"
     }
   },
   "scripts": {

@@ -5,10 +5,10 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { PromotionService } from '@onecoach/lib-marketplace/promotion.service';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { requireAdmin } from '@onecoach/lib-core';
+import { PromotionService } from '@onecoach/lib-marketplace';
+import { prisma } from '@onecoach/lib-core';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,10 +62,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     });
   } catch (error: unknown) {
     logError("Errore nell'applicazione della promozione", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'applicazione della promozione"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

@@ -10,7 +10,7 @@
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 /**
  * Rappresenta una connessione MCP isolata

@@ -32,9 +32,9 @@ import {
   HEALTH_DATA_TYPES,
   DEFAULT_SYNC_DAYS,
   HEALTH_STORAGE_KEYS,
-} from '@onecoach/constants/health.config';
-import { logger } from '@onecoach/lib-shared/utils/logger';
-import { getErrorMessage } from '@onecoach/lib-shared/utils/error';
+} from '@onecoach/constants.config';
+import { logger } from '@onecoach/lib-shared';
+import { getErrorMessage } from '@onecoach/lib-shared';
 
 /**
  * Hook to initialize and manage Health Kit/Connect

@@ -5,8 +5,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { requireAdmin } from '@onecoach/lib-core';
+import { prisma } from '@onecoach/lib-core';
 import { AffiliateRewardStatus, Prisma } from '@onecoach/types';
 
 import { logger } from '@onecoach/lib-core';

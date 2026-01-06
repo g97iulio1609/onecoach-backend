@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 
 export const dynamic = 'force-dynamic';
 import {

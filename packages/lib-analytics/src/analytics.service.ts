@@ -7,7 +7,7 @@
 
 import 'server-only';
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { getExerciseSets } from '@onecoach/one-workout';
 import type {
   UserAnalyticsReport,

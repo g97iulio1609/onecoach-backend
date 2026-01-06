@@ -4,7 +4,7 @@
  * Manages onboarding progress and wizard state
  * Replaces OnboardingContext with a simpler solution
  */
-import type { OnboardingProgress } from '@onecoach/constants/onboarding-constants';
+import type { OnboardingProgress } from '@onecoach/constants';
 export type { OnboardingProgress };
 /**
  * Onboarding step completion

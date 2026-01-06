@@ -7,10 +7,10 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 import { PolicyService } from '@onecoach/lib-core/policy.service';
 import type { PolicyStatus } from '@onecoach/types';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,10 +75,7 @@ export async function PUT(_req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (error: unknown) {
     logError("Errore nell'aggiornamento della policy", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'aggiornamento della policy"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }
@@ -101,10 +98,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     });
   } catch (error: unknown) {
     logError("Errore nell'eliminazione della policy", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'eliminazione della policy"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

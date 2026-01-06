@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth/config';
-import { prisma as db } from '@onecoach/lib-core/prisma';
+import { prisma as db } from '@onecoach/lib-core';
 import {
   verifyAppleReceipt,
   verifyGoogleReceipt,
 } from '@onecoach/lib-core/iap-verification.server';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import type { SubscriptionPlan } from '@onecoach/types';
 
 export const dynamic = 'force-dynamic';

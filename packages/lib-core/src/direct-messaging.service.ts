@@ -5,7 +5,7 @@
  * Implements SOLID principles (SRP, DIP)
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from './prisma';
 import { Prisma } from '@prisma/client';
 import { createId } from '@paralleldrive/cuid2';
 import type {

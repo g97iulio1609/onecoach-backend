@@ -1,5 +1,5 @@
 import { ExerciseAdminService } from '@onecoach/lib-exercise-admin.service';
-import { createGenerationHandler } from '@onecoach/lib-api/utils/generation-handler';
+import { createGenerationHandler } from '@onecoach/lib-api';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';

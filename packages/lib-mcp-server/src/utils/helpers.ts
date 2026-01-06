@@ -12,10 +12,9 @@
  * @module lib-mcp-server/utils/helpers
  */
 
+import { logger, handleMemoryEvent } from '@onecoach/lib-core';
 import type { McpSuccessResponse, McpTool } from '../types';
-import { handleMemoryEvent } from '@onecoach/lib-core';
 
-import { logger } from '@onecoach/lib-core';
 // ============================================================================
 // VALIDATION HELPERS
 // ============================================================================

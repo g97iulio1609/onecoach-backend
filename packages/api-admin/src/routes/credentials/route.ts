@@ -6,15 +6,15 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { requireAdmin } from '@onecoach/lib-core';
+import { prisma } from '@onecoach/lib-core';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import {
   updateVercelAdminCredentials,
   updateVercelSuperAdminCredentials,
 } from '@onecoach/lib-vercel-admin';
 import bcrypt from 'bcryptjs';
-import { validatePassword } from '@onecoach/lib-shared/utils/password-validation';
+import { validatePassword } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,5 +1,5 @@
-import { FoodAdminService } from '@onecoach/lib-food';
-import { createGenerationHandler } from '@onecoach/lib-api/utils/generation-handler';
+import { generateFoodsWithAgent } from '@onecoach/lib-ai-agents';
+import { createGenerationHandler } from '@onecoach/lib-api';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ export const POST = createGenerationHandler({
     const countMatch = prompt.match(/(\d+)\s*(nuovi\s*)?(alimenti|foods?)/i);
     const count = countMatch && countMatch[1] ? parseInt(countMatch[1], 10) : 5;
 
-    const result = await FoodAdminService.generateFoodsWithAgent({
+    const result = await generateFoodsWithAgent({
       count,
       description: prompt,
       userId,
@@ -31,8 +31,8 @@ export const POST = createGenerationHandler({
 
     // Return directly - createGenerationHandler will wrap it
     return {
-      summary: `Generati ${result.created} alimenti, ${result.updated} aggiornati, ${result.skipped} saltati`,
-      createResult: result,
+      summary: `Generati ${result.createResult.created} alimenti, ${result.createResult.updated} aggiornati, ${result.createResult.skipped} saltati`,
+      createResult: result.createResult,
     };
   },
   errorMessage: 'Errore durante la generazione alimenti con AI',

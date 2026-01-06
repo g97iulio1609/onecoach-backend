@@ -10,7 +10,7 @@
  * Refactored to use centralized utilities following DRY principle
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { normalizeNutritionPlan } from '@onecoach/lib-nutrition/plan-transform';
 import { resolveFoodReferences } from '@onecoach/lib-nutrition/helpers/plan-server-transform';
 import {

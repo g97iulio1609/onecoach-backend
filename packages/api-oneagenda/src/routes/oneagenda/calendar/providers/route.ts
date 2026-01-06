@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
 import { CalendarSyncService } from '@onecoach/oneagenda-core';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 const syncService = new CalendarSyncService();
 

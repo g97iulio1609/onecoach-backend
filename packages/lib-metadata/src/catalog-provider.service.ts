@@ -13,7 +13,7 @@
  * or server components.
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 
 import { logger } from '@onecoach/lib-core';
 // Cache configuration for exercises (still useful for common exercises)

@@ -7,7 +7,7 @@
 
 import { AgentRole } from '@onecoach/one-agent';
 import { generateExercisesWithAgent } from '@onecoach/lib-ai-agents';
-import { createStreamingHandler } from '@onecoach/lib-api/utils/streaming-handler';
+import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface ExerciseStreamInput {
   prompt: string;
@@ -55,11 +55,10 @@ export const POST = createStreamingHandler<
       } 
     };
   },
-  executeGeneration: async ({ input, userId, sendEvent }) => {
+  executeGeneration: async ({ input, sendEvent }) => {
     // Parse prompt to extract generation parameters
     const lowerPrompt = input.prompt.toLowerCase();
     const muscleGroups: string[] = [];
-    const bodyPartIds: string[] = [];
     let count = 5; // Default count
     let forEachMuscleGroup = false;
 

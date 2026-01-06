@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
-import { FoodAdminService, foodImportSchema } from '@onecoach/lib-food/food-admin.service';
+import { FoodAdminService, foodImportSchema } from '@onecoach/lib-food';
 
 import { logger } from '@onecoach/lib-core';
 const batchCreateParameters = z.object({

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared';
 
 import { logger } from '../logger.service';
 // Stable UUIDs for seed data (idempotent)

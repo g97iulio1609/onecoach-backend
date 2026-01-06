@@ -6,7 +6,7 @@
  */
 
 import { Prisma } from '@prisma/client';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type {
   MarketplacePlanType,
   PurchaseStatus,

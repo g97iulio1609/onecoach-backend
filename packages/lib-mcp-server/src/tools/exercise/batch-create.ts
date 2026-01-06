@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
-import { ExerciseAdminService } from '@onecoach/lib-exercise/exercise-admin.service';
+import { ExerciseAdminService } from '@onecoach/lib-exercise';
 import { createExerciseSchema } from '@onecoach/schemas';
 
 // We need to add approvalStatus which is in ExerciseImportPayload but not createExerciseSchema

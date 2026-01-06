@@ -160,7 +160,7 @@ export async function updateVisionModelConfig(
   dishSegmentation?: string
 ): Promise<void> {
   // Import dynamically to avoid circular dependencies
-  const { prisma } = await import('@onecoach/lib-core/prisma');
+  const { prisma } = await import('@onecoach/lib-core');
   const { AIProvider } = await import('@prisma/client');
   
   const currentConfig = await prisma.ai_provider_configs.findUnique({

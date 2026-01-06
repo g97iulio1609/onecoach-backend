@@ -5,15 +5,7 @@
  * Integra intent detection e tools per generazione piani
  */
 
-import { NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
-import { createChatAgentStream } from '@onecoach/lib-ai-agents/chat-agent';
-import { userProfileService } from '@onecoach/lib-core';
-import { z } from 'zod';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
-import { AI_REASONING_CONFIG, TOKEN_LIMITS } from '@onecoach/constants/models';
-
-import { logger } from '@onecoach/lib-core';
+import { NextResponse, z } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 const chatStreamRequestSchema = z.object({

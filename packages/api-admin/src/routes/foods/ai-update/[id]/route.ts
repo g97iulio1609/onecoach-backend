@@ -6,15 +6,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { FoodService } from '@onecoach/lib-food.service';
+import { requireAdmin } from '@onecoach/lib-core';
+import { FoodService } from '@onecoach/lib-food';
 import { createAIProvider } from '@onecoach/one-agent';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import { createFoodSchema } from '@onecoach/schemas/food.schema';
-import { ensureMacrosArePer100g } from '@onecoach/lib-shared/utils/macro-normalization';
+import { ensureMacrosArePer100g } from '@onecoach/lib-shared';
 import type { Macros } from '@onecoach/types';
 import { AIProviderConfigService } from '@onecoach/lib-ai';
-import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { TOKEN_LIMITS } from '@onecoach/constants';
 
 import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
@@ -169,7 +169,7 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
     try {
       aiFoodData = JSON.parse(jsonText);
     } catch (parseError: unknown) {
-      logger.error('[AI Food Update] JSON parse error:', parseError, 'Response:', jsonText);
+      logger.error('[AI Food Update] JSON parse error', { error: parseError, response: jsonText });
       return NextResponse.json(
         { error: 'Invalid JSON response from AI', details: jsonText.substring(0, 200) },
         { status: 500 }
@@ -218,7 +218,7 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
       if (searchResults.length > 0) {
         // Check if any result is similar enough (excluding current food)
         const similarFood = searchResults.find(
-          (f: unknown) =>
+          (f: { id: string; name: string }) =>
             f.id !== id && f.name.toLowerCase() === aiFoodData.name.trim().toLowerCase()
         );
         if (similarFood) {

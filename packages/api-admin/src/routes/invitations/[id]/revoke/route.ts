@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/server/auth';
+import { auth } from '@onecoach/lib-core/auth';
 import { InvitationService } from '@onecoach/lib-core/invitation.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import type { UserRole } from '@onecoach/types';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +11,7 @@ interface SessionUser {
   role: UserRole;
 }
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
     const user = session?.user as SessionUser | undefined;

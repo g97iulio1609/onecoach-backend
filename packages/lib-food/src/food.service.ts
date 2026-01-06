@@ -11,7 +11,7 @@
  * safely used in client components.
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import type { FoodItem } from '@onecoach/types';

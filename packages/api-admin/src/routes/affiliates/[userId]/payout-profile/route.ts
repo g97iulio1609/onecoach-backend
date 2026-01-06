@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { PayoutProfileService } from '@onecoach/lib-marketplace/payout-profile.service';
+import { requireAdmin } from '@onecoach/lib-core';
+import { PayoutProfileService } from '@onecoach/lib-marketplace';
 
 export const dynamic = 'force-dynamic';
 

@@ -8,11 +8,11 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
+import { requireAuth } from '@onecoach/lib-core';
 import { OneRepMaxService } from '@onecoach/lib-exercise/one-rep-max.service';
 import { updateProgramWeightsForExerciseId } from '@onecoach/one-workout';
 import { z } from 'zod';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';

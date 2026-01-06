@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
+import { requireAuth } from '@onecoach/lib-core';
 import { ExerciseService } from '@onecoach/lib-exercise.service';
 
 import { logger } from '@onecoach/lib-core';

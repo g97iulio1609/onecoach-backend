@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth/config';
-import { prisma as db } from '@onecoach/lib-core/prisma';
-import { logError, getErrorMessage, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { prisma as db } from '@onecoach/lib-core';
+import { logError, getErrorMessage, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 

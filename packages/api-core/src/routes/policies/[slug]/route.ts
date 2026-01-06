@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { PolicyService } from '@onecoach/lib-core/policy.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 

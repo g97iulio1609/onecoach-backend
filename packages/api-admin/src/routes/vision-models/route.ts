@@ -6,10 +6,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 import { AIProviderConfigService } from '@onecoach/lib-ai';
 import { updateVisionModelConfig } from '@onecoach/lib-food';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,10 +71,7 @@ export async function PUT(_req: NextRequest) {
     });
   } catch (error: unknown) {
     logError("Errore nell'aggiornamento configurazione", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'aggiornamento configurazione"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

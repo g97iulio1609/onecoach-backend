@@ -6,11 +6,11 @@
  * preventing inconsistencies from manual input or AI-generated variations.
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { Prisma } from '@prisma/client';
-import { toSlug } from '@onecoach/lib-shared/utils/formatters';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
-import { SimpleCache } from '@onecoach/lib-shared/utils/simple-cache';
+import { toSlug } from '@onecoach/lib-shared';
+import { createId } from '@onecoach/lib-shared';
+import { SimpleCache } from '@onecoach/lib-shared';
 
 import { logger } from '@onecoach/lib-core';
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour

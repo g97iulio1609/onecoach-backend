@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared';
 
 export async function seedExerciseCatalog(prisma: PrismaClient, adminUserId: string) {
   const exerciseTypes = [

@@ -15,7 +15,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 import {
   getEdgeConfigValue,
   getAllEdgeConfigValues,
@@ -23,7 +23,7 @@ import {
   setEdgeConfigValues,
   deleteEdgeConfigValue,
 } from '@onecoach/lib-core/edge-config.service';
-import { logError } from '@onecoach/lib-shared/utils/error';
+import { logError } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,10 +96,11 @@ export async function GET(request: NextRequest) {
   }
 
   const user = userOrError;
+  let key: string | null = null;
 
   try {
     const searchParams = request.nextUrl.searchParams;
-    const key = searchParams.get('key');
+    key = searchParams.get('key');
 
     if (key) {
       // Valida chiave
@@ -252,10 +253,11 @@ export async function DELETE(request: NextRequest) {
   }
 
   const user = userOrError;
+  let key: string | null = null;
 
   try {
     const searchParams = request.nextUrl.searchParams;
-    const key = searchParams.get('key');
+    key = searchParams.get('key');
 
     if (!key) {
       return NextResponse.json(

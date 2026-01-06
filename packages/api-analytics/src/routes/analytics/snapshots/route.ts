@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
+import { requireAuth } from '@onecoach/lib-core';
 import {
   generateProgressSnapshot,
   getProgressSnapshots,

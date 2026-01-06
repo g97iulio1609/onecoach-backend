@@ -1,4 +1,4 @@
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { createId, toSlug } from '@onecoach/lib-shared/utils';
 import type {
   CreateExerciseInput,

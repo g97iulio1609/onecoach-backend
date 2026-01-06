@@ -7,7 +7,7 @@
  * @module lib-import-core/base-import.service
  */
 
-import { logger as baseLogger } from '@onecoach/lib-shared/utils/logger';
+import { logger as baseLogger } from '@onecoach/lib-shared';
 import type {
     ImportFile,
     ImportOptions,

@@ -11,7 +11,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { createAgentCoordinator, createAIModel, MODEL_CONSTANTS } from '@onecoach/lib-ai-agents';
 import { auth } from '@onecoach/lib-core/auth';
-import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { TOKEN_LIMITS } from '@onecoach/constants';
 
 import { logger } from '@onecoach/lib-core';
 /**

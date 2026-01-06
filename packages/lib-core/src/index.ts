@@ -31,6 +31,8 @@ export * from './consent.service';
 export * from './policy.service';
 export * from './setup-intent.service';
 export * from './edge-config.service';
+export * from './feature-flags.service';
+export * from './feature-flags.evaluator';
 export * from './iap-verification.server';
 export * from './direct-messaging.service';
 export * from './logger.service';

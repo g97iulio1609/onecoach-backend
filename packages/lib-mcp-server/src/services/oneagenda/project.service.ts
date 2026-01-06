@@ -5,7 +5,7 @@
  * Usa Prisma direttamente invece di API HTTP calls
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type { ProjectStatus } from '@prisma/client';
 
 export interface CreateProjectInput {

@@ -5,9 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, roleSatisfies } from '@onecoach/lib-core/auth';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { getRevenueTrends, type Period } from '@onecoach/lib-analytics/coach-analytics.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { prisma } from '@onecoach/lib-core';
+import { getRevenueTrends, type Period } from '@onecoach/lib-analytics';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 

@@ -24,9 +24,9 @@ import {
 } from 'react-native-iap';
 import { useIAPProducts, useIAPSubscription, useIAPPurchase } from '@onecoach/lib-stores/iap.store';
 import { useSubscriptionStatus, usePurchaseProduct, useRestorePurchases } from './use-iap';
-import { ALL_PRODUCT_IDS, PRODUCT_TO_PLAN_MAP } from '@onecoach/constants/iap.config';
+import { ALL_PRODUCT_IDS, PRODUCT_TO_PLAN_MAP } from '@onecoach/constants';
 import type { ProductId } from '@onecoach/lib-stores/iap.store';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 /**
  * Hook to manage IAP in React Native

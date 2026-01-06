@@ -10,7 +10,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import type { OnboardingProgress } from '@onecoach/constants/onboarding-constants';
+import type { OnboardingProgress } from '@onecoach/constants';
 export type { OnboardingProgress };
 
 /**

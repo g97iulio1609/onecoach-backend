@@ -5,8 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@onecoach/lib-core/auth/session';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { getCurrentUser } from '@onecoach/lib-core';
+import { prisma } from '@onecoach/lib-core';
 
 import { logger } from '@onecoach/lib-core';
 export const runtime = 'nodejs';

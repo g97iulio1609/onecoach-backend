@@ -3,6 +3,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createXai } from '@ai-sdk/xai';
+import { createMinimax } from 'vercel-minimax-ai-provider';
 import { getOpenRouterConfig, getAIProviderKey } from '../config/env';
 
 /**
@@ -87,14 +88,14 @@ export class AIProviderFactory {
   }
 
   /**
-   * Create a MiniMax provider (via Anthropic SDK)
+   * Create a MiniMax provider using official vercel-minimax-ai-provider
+   * https://github.com/MiniMax-AI/vercel-minimax-ai-provider
    */
   public static createMiniMax(apiKey?: string): any {
     const key = apiKey || getAIProviderKey('minimax');
-    return (createAnthropic as any)({
-      apiKey: key,
-      baseURL: 'https://api.minimax.io/anthropic',
-    });
+    // Official provider uses Anthropic-compatible API by default
+    // which provides better support for advanced features
+    return createMinimax({ apiKey: key });
   }
 
   /**

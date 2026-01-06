@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/server/auth';
-import { decide } from '@/flags';
-import { featureFlagsService } from '@/lib/services/feature-flags.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { auth } from '@onecoach/lib-core/auth';
+import { decide, featureFlagsService } from '@onecoach/lib-core';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import type { UserRole } from '@onecoach/types';
 
 export const dynamic = 'force-dynamic';

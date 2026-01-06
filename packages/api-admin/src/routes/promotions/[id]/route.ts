@@ -7,9 +7,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { requireAdmin } from '@onecoach/lib-core';
+import { prisma } from '@onecoach/lib-core';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,8 +90,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
           recentUses: recentUses.map((use: RecentUseType) => ({
             id: use.id,
             userId: use.userId,
-            userEmail: use.users.email,
-            userName: use.users.name,
+            userEmail: use.users?.email || 'N/A',
+            userName: use.users?.name || 'Unknown',
             appliedAt: use.appliedAt,
             paymentId: use.paymentId,
           })),
@@ -151,10 +151,7 @@ export async function PUT(_req: Request, { params }: { params: Promise<{ id: str
     });
   } catch (error: unknown) {
     logError("Errore nell'aggiornamento della promozione", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'aggiornamento della promozione"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

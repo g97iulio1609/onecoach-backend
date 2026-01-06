@@ -11,7 +11,7 @@ import {
   getRefreshToken,
   updateAccessToken,
   clearSession,
-} from '@onecoach/lib-core/auth/session.native';
+} from '@onecoach/lib-core.native';
 
 export class NativeApiClient extends BaseApiClient {
   private refreshPromise: Promise<void> | null = null;

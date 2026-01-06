@@ -28,7 +28,7 @@ import type { IExerciseService, IFoodService, IAnalyticsService } from '@onecoac
 import {
   getBodyMeasurementHistory,
   createBodyMeasurement as createBodyMeasurementFn,
-} from '@onecoach/lib-analytics/body-measurements.service';
+} from '@onecoach/lib-analytics';
 
 /**
  * Wrapper per ExerciseService che implementa IExerciseService

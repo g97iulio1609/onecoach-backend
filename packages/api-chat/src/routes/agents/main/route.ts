@@ -7,12 +7,7 @@
  * @module app/api/agents/route
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { createAgentCoordinator, createAIModel } from '@onecoach/lib-ai-agents';
-import { auth } from '@onecoach/lib-core/auth';
-import { TOKEN_LIMITS } from '@onecoach/constants/models';
-import { MODEL_CONSTANTS } from '@onecoach/lib-ai-agents/constants';
+import { NextRequest, NextResponse, auth } from '@onecoach/lib-ai-agents';
 
 import { logger } from '@onecoach/lib-core';
 /**

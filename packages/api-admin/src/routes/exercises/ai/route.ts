@@ -1,6 +1,6 @@
 
 import { executeAiPlan } from '@onecoach/lib-ai-agents';
-import { createGenerationHandler } from '@onecoach/lib-api/utils/generation-handler';
+import { createGenerationHandler } from '@onecoach/lib-api';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';

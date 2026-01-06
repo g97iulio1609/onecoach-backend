@@ -4,7 +4,7 @@
  * Servizio per gestire audit log dei payout
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { Prisma } from '@prisma/client';
 
 export type PayoutAuditAction = 'CREATED' | 'APPROVED' | 'REJECTED' | 'PAID' | 'CANCELLED';

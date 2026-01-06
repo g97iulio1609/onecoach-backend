@@ -8,7 +8,7 @@
 import { userMemoryService } from '../user-memory.service';
 import type { MemoryDomain, MemoryHistoryItem } from './types';
 
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 // ============================================================================
 // EVENT TYPES
 // ============================================================================

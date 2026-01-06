@@ -1,4 +1,4 @@
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 
 export class PayoutProfileService {
   static async getProfile(userId: string) {

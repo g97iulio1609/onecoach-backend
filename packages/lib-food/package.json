@@ -31,6 +31,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@onecoach/constants": "workspace:*",
     "@onecoach/contracts": "workspace:*",
     "@onecoach/lib-ai": "workspace:*",
     "@onecoach/lib-core": "workspace:*",

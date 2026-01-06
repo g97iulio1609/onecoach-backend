@@ -8,9 +8,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
 import { IntelligentAssistantService } from '@onecoach/oneagenda-core';
-import { oneagendaDB } from '@onecoach/oneagenda-core/db';
-import { logger } from '@onecoach/lib-shared/utils/logger';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { oneagendaDB } from '@onecoach/oneagenda-core';
+import { logger } from '@onecoach/lib-shared';
+import { prisma } from '@onecoach/lib-core';
 
 /**
  * POST /api/oneagenda/schedule

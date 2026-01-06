@@ -6,7 +6,7 @@
  * displayed with localized names in the frontend.
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { SimpleCache } from '@onecoach/lib-shared';
 
 const DEFAULT_LOCALE = 'en';

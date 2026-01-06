@@ -7,9 +7,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { featureFlagsService } from '@/lib/services/feature-flags.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { requireAdmin } from '@onecoach/lib-core';
+import { featureFlagsService } from '@onecoach/lib-core';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import type { RolloutStrategy } from '@onecoach/types';
 
 export const dynamic = 'force-dynamic';

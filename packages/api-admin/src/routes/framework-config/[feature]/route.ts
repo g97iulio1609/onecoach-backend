@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 
 export const dynamic = 'force-dynamic';
 import {
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest, context: { params: RouteParams }
   // TypeScript type narrowing: userOrError is now definitely User
   // Use explicit type to help TypeScript understand the narrowed type
   const user = userOrError as Awaited<
-    ReturnType<typeof import('lib/auth/session').getCurrentUser>
+    ReturnType<typeof import('@onecoach/lib-core').getCurrentUser>
   > & { id: string };
 
   try {

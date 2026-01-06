@@ -5,9 +5,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { CreditService } from '@onecoach/lib-core/credit.service';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { requireAdmin } from '@onecoach/lib-core';
+import { creditService } from '@onecoach/lib-core/credit.service';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +28,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
     // Add or remove credits
     if (amount > 0) {
-      await CreditService.addCredits({
+      await creditService.addCredits({
         userId,
         amount,
         type: 'ADMIN_ADJUSTMENT',
@@ -39,7 +39,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
         },
       });
     } else {
-      await CreditService.consumeCredits({
+      await creditService.consumeCredits({
         userId,
         amount: Math.abs(amount),
         type: 'ADMIN_ADJUSTMENT',

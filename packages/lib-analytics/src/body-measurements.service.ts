@@ -7,7 +7,7 @@
 
 import 'server-only';
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type { BodyMeasurement } from '@onecoach/types';
 import { Prisma } from '@prisma/client';
 

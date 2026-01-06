@@ -6,13 +6,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
+import { requireAuth } from '@onecoach/lib-core';
 import {
   createBodyMeasurement,
   getBodyMeasurementHistory,
   getLatestBodyMeasurement,
   getBodyMeasurementStats,
-} from '@onecoach/lib-analytics/body-measurements.service';
+} from '@onecoach/lib-analytics';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';

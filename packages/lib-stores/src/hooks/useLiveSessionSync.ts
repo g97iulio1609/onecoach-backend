@@ -28,7 +28,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useCopilotActiveContextStore } from '../copilot-active-context.store';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 export interface UseLiveSessionSyncOptions {
   sessionId: string;

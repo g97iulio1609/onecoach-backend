@@ -15,7 +15,7 @@
 import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import { prisma } from '@onecoach/lib-core';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 
 // =====================================================
 // Helper: Get Live Session from Context

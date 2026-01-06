@@ -5,17 +5,16 @@
  * Implementa ISubscriptionService contract
  */
 
-import { prisma } from './prisma';
-import { getStripe } from './stripe';
+import Stripe from 'stripe';
+import { createId } from '@paralleldrive/cuid2';
 import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
-import type { ISubscriptionService } from '@onecoach/contracts';
-import type Stripe from 'stripe';
+import { getSubscriptionPriceId, getCreditsFromPriceId } from '@onecoach/constants';
+import type { ISubscriptionService } from '@onecoach/contracts'; 
+import { logger } from './logger.service';
 import { creditService } from './credit.service';
 import { SetupIntentService } from './setup-intent.service';
-import { createId } from '@onecoach/lib-shared/id-generator';
-import { getCreditsFromPriceId } from '@onecoach/constants/credit-packs';
-import { getSubscriptionPriceId } from '@onecoach/constants/subscription-prices';
-import { logger } from './logger.service';
+import { getStripe } from './stripe';
+import { prisma } from './prisma';
 
 // ----------------------------------------------------------------------------
 // Interfaces for External Services (to break cyclic dependencies)

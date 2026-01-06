@@ -7,7 +7,7 @@
 
 import { AgentRole } from '@onecoach/one-agent';
 import { ExerciseAdminService } from '@onecoach/lib-exercise-admin.service';
-import { createStreamingHandler } from '@onecoach/lib-api/utils/streaming-handler';
+import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface ExerciseStreamInput {
   prompt: string;

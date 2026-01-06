@@ -9,7 +9,7 @@ import {
   CREDIT_PACK_OPTIONS,
   getCreditPackPriceId,
   getCreditPackPricing,
-} from '@onecoach/constants/credit-packs';
+} from '@onecoach/constants';
 
 /**
  * Piani abbonamento

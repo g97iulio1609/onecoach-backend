@@ -1,4 +1,4 @@
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { logger } from '@onecoach/lib-shared';
 // Utility locale per generare codici senza dipendenze esterne
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

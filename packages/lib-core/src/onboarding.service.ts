@@ -11,7 +11,7 @@ import type { IOnboardingService } from '@onecoach/contracts';
 import type { OnboardingProgress, StepCompletionInput } from '@onecoach/types';
 import type { Prisma } from '@prisma/client';
 
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { logger } from '@onecoach/lib-shared';
 type DbOnboardingProgress = Prisma.user_onboarding_progressGetPayload<object>;
 
 /**

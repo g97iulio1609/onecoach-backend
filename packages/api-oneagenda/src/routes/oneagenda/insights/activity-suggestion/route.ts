@@ -7,8 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
 import { IntelligentAssistantService, TaskStatus } from '@onecoach/oneagenda-core';
-import { oneagendaDB } from '@onecoach/oneagenda-core/db';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { oneagendaDB } from '@onecoach/oneagenda-core';
+import { logger } from '@onecoach/lib-shared';
 
 /**
  * POST /api/oneagenda/insights/activity-suggestion

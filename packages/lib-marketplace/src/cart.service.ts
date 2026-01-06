@@ -5,7 +5,7 @@
  * Segue principi KISS/SOLID: una singola responsabilità per operazioni di cart.
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { findCreditPackOption } from '@onecoach/constants';
 import { marketplaceService } from './marketplace.service';
 import { PromotionService } from './promotion.service';

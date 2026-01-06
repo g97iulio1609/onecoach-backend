@@ -4,7 +4,7 @@
  */
 
 import type { PrismaClient } from '@prisma/client';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared';
 import type { Macros } from '@onecoach/types';
 
 import { logger } from '../logger.service';

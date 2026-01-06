@@ -5,11 +5,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@onecoach/lib-core/auth/session';
+import { getCurrentUser } from '@onecoach/lib-core';
 import { getAgentRegistry } from '@onecoach/one-agent';
 import { initializeAgentRegistryWithDB } from '@onecoach/lib-ai-agents';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { prisma } from '@onecoach/lib-core';
+import { logger } from '@onecoach/lib-shared';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

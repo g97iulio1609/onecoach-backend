@@ -423,7 +423,7 @@
         "./packages/app/src/features/projects/*"
       ],
       "@/*": [
-        "./apps/next/*"
+        "../../../apps/next/*"
       ],
       "app/*": [
         "./packages/app/src/*"

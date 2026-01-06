@@ -126,4 +126,4 @@ export function registerService<K extends ServiceKey>(key: K, service: ServiceMa
 /**
  * Re-export registration function
  */
-// export { registerAllServices } from './register-services';
+export { registerAllServices } from './register-services';

@@ -10,7 +10,7 @@
  * La validazione usa lo schema Zod centralizzato da @onecoach/schemas
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type {
   UserOneRepMax,
   UserOneRepMaxWithExercise,

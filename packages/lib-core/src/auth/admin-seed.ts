@@ -4,7 +4,7 @@
 
 import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { createId } from '@onecoach/lib-shared/utils/id-generator';
+import { createId } from '@onecoach/lib-shared';
 import { prisma } from '../prisma';
 
 import { logger } from '../logger.service';

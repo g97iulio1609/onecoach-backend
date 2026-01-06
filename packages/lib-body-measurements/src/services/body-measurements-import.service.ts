@@ -9,7 +9,7 @@
 
 import { BaseImportService } from '@onecoach/lib-import-core';
 import type { ImportOptions, BaseImportResult } from '@onecoach/lib-import-core';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import type { ImportedBodyMeasurements, ImportedMeasurement } from '../schemas/imported-body-measurements.schema';
 
 export interface BodyMeasurementsImportResult extends BaseImportResult {

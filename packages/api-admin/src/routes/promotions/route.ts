@@ -6,11 +6,11 @@
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { PromotionService } from '@onecoach/lib-marketplace/promotion.service';
-import { prisma } from '@onecoach/lib-core/prisma';
+import { requireAdmin } from '@onecoach/lib-core';
+import { PromotionService } from '@onecoach/lib-marketplace';
+import { prisma } from '@onecoach/lib-core';
 import type { PromotionType, DiscountType, Prisma } from '@onecoach/types';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 

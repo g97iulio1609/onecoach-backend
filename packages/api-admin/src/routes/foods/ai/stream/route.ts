@@ -6,8 +6,8 @@
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { FoodAdminService } from '@onecoach/lib-food';
-import { createStreamingHandler } from '@onecoach/lib-api/utils/streaming-handler';
+import { generateFoodsWithAgent } from '@onecoach/lib-ai-agents';
+import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface FoodStreamInput {
   prompt: string;
@@ -21,7 +21,7 @@ interface FoodStreamInput {
  */
 export const POST = createStreamingHandler<
   FoodStreamInput,
-  Awaited<ReturnType<typeof FoodAdminService.generateFoodsWithAgent>>
+  Awaited<ReturnType<typeof generateFoodsWithAgent>>
 >({
   agentRole: AgentRole.FOOD_GENERATION,
   initialDescription: 'Starting food generation...',
@@ -57,7 +57,7 @@ export const POST = createStreamingHandler<
     };
 
     // Fetch food categories from database
-    const { prisma } = await import('@onecoach/lib-core/prisma');
+    const { prisma } = await import('@onecoach/lib-core');
     const allCategories = await prisma.food_categories.findMany({
       select: { id: true, name: true, slug: true },
     });
@@ -66,7 +66,7 @@ export const POST = createStreamingHandler<
     for (const [categoryType, keywords] of Object.entries(categoryKeywords)) {
       if (keywords.some((kw) => lowerPrompt.includes(kw))) {
         const matchingCategory = allCategories.find(
-          (c: unknown) =>
+          (c: { name: string; slug: string }) =>
             c.name.toLowerCase().includes(categoryType) ||
             c.slug.toLowerCase().includes(categoryType)
         );
@@ -116,10 +116,10 @@ export const POST = createStreamingHandler<
       },
     });
 
-    const result = await FoodAdminService.generateFoodsWithAgent({
+    const result = await generateFoodsWithAgent({
       count,
       description: input.prompt,
-      existingFoods: existingFoods.map((f: unknown) => f.name),
+      existingFoods: existingFoods.map((f: { name: string }) => f.name),
       categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
       userId,
       mergeExisting: input.mergeExisting,
@@ -138,15 +138,15 @@ export const POST = createStreamingHandler<
     return result;
   },
   buildOutput: (result) => ({
-    summary: `Generati ${result.created} alimenti, ${result.updated} aggiornati, ${result.skipped} saltati`,
+    summary: `Generati ${result.createResult.created} alimenti, ${result.createResult.updated} aggiornati, ${result.createResult.skipped} saltati`,
     createResult: {
-      created: result.created,
-      updated: result.updated,
-      skipped: result.skipped,
-      createdItems: result.createdItems,
-      updatedItems: result.updatedItems,
-      skippedNames: result.skippedNames,
-      errors: result.errors,
+      created: result.createResult.created,
+      updated: result.createResult.updated,
+      skipped: result.createResult.skipped,
+      createdItems: result.createResult.createdItems,
+      updatedItems: result.createResult.updatedItems,
+      skippedNames: result.createResult.skippedNames,
+      errors: result.createResult.errors,
     },
   }),
 });

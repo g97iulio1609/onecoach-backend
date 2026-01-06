@@ -14,7 +14,7 @@
 
 import { NextRequest } from 'next/server';
 import type { AgentRole, AgentError } from '../types/agent.types';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 
 /**
  * Tipo per eventi stream

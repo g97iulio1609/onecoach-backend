@@ -14,7 +14,7 @@
  * @version 2.0.0 - AI SDK v6 Integration
  */
 
-import { prisma } from '@onecoach/lib-core/prisma';
+import { prisma } from '@onecoach/lib-core';
 import { Prisma } from '@prisma/client';
 import type { $Enums } from '@prisma/client';
 import { logger } from '@onecoach/lib-core';

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 import { FoodMatchingService } from '@onecoach/lib-food';
-import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
+import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,11 +16,11 @@ type ImportItem = {
 };
 
 function parseCsv(text: string): ImportItem[] {
-  const lines = text.split(/\r?\n/).filter((l: unknown) => l.trim().length > 0);
+  const lines = text.split(/\r?\n/).filter((l: string) => l.trim().length > 0);
   if (lines.length < 2) return [];
   const firstLine = lines[0];
   if (!firstLine) return [];
-  const headers = firstLine.split(',').map((h: unknown) => h.trim());
+  const headers = firstLine.split(',').map((h: string) => h.trim());
   const get = (row: string[], key: string) => row[headers.indexOf(key)]?.trim() ?? '';
   const items: ImportItem[] = [];
   for (let i = 1; i < lines.length; i++) {
@@ -74,12 +74,17 @@ export async function POST(_req: NextRequest) {
 
     const results: unknown[] = [];
     for (const item of items) {
-      // Use matchFood method (findOrCreateFood was refactored)
-      const matchResult = await FoodMatchingService.matchFood(item.name);
+      // Use findOrCreateFood method
+      const matchResult = await FoodMatchingService.findOrCreateFood({
+        name: item.name,
+        macrosPer100g: item.macrosPer100g,
+        servingSize: item.servingSize,
+        barcode: item.barcode,
+        metadata: item.metadata,
+      });
       results.push({
         foodItem: matchResult.foodItem,
         matchType: matchResult.matchType,
-        confidence: matchResult.confidence,
       });
     }
 

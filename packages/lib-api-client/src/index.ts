@@ -22,6 +22,8 @@ export * from './queries';
 export * from './react-query';
 // Memory API
 export * from './memory';
+// Export Utils
+export * from './utils';
 // Export types
 export type { WorkoutProgramResponse, WorkoutProgramsResponse } from './workout';
 export type { NutritionPlanResponse, NutritionPlansResponse } from './nutrition';

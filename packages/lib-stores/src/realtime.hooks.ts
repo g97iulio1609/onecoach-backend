@@ -513,34 +513,6 @@ export function useRealtimeSync<T extends { id: string | number }>({
   });
 }
 
-// ============================================================================
-// useRealtimeSyncWithClient - Versione che accetta queryClient esplicito
-// ============================================================================
-
-export interface UseRealtimeSyncWithClientOptions<T extends { id: string | number }> extends Omit<
-  UseRealtimeSyncOptions<T>,
-  never
-> {
-  /** QueryClient da React Query */
-  queryClient: import('@tanstack/react-query').QueryClient;
-}
-
-/**
- * Versione di useRealtimeSync che accetta un QueryClient esplicito.
- * Preferibile quando si ha accesso diretto al queryClient.
- *
- * @example
- * ```tsx
- * const queryClient = useQueryClient();
- *
- * useRealtimeSyncWithClient<WorkoutSession>({
- *   table: 'workout_sessions',
- *   queryKey: ['sessions', programId],
- *   queryClient,
- *   enabled: !!programId,
- * });
- * ```
- */
 // --- Logger Factory ---
 const createRealtimeLogger = (context: string) => {
   return {

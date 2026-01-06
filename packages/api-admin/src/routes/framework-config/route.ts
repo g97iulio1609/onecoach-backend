@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@onecoach/lib-core/auth/guards';
+import { requireAdmin } from '@onecoach/lib-core';
 
 export const dynamic = 'force-dynamic';
 import {
@@ -27,7 +27,7 @@ export async function GET(_request: NextRequest) {
     const configs = await AIFrameworkConfigService.getAllConfigs();
 
     // Enrich with descriptions
-    const enriched = configs.map((config: unknown) => ({
+    const enriched = configs.map((config) => ({
       ...config,
       description:
         config.description ||

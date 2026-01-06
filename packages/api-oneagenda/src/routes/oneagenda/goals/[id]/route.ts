@@ -4,8 +4,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
-import { oneagendaDB } from '@onecoach/oneagenda-core/db';
-import { logger } from '@onecoach/lib-shared/utils/logger';
+import { oneagendaDB } from '@onecoach/oneagenda-core';
+import { logger } from '@onecoach/lib-shared';
 
 interface RouteContext {
   params: Promise<{ id: string }>;

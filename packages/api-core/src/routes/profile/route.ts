@@ -5,22 +5,7 @@
  * PUT:    Aggiorna il profilo con le informazioni fornite
  */
 
-import { NextResponse } from 'next/server';
-import { requireAuth } from '@onecoach/lib-core/auth/guards';
-import { userProfileService } from '@onecoach/lib-core';
-import { prisma } from '@onecoach/lib-core/prisma';
-import { z } from 'zod';
-import { ActivityLevel, Sex, WeightUnit, DietType } from '@onecoach/types';
-import {
-  logError,
-  mapErrorToApiResponse,
-  isError,
-  isPrismaError,
-  isZodError,
-} from '@onecoach/lib-shared/utils/error';
-import { convertDecimalToNumber } from '@onecoach/lib-shared/prisma-type-guards';
-
-import { logger } from '@onecoach/lib-core';
+import { NextResponse, prisma } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
 
 // Prisma richiede il runtime Node.js

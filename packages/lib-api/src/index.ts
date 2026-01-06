@@ -18,6 +18,8 @@ export * from './hooks';
 export * from './queries';
 // Export React Query provider and config
 export * from './react-query';
+// Export Utils
+export * from './utils';
 // Export types
 export type { WorkoutProgramResponse, WorkoutProgramsResponse } from './workout';
 export type { NutritionPlanResponse, NutritionPlansResponse } from './nutrition';

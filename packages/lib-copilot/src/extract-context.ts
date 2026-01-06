@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { generateText, Output } from 'ai';
 import { getModelByTier, createCustomModel } from './utils/model-factory';
 import { AIProviderConfigService } from '@onecoach/lib-ai';
-import { TOKEN_LIMITS } from '@onecoach/constants/models';
+import { TOKEN_LIMITS } from '@onecoach/constants';
 
 interface ExtractionContext {
   message: string;
