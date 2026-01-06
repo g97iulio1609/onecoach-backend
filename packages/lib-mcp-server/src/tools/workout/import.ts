@@ -15,9 +15,9 @@ import {
   ImportOptionsSchema,
   IMPORT_LIMITS,
   SUPPORTED_MIME_TYPES,
-  WorkoutVisionService,
-  type ImportProgress,
-} from '@onecoach/lib-workout';
+  WorkoutVisionService as VisionService,
+} from '@onecoach/one-workout';
+import type { ImportProgress } from '@onecoach/lib-import-core';
 import {
   type ImportedWorkoutProgram,
 } from '@onecoach/schemas';
@@ -53,12 +53,12 @@ function createAIContext(userId: string) {
 
       // Images - use vision parsing
       if (mimeTypeLower.startsWith('image/')) {
-        return WorkoutVisionService.parseImage(content, mimeType, userId);
+        return VisionService.parseImage(content, mimeType, userId);
       }
 
       // PDF - use PDF parser
       if (mimeTypeLower === 'application/pdf') {
-        return WorkoutVisionService.parsePDF(content, userId);
+        return VisionService.parsePDF(content, userId);
       }
 
       // Documents (DOCX, DOC, ODT) - use document parser
@@ -67,12 +67,12 @@ function createAIContext(userId: string) {
         mimeTypeLower.includes('msword') ||
         mimeTypeLower.includes('opendocument.text')
       ) {
-        return WorkoutVisionService.parseDocument(content, mimeType, userId);
+        return VisionService.parseDocument(content, mimeType, userId);
       }
 
       // Fallback per tipi sconosciuti - prova come documento
       logger.warn(`[WorkoutImport] Unknown MIME type ${mimeType}, trying document parser`);
-      return WorkoutVisionService.parseDocument(content, mimeType, userId);
+      return VisionService.parseDocument(content, mimeType, userId);
     },
   };
 }

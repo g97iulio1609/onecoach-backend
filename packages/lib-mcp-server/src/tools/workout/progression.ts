@@ -12,7 +12,7 @@ import {
   WorkoutProgressionService,
   ProgressionTemplateService,
   type ProgressionParams,
-} from '@onecoach/lib-workout';
+} from '@onecoach/one-workout';
 import { aiWorkoutProgramSchema } from '@onecoach/schemas';
 import { normalizeWorkoutProgram } from './program-normalizer';
 
