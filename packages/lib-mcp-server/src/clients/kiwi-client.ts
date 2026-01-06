@@ -129,11 +129,4 @@ export class KiwiMcpClient {
     }
   }
 
-  /**
-   * @deprecated Non più necessario - le connessioni sono gestite per-request
-   */
-  public async close() {
-    // No-op: le connessioni sono ora gestite per-request
-    logger.info("ℹ️ [Kiwi MCP] close() chiamato ma le connessioni sono per-request");
-  }
 }

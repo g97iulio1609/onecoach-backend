@@ -14,7 +14,6 @@
  */
 
 import { prisma } from '@onecoach/lib-core/prisma';
-import { AI_FOOD_GENERATION_INSTRUCTIONS } from '@onecoach/schemas';
 
 import { logger } from '@onecoach/lib-core';
 // Cache configuration for exercises (still useful for common exercises)
@@ -357,12 +356,4 @@ export class CatalogProviderService {
     exerciseCacheTime = 0;
   }
 
-  /**
-   * Get instructions for AI on how to specify foods
-   * Delegates to SSOT schema instructions
-   * @deprecated Use AI_FOOD_GENERATION_INSTRUCTIONS directly from @onecoach/schemas
-   */
-  static getFoodInstructions(): string {
-    return AI_FOOD_GENERATION_INSTRUCTIONS;
-  }
 }

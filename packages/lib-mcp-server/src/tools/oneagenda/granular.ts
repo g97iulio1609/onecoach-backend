@@ -10,7 +10,7 @@
 import { z } from 'zod';
 import type { McpTool, McpContext } from '../../types';
 import { prisma, type Prisma } from '@onecoach/lib-core';
-import { successResult } from '../shared';
+import { successResult } from '@onecoach/lib-copilot-framework';
 
 // =====================================================
 // Schema Definitions

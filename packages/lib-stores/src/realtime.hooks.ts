@@ -644,11 +644,6 @@ export function useRealtimeListSync<T extends { id: string | number }>({
   });
 }
 
-/**
- * @deprecated Use useRealtimeListSync instead
- */
-export const useRealtimeSyncWithClient = useRealtimeListSync;
-
 // ============================================================================
 // useRealtimeSyncSingle - Hook per singolo record (non lista)
 // ============================================================================

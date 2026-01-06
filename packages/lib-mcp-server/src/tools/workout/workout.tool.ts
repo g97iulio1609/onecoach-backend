@@ -7,7 +7,7 @@
  * @module lib-mcp-server/tools/workout/workout.tool
  */
 
-import { createAgenticTool } from '../shared';
+import { createAgenticTool } from '@onecoach/lib-copilot-framework';
 import { prisma, type Prisma } from '@onecoach/lib-core';
 import { normalizeWorkoutProgram } from './program-normalizer';
 import { workoutActions, type WorkoutProgramData } from './workout.actions';

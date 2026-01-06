@@ -60,11 +60,5 @@ export declare class CatalogProviderService {
      * Clear exercise cache (useful for testing or manual refresh)
      */
     static clearCache(): void;
-    /**
-     * Get instructions for AI on how to specify foods
-     * Delegates to SSOT schema instructions
-     * @deprecated Use AI_FOOD_GENERATION_INSTRUCTIONS directly from @onecoach/schemas
-     */
-    static getFoodInstructions(): string;
 }
 //# sourceMappingURL=catalog-provider.service.d.ts.map

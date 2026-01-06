@@ -8,7 +8,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useRealtimeSubscription, useRealtimeSyncWithClient } from './realtime.hooks';
+import { useRealtimeSubscription, useRealtimeListSync } from './realtime.hooks';
 import type { direct_conversations, direct_messages } from '@prisma/client';
 
 // ============================================================================
@@ -236,7 +236,7 @@ export function useDirectConversationsSync({
 }: UseDirectConversationsSyncOptions) {
   const filter = role === 'COACH' ? `coachId=eq.${userId}` : `athleteId=eq.${userId}`;
 
-  useRealtimeSyncWithClient<direct_conversations>({
+  useRealtimeListSync<direct_conversations>({
     table: 'direct_conversations',
     queryKey,
     queryClient,
@@ -290,7 +290,7 @@ export function useDirectMessagesSync({
 }: UseDirectMessagesSyncOptions) {
   const filter = conversationId ? `conversationId=eq.${conversationId}` : undefined;
 
-  useRealtimeSyncWithClient<direct_messages>({
+  useRealtimeListSync<direct_messages>({
     table: 'direct_messages',
     queryKey,
     queryClient,

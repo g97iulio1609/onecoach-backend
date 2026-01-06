@@ -179,7 +179,7 @@ export {
   useRealtimeStatus,
   useRealtimeDebug,
   useRealtimeSync,
-  useRealtimeSyncWithClient,
+  useRealtimeListSync,
   useRealtimeSyncSingle,
   useMagicAnimation,
   useRealtimeWithMagic,
