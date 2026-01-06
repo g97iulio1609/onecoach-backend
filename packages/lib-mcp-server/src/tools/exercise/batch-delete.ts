@@ -23,7 +23,7 @@ export const exerciseBatchDeleteTool: McpTool = {
         deleted += 1;
       } catch (error) {
         // continue deleting others; collect minimal info
-        logger.warn(`[exercise_batch_delete] Failed to delete ${id}:`, error);
+        logger.warn(`[exercise_batch_delete] Failed to delete ${id}:`, { error });
       }
     }
 

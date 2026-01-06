@@ -5,15 +5,14 @@
  */
 
 import { getService } from '@onecoach/lib-registry';
-import type { IWorkoutService } from '@onecoach/contracts';
 import type { NextRequest } from 'next/server';
 
 /**
  * GET /api/workout
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const workoutService = getService<IWorkoutService>('workout');
+    const workoutService = getService('workout');
     const result = await workoutService.getAll();
 
     if (!result.success) {
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const workoutService = getService<IWorkoutService>('workout');
+    const workoutService = getService('workout');
     const body = await request.json();
 
     const result = await workoutService.create(body);

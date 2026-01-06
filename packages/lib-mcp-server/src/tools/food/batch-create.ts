@@ -15,7 +15,7 @@ export const foodBatchCreateTool: McpTool = {
   parameters: batchCreateParameters,
   execute: async (args, context: McpContext) => {
     logger.warn('🍎🍎🍎 [food_batch_create] Esecuzione tool per creare alimenti in batch');
-    logger.warn('🍎🍎🍎 [food_batch_create] Numero alimenti da creare:', args.items?.length || 0);
+    logger.warn('🍎🍎🍎 [food_batch_create] Numero alimenti da creare:', { count: args.items?.length || 0 });
     logger.warn('🍎🍎🍎 [food_batch_create] Context:', {
       userId: context.userId,
       isAdmin: context.isAdmin,
@@ -34,7 +34,7 @@ export const foodBatchCreateTool: McpTool = {
     logger.warn('✅ [food_batch_create] Autorizzazione OK, creazione batch...');
     logger.warn(
       '📋 [food_batch_create] Primi 3 alimenti:',
-      JSON.stringify(args.items.slice(0, 3), null, 2)
+      { items: JSON.stringify(args.items.slice(0, 3), null, 2) }
     );
 
     const result = await FoodAdminService.import(args.items, {
@@ -45,11 +45,11 @@ export const foodBatchCreateTool: McpTool = {
     logger.warn('✅ [food_batch_create] Batch creato con successo');
     logger.warn(
       '📊 [food_batch_create] Risultato:',
-      JSON.stringify(result, null, 2).substring(0, 500)
+      { result: JSON.stringify(result, null, 2).substring(0, 500) }
     );
-    logger.warn('📊 [food_batch_create] Alimenti creati:', result.created || 0);
-    logger.warn('📊 [food_batch_create] Alimenti già esistenti:', result.skipped || 0);
-    logger.warn('📊 [food_batch_create] Errori:', result.errors?.length || 0);
+    logger.warn('📊 [food_batch_create] Alimenti creati:', { count: result.created || 0 });
+    logger.warn('📊 [food_batch_create] Alimenti già esistenti:', { count: result.skipped || 0 });
+    logger.warn('📊 [food_batch_create] Errori:', { count: result.errors?.length || 0 });
 
     return result;
   },

@@ -1,19 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "..",
-    "noEmit": false,
     "strict": true,
-    "composite": true
+    "noEmit": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../lib-core" },
-    { "path": "../../../onecoach-shared/packages/lib-shared" },
-    { "path": "../../../onecoach-constants" },
-    { "path": "../../../onecoach-schemas" },
-    { "path": "../../../onecoach-types" }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

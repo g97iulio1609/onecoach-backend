@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { ExerciseService } from '@onecoach/lib-exercise.service';
+import { ExerciseService } from '@onecoach/lib-exercise';
 import { ExerciseApprovalStatus } from '@onecoach/types';
 import { z } from 'zod';
 import { logError, getErrorMessage, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
@@ -64,7 +64,7 @@ export async function POST(_req: Request) {
       return NextResponse.json({
         success: true,
         results,
-        deleted: results.filter((result: unknown) => result.success).length,
+        deleted: results.filter((result: { success: boolean }) => result.success).length,
       });
     }
 
@@ -100,7 +100,7 @@ export async function POST(_req: Request) {
     return NextResponse.json({
       success: true,
       results,
-      updated: results.filter((result: unknown) => result.success).length,
+        updated: results.filter((result: { success: boolean }) => result.success).length,
       status: targetStatus,
     });
   } catch (error: unknown) {

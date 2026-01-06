@@ -10,26 +10,14 @@ import { prisma } from '@onecoach/lib-core/prisma';
 import { FoodService, normalizeFoodName } from './food.service';
 import { createFoodSchema, type CreateFoodInput, type UpdateFoodInput } from '@onecoach/schemas';
 import { z } from 'zod';
-import { FoodGenerationAgent, createAIAgentConfig, createAgentInstance } from '@onecoach/one-agent';
+// import { FoodGenerationAgent, createAIAgentConfig, createAgentInstance } from '@onecoach/one-agent';
+// import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing';
+// import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
 
-import { processBatchesInParallel } from '@onecoach/lib-shared/batch-processing';
-import { normalizeUrl } from '@onecoach/lib-shared/url-normalizer';
-import type { Macros } from '@onecoach/types';
-import { TOKEN_LIMITS } from '@onecoach/constants/models';
-import { MODEL_CONSTANTS } from '@onecoach/lib-ai-agents/constants';
+// import { TOKEN_LIMITS } from '@onecoach/constants/models';
+// import { MODEL_CONSTANTS } from '@onecoach/lib-ai';
 
-type GeneratedFood = {
-  name: string;
-  description: string;
-  macrosPer100g: Macros;
-  servingSize: number;
-  unit?: string;
-  brandName?: string;
-  categoryIds?: string[];
-  imageUrl?: string;
-  barcode?: string;
-  translations?: Array<{ locale: string; name: string; description?: string }>;
-};
+
 
 /**
  * Schema per import payload (estende createFoodSchema)
@@ -127,6 +115,9 @@ export class FoodAdminService {
    * Genera alimenti usando FoodGenerationAgent (OneAgent SDK)
    * Usa parallel batch processing per migliori performance
    */
+// Circular Dependency: This method requires OneAgent which depends on lib-ai-agents which depends on lib-food.
+  // It should be moved to the application layer or lib-ai-agents.
+  /*
   static async generateFoodsWithAgent(options: {
     count: number;
     description?: string;
@@ -353,6 +344,7 @@ export class FoodAdminService {
 
     return importResult;
   }
+  */
 
   /**
    * Importa alimenti nel database con deduplica e merge

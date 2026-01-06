@@ -7,7 +7,7 @@
  */
 
 import { prisma } from '@onecoach/lib-core/prisma';
-import { getExerciseSets } from '@onecoach/lib-workout';
+import { getExerciseSets } from '@onecoach/one-workout';
 import type { Exercise } from '@onecoach/types';
 import { Prisma } from '@prisma/client';
 

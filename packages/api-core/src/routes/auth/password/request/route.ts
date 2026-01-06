@@ -107,8 +107,8 @@ export async function POST(request: NextRequest) {
     const resetLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password/${token}`;
 
     if (process.env.NODE_ENV === 'development') {
-      logger.warn('🔑 Password reset link:', resetLink);
-      logger.warn('🔑 Raw token:', token);
+      logger.warn('🔑 Password reset link:', { resetLink });
+      logger.warn('🔑 Raw token:', { token });
     }
 
     return NextResponse.json({

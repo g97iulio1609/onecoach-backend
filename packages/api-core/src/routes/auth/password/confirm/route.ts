@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     if (process.env.NODE_ENV === 'development') {
-      logger.warn('✅ Password reset successful for user:', resetToken.user?.email ?? userId);
+      logger.warn('✅ Password reset successful for user:', { email: resetToken.user?.email ?? userId });
     }
 
     return NextResponse.json({

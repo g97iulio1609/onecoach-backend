@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@onecoach/contracts": "workspace:*",
-    "@onecoach/lib-nutrition": "workspace:*",
+    "@onecoach/one-nutrition": "workspace:*",
     "@onecoach/lib-registry": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "next": "16.1.1"

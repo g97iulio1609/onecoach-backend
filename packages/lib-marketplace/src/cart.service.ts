@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@onecoach/lib-core/prisma';
-import { findCreditPackOption } from '@onecoach/constants/credit-packs';
+import { findCreditPackOption } from '@onecoach/constants';
 import { marketplaceService } from './marketplace.service';
 import { PromotionService } from './promotion.service';
 import type { CartItemType, CartStatus, cart_items, carts } from '@prisma/client';

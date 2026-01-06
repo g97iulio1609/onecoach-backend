@@ -1,85 +1,12 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "..",
-    "composite": true,
-    "noEmit": false,
+    "outDir": "./dist",
+    "composite": false,
     "declaration": true,
     "declarationMap": true,
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "baseUrl": ".",
-    "paths": {
-      "@onecoach/types": [
-        "../../../onecoach-types/dist/index.d.ts"
-      ],
-      "@onecoach/types/*": [
-        "../../../onecoach-types/dist/*.d.ts"
-      ],
-      "@onecoach/schemas": [
-        "../../../onecoach-schemas/dist/index.d.ts"
-      ],
-      "@onecoach/schemas/*": [
-        "../../../onecoach-schemas/dist/*"
-      ],
-      "@onecoach/lib-core": [
-        "../lib-core/dist/index.d.ts"
-      ],
-      "@onecoach/lib-core/*": [
-        "../lib-core/dist/*"
-      ],
-      "@onecoach/lib-core/prisma": [
-        "../lib-core/dist/prisma.d.ts"
-      ],
-      "@onecoach/lib-shared": [
-        "../lib-shared/dist/index.d.ts"
-      ],
-      "@onecoach/lib-shared/*": [
-        "../lib-shared/dist/*"
-      ],
-      "@onecoach/lib-shared/utils/logger": [
-        "../lib-shared/dist/utils/logger/index.d.ts"
-      ],
-      "@onecoach/lib-workout": [
-        "../lib-workout/dist/index.d.ts"
-      ],
-      "@onecoach/lib-workout/*": [
-        "../lib-workout/dist/*"
-      ],
-      "@onecoach/lib-import-core": [
-        "../lib-import-core/src/index.ts"
-      ],
-      "@onecoach/lib-nutrition": [
-        "./src/stubs/lib-nutrition.d.ts"
-      ],
-      "@onecoach/lib-food": [
-        "./src/stubs/lib-food.d.ts"
-      ],
-      "@onecoach/lib-food/*": [
-        "./src/stubs/lib-food.d.ts"
-      ],
-      "@onecoach/lib-exercise": [
-        "./src/stubs/lib-exercise.d.ts"
-      ],
-      "@onecoach/lib-exercise/*": [
-        "./src/stubs/lib-exercise.d.ts"
-      ],
-      "@onecoach/lib-copilot-framework": [
-        "../../../../submodules/lib-copilot-framework/src/index.ts"
-      ],
-      "@onecoach/lib-copilot-framework/*": [
-        "../../../../submodules/lib-copilot-framework/src/*"
-      ]
-    }
+    "noEmit": false
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "references": [
-    { "path": "../../../../submodules/lib-copilot-framework" }
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core/auth/guards';
-import { ExerciseAdminService, exerciseImportSchema } from '@onecoach/lib-exercise-admin.service';
+import { ExerciseAdminService, exerciseImportSchema } from '@onecoach/lib-exercise';
 import { z } from 'zod';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared/utils/error';
 

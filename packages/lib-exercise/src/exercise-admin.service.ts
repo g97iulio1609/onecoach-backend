@@ -183,7 +183,7 @@ const EXERCISE_EXPORT_INCLUDE = {
 } as const;
 
 export type ExerciseImportPayload = z.infer<typeof exerciseImportSchema>;
-type ExerciseAiPlan = z.infer<typeof exerciseAiPlanSchema>;
+export type ExerciseAiPlan = z.infer<typeof exerciseAiPlanSchema>;
 
 interface RelationReference {
   slug: string;

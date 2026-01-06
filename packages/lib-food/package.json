@@ -33,10 +33,8 @@
   "dependencies": {
     "@onecoach/contracts": "workspace:*",
     "@onecoach/lib-ai": "workspace:*",
-    "@onecoach/lib-ai-agents": "workspace:*",
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
-    "@onecoach/one-agent": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0",

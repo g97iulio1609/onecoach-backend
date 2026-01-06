@@ -6,13 +6,16 @@
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { ExerciseAdminService } from '@onecoach/lib-exercise-admin.service';
+import { generateExercisesWithAgent } from '@onecoach/lib-ai-agents';
 import { createStreamingHandler } from '@onecoach/lib-api/utils/streaming-handler';
 
 interface ExerciseStreamInput {
   prompt: string;
   autoApprove?: boolean;
   mergeExisting?: boolean;
+  difficulty?: string;
+  variations?: boolean;
+  equipment?: string[];
 }
 
 /**
@@ -22,18 +25,35 @@ interface ExerciseStreamInput {
  */
 export const POST = createStreamingHandler<
   ExerciseStreamInput,
-  Awaited<ReturnType<typeof ExerciseAdminService.generateExercisesWithAgent>>
+  Awaited<ReturnType<typeof generateExercisesWithAgent>>
 >({
   agentRole: AgentRole.EXERCISE_GENERATION,
   initialDescription: 'Starting exercise generation...',
   validateRequest: (body) => {
-    const { prompt, autoApprove = true, mergeExisting = false } = body as ExerciseStreamInput;
+    const { 
+      prompt, 
+      autoApprove = true, 
+      mergeExisting = false,
+      difficulty,
+      variations,
+      equipment 
+    } = body as ExerciseStreamInput;
 
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
       return { valid: false, error: 'Prompt is required' };
     }
 
-    return { valid: true, data: { prompt, autoApprove, mergeExisting } };
+    return { 
+      valid: true, 
+      data: { 
+        prompt, 
+        autoApprove, 
+        mergeExisting,
+        difficulty,
+        variations,
+        equipment 
+      } 
+    };
   },
   executeGeneration: async ({ input, userId, sendEvent }) => {
     // Parse prompt to extract generation parameters
@@ -92,7 +112,7 @@ export const POST = createStreamingHandler<
 
     // If "for each muscle group", use all available muscles
     if (forEachMuscleGroup) {
-      const allMuscleNames = metadata.muscles.map((m: unknown) => m.name.toLowerCase());
+      const allMuscleNames = metadata.muscles.map((m: { name: string }) => m.name.toLowerCase());
       const muscleNameMap: Record<string, string> = {
         abs: 'abs',
         biceps: 'biceps',
@@ -159,41 +179,33 @@ export const POST = createStreamingHandler<
       },
     });
 
-    const result = await ExerciseAdminService.generateExercisesWithAgent({
+    const result = await generateExercisesWithAgent({
       count: totalCount,
-      muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
-      bodyPartIds: bodyPartIds.length > 0 ? bodyPartIds : undefined,
-      description: input.prompt,
-      userId,
-      autoApprove: input.autoApprove,
-      mergeExisting: input.mergeExisting,
-      onProgress: (progress, message) => {
-        sendEvent({
-          type: 'agent_progress',
-          data: {
-            progress,
-            message,
-          },
-        });
-      },
+      muscleGroups: muscleGroups.length > 0 ? muscleGroups : [],
+      equipment: input.equipment ?? [],
+      difficulty: input.difficulty ?? 'Intermediate',
+      variations: input.variations ?? false,
+      autoApprove: input.autoApprove ?? false,
+      mergeExisting: input.mergeExisting ?? false,
     });
+
 
     // Progress updates are now handled by the service via onProgress callback
     return result;
   },
   buildOutput: (result) => ({
-    summary: `Generati ${result.created} esercizi, ${result.updatedItems.length} aggiornati, ${result.skippedSlugs.length} saltati`,
+    summary: `Generati ${result.createResult.created} esercizi, ${result.createResult.updatedItems.length} aggiornati, ${result.createResult.skippedSlugs.length} saltati`,
     createResult: {
-      created: result.created,
-      updated: result.updatedItems.length,
-      skipped: result.skippedSlugs.length,
-      createdItems: result.createdItems,
-      updatedItems: result.updatedItems,
-      skippedSlugs: result.skippedSlugs,
-      errors: result.errors,
+      created: result.createResult.created,
+      updated: result.createResult.updated,
+      skipped: result.createResult.skipped,
+      createdItems: result.createResult.createdItems,
+      updatedItems: result.createResult.updatedItems,
+      skippedSlugs: result.createResult.skippedSlugs,
+      errors: result.createResult.errors,
     },
-    updateResult: [],
-    deleteResult: [],
-    approvalResult: [],
+    updateResult: result.updateResult,
+    deleteResult: result.deleteResult,
+    approvalResult: result.approvalResult,
   }),
 });

@@ -12,6 +12,10 @@
     "src/**/*"
   ],
   "references": [
+    { "path": "../../../onecoach-constants" },
+    { "path": "../../../onecoach-types" },
+    { "path": "../../../onecoach-schemas" },
+    { "path": "../../../onecoach-shared/packages/contracts" },
     { "path": "../lib-core" },
     { "path": "../../../onecoach-shared/packages/lib-shared" },
     { "path": "../../../lib-ai" }

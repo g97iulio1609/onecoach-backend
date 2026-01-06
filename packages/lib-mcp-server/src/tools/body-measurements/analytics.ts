@@ -78,14 +78,15 @@ export const bodyMeasurementsAnalyzeTool: McpTool<z.infer<typeof analyzeParams>>
     // BMI Calculation if possible
     let currentBMI: number | null = null;
     let bmiCategory = 'Unknown';
-    if (last.weight && last.height) {
-        const hM = Number(last.height) / 100;
-        currentBMI = Number((Number(last.weight) / (hM * hM)).toFixed(1));
-        if (currentBMI < 18.5) bmiCategory = 'Underweight';
-        else if (currentBMI < 25) bmiCategory = 'Normal weight';
-        else if (currentBMI < 30) bmiCategory = 'Overweight';
-        else bmiCategory = 'Obese';
-    }
+    // BMI Calculation temporarily disabled due to missing height scheme
+    // if (last.weight && last.height) {
+    //     const hM = Number(last.height) / 100;
+    //     currentBMI = Number((Number(last.weight) / (hM * hM)).toFixed(1));
+    //     if (currentBMI < 18.5) bmiCategory = 'Underweight';
+    //     else if (currentBMI < 25) bmiCategory = 'Normal weight';
+    //     else if (currentBMI < 30) bmiCategory = 'Overweight';
+    //     else bmiCategory = 'Obese';
+    // }
 
     return {
       content: [

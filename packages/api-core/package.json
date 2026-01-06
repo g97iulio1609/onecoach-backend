@@ -13,7 +13,7 @@
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-marketplace": "workspace:*",
     "@onecoach/lib-registry": "workspace:*",
-    "@onecoach/lib-workout": "workspace:*",
+    "@onecoach/one-workout": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "@onecoach/types": "workspace:*",
     "next": "16.1.1",

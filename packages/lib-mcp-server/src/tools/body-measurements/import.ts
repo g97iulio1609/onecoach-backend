@@ -21,7 +21,7 @@ import {
   type AIParseContext,
   type ImportFile,
 } from '@onecoach/lib-import-core';
-import { ImportedBodyMeasurements } from '@onecoach/lib-body-measurements';
+import type { ImportedBodyMeasurements } from '@onecoach/lib-body-measurements';
 import { randomUUID } from 'crypto';
 
 import { logger } from '@onecoach/lib-core';
@@ -101,7 +101,7 @@ Uses AI to extract date, weight, body composition, and circumferences.`,
     const result = await importService.import(files as ImportFile[], context.userId, options);
 
     if (!result.success) {
-      throw new Error(result.errors.join('\n'));
+      throw new Error((result.errors || []).join('\n'));
     }
 
     return {

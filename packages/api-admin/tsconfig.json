@@ -1,14 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "composite": true,
-    "strict": true
+    "strict": true,
+    "noEmit": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../../../lib-ai" },
-    { "path": "../lib-vercel-admin" }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

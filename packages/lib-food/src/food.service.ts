@@ -16,7 +16,7 @@ import { Prisma } from '@prisma/client';
 import { createId } from '@onecoach/lib-shared/id-generator';
 import type { FoodItem } from '@onecoach/types';
 import type { Macros } from '@onecoach/types';
-import { SUPPORTED_FOOD_LOCALES } from '@onecoach/constants/supported-locales';
+import { SUPPORTED_FOOD_LOCALES } from '@onecoach/constants';
 import type { FoodsResponse } from '@onecoach/lib-api';
 
 const DEFAULT_LOCALE = 'it';

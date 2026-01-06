@@ -10,7 +10,7 @@
   "dependencies": {
     "@onecoach/contracts": "workspace:*",
     "@onecoach/lib-registry": "workspace:*",
-    "@onecoach/lib-workout": "workspace:*",
+    "@onecoach/one-workout": "workspace:*",
     "@onecoach/schemas": "workspace:*",
     "next": "16.1.1"
   },

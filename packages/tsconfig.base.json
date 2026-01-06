@@ -72,16 +72,67 @@
         "./packages/lib-registry/src/*"
       ],
       "@onecoach/lib-nutrition": [
-        "./packages/lib-nutrition/src/index.ts"
+        "../one-nutrition/src/index.ts"
       ],
       "@onecoach/lib-nutrition/*": [
-        "./packages/lib-nutrition/src/*"
+        "../one-nutrition/src/*"
+      ],
+      "@onecoach/one-nutrition": [
+        "../one-nutrition/src/index.ts"
+      ],
+      "@onecoach/one-nutrition/*": [
+        "../one-nutrition/src/*"
+      ],
+      "@onecoach/one-nutrition/plan-transform": [
+        "../one-nutrition/src/core/transformers/plan-transform.ts"
+      ],
+      "@onecoach/lib-nutrition/plan-sync": [
+        "../one-nutrition/src/core/helpers/plan-sync.ts"
+      ],
+      "@onecoach/lib-nutrition/template-helpers": [
+        "../one-nutrition/src/core/helpers/template-helpers.ts"
       ],
       "@onecoach/lib-workout": [
-        "./packages/lib-workout/src/index.ts"
+        "../one-workout/src/index.ts"
       ],
       "@onecoach/lib-workout/*": [
-        "./packages/lib-workout/src/*"
+        "../one-workout/src/*"
+      ],
+      "@onecoach/one-workout": [
+        "../one-workout/src/index.ts"
+      ],
+      "@onecoach/one-workout/*": [
+        "../one-workout/src/*"
+      ],
+      "@onecoach/one-workout/program-transform": [
+        "../one-workout/src/core/transformers/program-transform.ts"
+      ],
+      "@onecoach/one-workout/program-server-transform": [
+        "../one-workout/src/core/transformers/program-server-transform.ts"
+      ],
+      "@onecoach/one-workout/normalizers/workout-normalizer": [
+        "../one-workout/src/core/normalizers/workout-normalizer.ts"
+      ],
+      "@onecoach/one-workout/weight-calculator": [
+        "../one-workout/src/core/calculators/weight-calculator.ts"
+      ],
+      "@onecoach/lib-workout/intensity-calculator": [
+        "../one-workout/src/core/calculators/intensity-calculator.ts"
+      ],
+      "@onecoach/lib-workout/weight-calculator": [
+        "../one-workout/src/core/workout-weight-calculator.service.ts"
+      ],
+      "@onecoach/lib-workout/program-transform": [
+        "./packages/lib-workout/src/core/transformers/program-transform.ts"
+      ],
+      "@onecoach/lib-workout/utils/progression-calculator": [
+        "./packages/lib-workout/src/core/calculators/progression-calculator.ts"
+      ],
+      "@onecoach/lib-workout/program-server-transform": [
+        "./packages/lib-workout/src/core/transformers/program-server-transform.ts"
+      ],
+      "@onecoach/lib-workout/normalizers/workout-normalizer": [
+        "./packages/lib-workout/src/core/normalizers/workout-normalizer.ts"
       ],
       "ai": [
         "./node_modules/ai/dist/index.d.ts"

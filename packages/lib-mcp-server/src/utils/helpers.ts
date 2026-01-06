@@ -75,7 +75,7 @@ export async function safeHandleMemoryEvent(
     await handleMemoryEvent(event);
   } catch (error: unknown) {
     // Non-blocking: memory update failures shouldn't break tool execution
-    logger.warn(`[MCP Helper] Error updating memory for ${event.type}:`, error);
+    logger.warn(`[MCP Helper] Error updating memory for ${event.type}:`, { error });
   }
 }
 

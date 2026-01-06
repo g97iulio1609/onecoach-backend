@@ -122,12 +122,11 @@ export async function POST(_req: Request) {
         },
       });
 
-      const { generateId: generateTransactionId } =
-        await import('@onecoach/lib-shared/id-generator');
+      const { createId } = await import('@onecoach/lib-shared/id-generator');
 
       await tx.credit_transactions.create({
         data: {
-          id: generateTransactionId('credit_tx'),
+          id: createId(),
           userId: createdUser.id,
           amount: WELCOME_CREDITS,
           type: 'ADMIN_ADJUSTMENT',

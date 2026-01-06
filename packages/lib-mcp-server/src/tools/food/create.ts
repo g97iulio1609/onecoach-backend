@@ -19,7 +19,7 @@ export const foodCreateTool: McpTool = {
   parameters: createFoodSchema,
   execute: async (args, context: McpContext) => {
     logger.warn('🍎 [food_create] Esecuzione tool per creare alimento');
-    logger.warn('🍎 [food_create] Argomenti:', JSON.stringify(args, null, 2));
+    logger.warn('🍎 [food_create] Argomenti:', { args: JSON.stringify(args, null, 2) });
     logger.warn('🍎 [food_create] Context:', { userId: context.userId, isAdmin: context.isAdmin });
 
     if (!context.isAdmin) {
@@ -32,7 +32,7 @@ export const foodCreateTool: McpTool = {
     logger.warn('✅ [food_create] Alimento creato con successo');
     logger.warn(
       '📊 [food_create] Alimento creato:',
-      JSON.stringify(food, null, 2).substring(0, 300)
+      { data: JSON.stringify(food, null, 2).substring(0, 300) }
     );
 
     return food;

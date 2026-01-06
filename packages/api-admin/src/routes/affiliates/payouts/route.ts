@@ -11,6 +11,7 @@ import { AffiliateRewardStatus, Prisma } from '@onecoach/types';
 import { PayoutAuditService } from '@onecoach/lib-marketplace/payout-audit.service';
 import { getCurrentUserId } from '@onecoach/lib-core/auth/session';
 import { affiliateLogger } from '@onecoach/lib-marketplace/affiliate-logger.service';
+import { logger } from '@onecoach/lib-shared/utils/logger';
 
 export const dynamic = 'force-dynamic';
 

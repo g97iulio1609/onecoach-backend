@@ -5,6 +5,7 @@
  */
 
 import { prisma } from '@onecoach/lib-core/prisma';
+import { logger } from '@onecoach/lib-shared';
 
 interface AffiliateEvent {
   event: string;

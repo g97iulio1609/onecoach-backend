@@ -82,7 +82,7 @@ export async function GET() {
 
     if (userExists.status !== 'ACTIVE') {
       if (process.env.NODE_ENV === 'development') {
-        logger.error('[PROFILE GET] User is not ACTIVE:', userOrError.id, userExists.status);
+        logger.error('[PROFILE GET] User is not ACTIVE:', { userId: userOrError.id, status: userExists.status });
       }
       return NextResponse.json(
         { error: 'Account non attivo. Contatta il supporto.' },
@@ -170,7 +170,7 @@ export async function PUT(_req: Request) {
 
   if (userExists.status !== 'ACTIVE') {
     if (process.env.NODE_ENV === 'development') {
-      logger.error('[PROFILE PUT] User is not ACTIVE:', userOrError.id, userExists.status);
+      logger.error('[PROFILE PUT] User is not ACTIVE:', { userId: userOrError.id, status: userExists.status });
     }
     return NextResponse.json(
       { error: 'Account non attivo. Contatta il supporto.' },

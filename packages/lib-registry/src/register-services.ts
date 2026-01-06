@@ -9,8 +9,8 @@
  */
 
 import { registerService } from './index';
-import { nutritionService } from '@onecoach/lib-nutrition';
-import { workoutService } from '@onecoach/lib-workout';
+import { nutritionService } from '@onecoach/one-nutrition';
+import { workoutService } from '@onecoach/one-workout';
 import { exerciseService } from '@onecoach/lib-exercise';
 import { foodService } from '@onecoach/lib-food';
 import { analyticsService } from '@onecoach/lib-analytics';
