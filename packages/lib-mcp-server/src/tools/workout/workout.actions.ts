@@ -557,6 +557,273 @@ export const removeExerciseAction: AgenticActionHandler<WorkoutProgramData> = {
   },
 };
 
+
+// =====================================================
+// =====================================================
+// Element Actions: Superset
+// =====================================================
+
+const AddSupersetDataSchema = z.object({
+  name: z.string().optional().describe('Superset name'),
+  exercises: z.array(z.object({
+    name: z.string().describe('Exercise name'),
+    catalogExerciseId: z.string().optional(),
+    setGroups: z.array(z.object({
+      count: z.number().int().positive().optional().default(3),
+      baseSet: z.object({
+        reps: z.number().int().positive().optional(),
+        rest: z.number().int().positive().optional(),
+      }).optional(),
+    })).min(1).optional(),
+  })).min(2).describe('At least 2 exercises for superset'),
+  restBetweenExercises: z.number().int().nonnegative().optional().default(0),
+  restAfterSuperset: z.number().int().positive().optional().default(90),
+  rounds: z.number().int().positive().optional().default(1),
+  notes: z.string().optional(),
+});
+
+export const addSupersetAction: AgenticActionHandler<WorkoutProgramData> = {
+  description: 'Add a superset (2+ exercises performed back-to-back)',
+  targetSchema: WorkoutTargetSchema,
+  newDataSchema: AddSupersetDataSchema,
+
+  execute: (program, { target, newData }, context) => {
+    const t = target as WorkoutTarget;
+    const payload = newData as z.infer<typeof AddSupersetDataSchema>;
+    const ctx = ((context as Record<string, unknown>)?.workout || {}) as WorkoutModificationContext;
+
+    if (!payload?.exercises || payload.exercises.length < 2) {
+      throw new Error('Superset requires at least 2 exercises');
+    }
+
+    const weekIndex = t.weekIndex ?? ctx.defaultWeekIndex ?? 0;
+    const dayIndex = t.dayIndex ?? ctx.defaultDayIndex ?? 0;
+    const week = program.weeks[weekIndex];
+    if (!week) throw new Error(`Week ${weekIndex} not found`);
+    const day = week.days[dayIndex];
+    if (!day) throw new Error(`Day ${dayIndex} not found`);
+
+    // Build exercises with setGroups
+    const supersetExercises = payload.exercises.map((ex) => ({
+      id: generateId('ex'),
+      name: ex.name,
+      catalogExerciseId: ex.catalogExerciseId || '',
+      setGroups: (ex.setGroups || [{ count: 3 }]).map((sg) => ({
+        id: generateId('sg'),
+        count: sg.count || 3,
+        baseSet: { reps: sg.baseSet?.reps ?? 10, rest: sg.baseSet?.rest ?? 0 },
+        sets: Array.from({ length: sg.count || 3 }, (_, i) => ({
+          reps: sg.baseSet?.reps ?? 10,
+          rest: sg.baseSet?.rest ?? 0,
+          setNumber: i + 1,
+        })),
+      })),
+    }));
+
+    // Create superset element
+    const supersetElement = {
+      type: 'superset' as const,
+      id: generateId('ss'),
+      name: payload.name || `Superset ${day.exercises.length + 1}`,
+      exercises: supersetExercises,
+      restBetweenExercises: payload.restBetweenExercises ?? 0,
+      restAfterSuperset: payload.restAfterSuperset ?? 90,
+      rounds: payload.rounds ?? 1,
+      notes: payload.notes,
+    };
+
+    // Add to day's elements array (or exercises for backward compat)
+    if (!day.exercises) day.exercises = [];
+    // Store as a special marked exercise for now
+    day.exercises.push({
+      ...supersetElement,
+      setGroups: [],
+    } as unknown as WorkoutExerciseData);
+
+    return program;
+  },
+};
+
+// =====================================================
+// Element Actions: Circuit
+// =====================================================
+
+const AddCircuitDataSchema = z.object({
+  name: z.string().describe('Circuit name'),
+  exercises: z.array(z.object({
+    name: z.string().describe('Exercise name'),
+    reps: z.number().int().positive().optional(),
+    duration: z.number().int().positive().optional().describe('Duration in seconds'),
+    notes: z.string().optional(),
+  })).min(2).describe('At least 2 exercises for circuit'),
+  rounds: z.number().int().positive().optional().default(3),
+  restBetweenExercises: z.number().int().nonnegative().optional().default(0),
+  restBetweenRounds: z.number().int().positive().optional().default(60),
+  notes: z.string().optional(),
+});
+
+export const addCircuitAction: AgenticActionHandler<WorkoutProgramData> = {
+  description: 'Add a circuit (exercises performed for multiple rounds with minimal rest)',
+  targetSchema: WorkoutTargetSchema,
+  newDataSchema: AddCircuitDataSchema,
+
+  execute: (program, { target, newData }, context) => {
+    const t = target as WorkoutTarget;
+    const payload = newData as z.infer<typeof AddCircuitDataSchema>;
+    const ctx = ((context as Record<string, unknown>)?.workout || {}) as WorkoutModificationContext;
+
+    if (!payload?.exercises || payload.exercises.length < 2) {
+      throw new Error('Circuit requires at least 2 exercises');
+    }
+
+    const weekIndex = t.weekIndex ?? ctx.defaultWeekIndex ?? 0;
+    const dayIndex = t.dayIndex ?? ctx.defaultDayIndex ?? 0;
+    const week = program.weeks[weekIndex];
+    if (!week) throw new Error(`Week ${weekIndex} not found`);
+    const day = week.days[dayIndex];
+    if (!day) throw new Error(`Day ${dayIndex} not found`);
+
+    const circuitElement = {
+      type: 'circuit' as const,
+      id: generateId('cir'),
+      name: payload.name,
+      exercises: payload.exercises.map((ex) => ({
+        name: ex.name,
+        reps: ex.reps,
+        duration: ex.duration,
+        notes: ex.notes,
+      })),
+      rounds: payload.rounds ?? 3,
+      restBetweenExercises: payload.restBetweenExercises ?? 0,
+      restBetweenRounds: payload.restBetweenRounds ?? 60,
+      notes: payload.notes,
+    };
+
+    if (!day.exercises) day.exercises = [];
+    day.exercises.push({
+      ...circuitElement,
+      setGroups: [],
+    } as unknown as WorkoutExerciseData);
+
+    return program;
+  },
+};
+
+// =====================================================
+// Element Actions: Warmup
+// =====================================================
+
+const AddWarmupDataSchema = z.object({
+  name: z.string().optional().default('Riscaldamento'),
+  durationMinutes: z.number().int().positive().optional().default(10),
+  exercises: z.array(z.object({
+    name: z.string().describe('Warmup exercise name'),
+    duration: z.number().int().positive().optional().describe('Duration in seconds'),
+    reps: z.number().int().positive().optional(),
+  })).min(1).describe('Warmup exercises'),
+  notes: z.string().optional(),
+});
+
+export const addWarmupAction: AgenticActionHandler<WorkoutProgramData> = {
+  description: 'Add a warmup section to the beginning of a workout day',
+  targetSchema: WorkoutTargetSchema,
+  newDataSchema: AddWarmupDataSchema,
+
+  execute: (program, { target, newData }, context) => {
+    const t = target as WorkoutTarget;
+    const payload = newData as z.infer<typeof AddWarmupDataSchema>;
+    const ctx = ((context as Record<string, unknown>)?.workout || {}) as WorkoutModificationContext;
+
+    const weekIndex = t.weekIndex ?? ctx.defaultWeekIndex ?? 0;
+    const dayIndex = t.dayIndex ?? ctx.defaultDayIndex ?? 0;
+    const week = program.weeks[weekIndex];
+    if (!week) throw new Error(`Week ${weekIndex} not found`);
+    const day = week.days[dayIndex];
+    if (!day) throw new Error(`Day ${dayIndex} not found`);
+
+    const warmupElement = {
+      type: 'warmup' as const,
+      id: generateId('wup'),
+      name: payload.name || 'Riscaldamento',
+      durationMinutes: payload.durationMinutes ?? 10,
+      exercises: payload.exercises.map((ex) => ({
+        name: ex.name,
+        duration: ex.duration,
+        reps: ex.reps,
+      })),
+      notes: payload.notes,
+    };
+
+    if (!day.exercises) day.exercises = [];
+    // Insert warmup at the beginning
+    day.exercises.unshift({
+      ...warmupElement,
+      setGroups: [],
+    } as unknown as WorkoutExerciseData);
+
+    return program;
+  },
+};
+
+// =====================================================
+// Element Actions: Cardio
+// =====================================================
+
+const AddCardioDataSchema = z.object({
+  name: z.string().describe('Cardio exercise name'),
+  exerciseId: z.string().optional().describe('Exercise ID from catalog'),
+  machine: z.enum(['treadmill', 'bike', 'rower', 'elliptical', 'stairmaster', 'jump_rope', 'other']).optional().default('treadmill'),
+  duration: z.number().int().positive().describe('Duration in seconds'),
+  distance: z.number().positive().optional().describe('Target distance in meters'),
+  intensity: z.enum(['low', 'moderate', 'high', 'interval']).optional().default('moderate'),
+  targetHeartRate: z.number().int().positive().optional(),
+  speed: z.number().positive().optional(),
+  incline: z.number().nonnegative().optional(),
+  notes: z.string().optional(),
+});
+
+export const addCardioAction: AgenticActionHandler<WorkoutProgramData> = {
+  description: 'Add a cardio exercise (treadmill, bike, rower, etc.)',
+  targetSchema: WorkoutTargetSchema,
+  newDataSchema: AddCardioDataSchema,
+
+  execute: (program, { target, newData }, context) => {
+    const t = target as WorkoutTarget;
+    const payload = newData as z.infer<typeof AddCardioDataSchema>;
+    const ctx = ((context as Record<string, unknown>)?.workout || {}) as WorkoutModificationContext;
+
+    const weekIndex = t.weekIndex ?? ctx.defaultWeekIndex ?? 0;
+    const dayIndex = t.dayIndex ?? ctx.defaultDayIndex ?? 0;
+    const week = program.weeks[weekIndex];
+    if (!week) throw new Error(`Week ${weekIndex} not found`);
+    const day = week.days[dayIndex];
+    if (!day) throw new Error(`Day ${dayIndex} not found`);
+
+    const cardioElement = {
+      type: 'cardio' as const,
+      id: generateId('car'),
+      name: payload.name,
+      exerciseId: payload.exerciseId || '',
+      machine: payload.machine ?? 'treadmill',
+      duration: payload.duration,
+      distance: payload.distance,
+      intensity: payload.intensity ?? 'moderate',
+      targetHeartRate: payload.targetHeartRate,
+      speed: payload.speed,
+      incline: payload.incline,
+      notes: payload.notes,
+    };
+
+    if (!day.exercises) day.exercises = [];
+    day.exercises.push({
+      ...cardioElement,
+      setGroups: [],
+    } as unknown as WorkoutExerciseData);
+
+    return program;
+  },
+};
+
 // =====================================================
 // Export All Actions
 // =====================================================
@@ -568,4 +835,8 @@ export const workoutActions = {
   update_exercise: updateExerciseAction,
   add_exercise: addExerciseAction,
   remove_exercise: removeExerciseAction,
+  add_superset: addSupersetAction,
+  add_circuit: addCircuitAction,
+  add_warmup: addWarmupAction,
+  add_cardio: addCardioAction,
 } as const;
