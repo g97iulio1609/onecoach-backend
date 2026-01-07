@@ -40,10 +40,10 @@ export class AIProviderFactory {
       throw new Error('OpenRouter API key is missing. Please set OPENROUTER_API_KEY environment variable.');
     }
 
-    const extraBody = config?.preferredProvider
-      ? { provider: { only: [config.preferredProvider] } }
-      : undefined;
-
+    // NOTE: Provider routing (order, allow_fallbacks) should be passed at request time
+    // via providerOptions.openrouter.provider, NOT at factory level.
+    // See: https://openrouter.ai/docs/features/provider-routing
+    // The buildProviderOptions utility handles this correctly.
     return (createOpenRouter as any)({
       apiKey,
       baseURL: config?.baseUrl || envConfig.baseUrl,
@@ -51,7 +51,6 @@ export class AIProviderFactory {
         'HTTP-Referer': config?.siteUrl || envConfig.siteUrl || 'https://onecoach.ai',
         'X-Title': config?.appName || envConfig.appName || 'onecoach AI',
       },
-      ...(extraBody ? { extraBody } : {}),
     });
   }
 
