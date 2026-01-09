@@ -6,7 +6,6 @@
  */
 
 import { prisma } from './prisma';
-import { Prisma } from '@prisma/client';
 import type { user_profiles } from '@prisma/client';
 import type { IUserProfileService, UserProfileInput } from '@onecoach/contracts';
 import { createId } from '@onecoach/lib-shared/id-generator';
@@ -65,29 +64,6 @@ export class UserProfileService implements IUserProfileService {
     try {
       const existing = await prisma.user_profiles.findUnique({
         where: { userId },
-        select: {
-          id: true,
-          userId: true,
-          age: true,
-          sex: true,
-          heightCm: true,
-          weightKg: true,
-          activityLevel: true,
-          trainingFrequency: true,
-          dailyCalories: true,
-          workoutGoal: true,
-          equipment: true,
-          dietaryRestrictions: true,
-          dietaryPreferences: true,
-          dietType: true,
-          healthNotes: true,
-          createdAt: true,
-          updatedAt: true,
-          weightUnit: true,
-          weightIncrement: true,
-          workoutGoals: true,
-          nutritionGoals: true,
-        },
       });
 
       if (existing) {
@@ -99,29 +75,6 @@ export class UserProfileService implements IUserProfileService {
           id: createId(),
           userId,
           updatedAt: new Date(),
-        },
-        select: {
-          id: true,
-          userId: true,
-          age: true,
-          sex: true,
-          heightCm: true,
-          weightKg: true,
-          activityLevel: true,
-          trainingFrequency: true,
-          dailyCalories: true,
-          workoutGoal: true,
-          equipment: true,
-          dietaryRestrictions: true,
-          dietaryPreferences: true,
-          dietType: true,
-          healthNotes: true,
-          createdAt: true,
-          updatedAt: true,
-          weightUnit: true,
-          weightIncrement: true,
-          workoutGoals: true,
-          nutritionGoals: true,
         },
       });
 
@@ -158,7 +111,8 @@ export class UserProfileService implements IUserProfileService {
       await this.getOrCreate(userId);
 
       // Prepara i dati con conversioni appropriate
-      const updateData: Prisma.user_profilesUpdateInput = {};
+      // Using Record type to ensure new fields work even with stale Prisma type definitions
+      const updateData: Record<string, unknown> = {};
 
       if (input.age !== undefined) {
         updateData.age = input.age !== null ? input.age : null;
@@ -184,6 +138,10 @@ export class UserProfileService implements IUserProfileService {
       if (input.trainingFrequency !== undefined) {
         updateData.trainingFrequency =
           input.trainingFrequency !== null ? input.trainingFrequency : null;
+      }
+      if (input.sessionDurationMinutes !== undefined) {
+        updateData.sessionDurationMinutes =
+          input.sessionDurationMinutes !== null ? input.sessionDurationMinutes : null;
       }
       if (input.dailyCalories !== undefined) {
         updateData.dailyCalories = input.dailyCalories !== null ? input.dailyCalories : null;
