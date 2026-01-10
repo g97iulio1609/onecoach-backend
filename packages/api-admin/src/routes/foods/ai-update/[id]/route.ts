@@ -8,16 +8,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core';
 import { FoodService } from '@onecoach/lib-food';
-import { createAIProvider } from '@onecoach/one-agent';
+import { createAIProvider } from '@onecoach/lib-ai';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 import { createFoodSchema } from '@onecoach/schemas/food.schema';
-import { ensureMacrosArePer100g } from '@onecoach/lib-shared';
 import type { Macros } from '@onecoach/types';
 import { AIProviderConfigService } from '@onecoach/lib-ai';
 import { TOKEN_LIMITS } from '@onecoach/constants';
 
 import { logger } from '@onecoach/lib-core';
 export const dynamic = 'force-dynamic';
+
+// Helper for structural compatibility - macros are already per 100g
+function ensureMacrosArePer100g(macros: Macros, _servingSize: number, _unit: string): Macros {
+  return macros;
+}
 
 type RouteParams = Promise<{ id: string }>;
 

@@ -1,4 +1,4 @@
-import { generateFoodsWithAgent } from '@onecoach/lib-ai-agents';
+import { generateFoods } from '@onecoach/one-nutrition';
 import { createGenerationHandler } from '@onecoach/lib-api';
 import { z } from 'zod';
 
@@ -12,28 +12,40 @@ const aiRequestSchema = z.object({
 /**
  * POST /api/admin/foods/ai
  *
- * Generate foods with non-streaming response
+ * Generate foods with SDK 3.1
  */
 export const POST = createGenerationHandler({
   requestSchema: aiRequestSchema,
-  executeGeneration: async ({ input, userId }) => {
+  executeGeneration: async ({ input }) => {
     // Parse prompt to extract count (default 5)
     const prompt = input.prompt;
     const countMatch = prompt.match(/(\d+)\s*(nuovi\s*)?(alimenti|foods?)/i);
     const count = countMatch && countMatch[1] ? parseInt(countMatch[1], 10) : 5;
 
-    const result = await generateFoodsWithAgent({
+    const result = await generateFoods({
       count,
       description: prompt,
-      userId,
-      mergeExisting: input.mergeExisting,
     });
 
-    // Return directly - createGenerationHandler will wrap it
+    if (!result.success) {
+      throw new Error(result.error?.message || 'Errore nella generazione alimenti');
+    }
+
+    const foods = result.output?.foods || [];
     return {
-      summary: `Generati ${result.createResult.created} alimenti, ${result.createResult.updated} aggiornati, ${result.createResult.skipped} saltati`,
-      createResult: result.createResult,
+      summary: `Generati ${foods.length} alimenti`,
+      createResult: {
+        created: foods.length,
+        updated: 0,
+        skipped: 0,
+        createdItems: foods.map(f => ({ name: f.name })),
+        updatedItems: [],
+        skippedSlugs: [],
+        errors: [],
+      },
     };
   },
   errorMessage: 'Errore durante la generazione alimenti con AI',
 });
+
+

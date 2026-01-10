@@ -20,9 +20,7 @@
       "@onecoach/constants": ["../constants/src/index.ts"],
       "@onecoach/constants/*": ["../constants/src/*"],
       "@onecoach/lib-config": ["../lib-config/src/index.ts"],
-      "@onecoach/lib-config/*": ["../lib-config/src/*"],
-      "@onecoach/lib-ai-agents": ["../lib-ai-agents/src/index.ts"],
-      "@onecoach/lib-ai-agents/*": ["../lib-ai-agents/src/*"]
+      "@onecoach/lib-config/*": ["../lib-config/src/*"]
     }
   },
   "include": ["src/**/*"],

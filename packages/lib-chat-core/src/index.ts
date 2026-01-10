@@ -75,18 +75,8 @@
  * ```
  */
 
-// Types
+// Server-safe exports only.
+// Client-only hooks/components/providers are available via `@onecoach/lib-chat-core/client`.
 export * from './types';
-
-// Providers
-export * from './providers';
-
-// Hooks
-export * from './hooks';
-
-// Components
-export * from './components';
-
-// Utils
 export * from './utils';
 export * from './conversation.service';

@@ -4,6 +4,8 @@
  * Export centralizzato di tutti i providers.
  */
 
+'use client';
+
 export {
   UnifiedChatProvider,
   useUnifiedChatContext,

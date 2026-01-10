@@ -1,12 +1,12 @@
 /**
  * Exercise AI Generation Streaming API Route
  *
- * Handles streaming exercise generation using ExerciseGenerationAgent.
+ * Handles streaming exercise generation using SDK 3.1.
  * Provides real-time progress updates via Server-Sent Events (SSE).
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { generateExercisesWithAgent } from '@onecoach/lib-ai-agents';
+import { generateExercises } from '@onecoach/one-workout';
 import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface ExerciseStreamInput {
@@ -25,7 +25,7 @@ interface ExerciseStreamInput {
  */
 export const POST = createStreamingHandler<
   ExerciseStreamInput,
-  Awaited<ReturnType<typeof generateExercisesWithAgent>>
+  Awaited<ReturnType<typeof generateExercises>>
 >({
   agentRole: AgentRole.EXERCISE_GENERATION,
   initialDescription: 'Starting exercise generation...',
@@ -178,33 +178,29 @@ export const POST = createStreamingHandler<
       },
     });
 
-    const result = await generateExercisesWithAgent({
+    const result = await generateExercises({
       count: totalCount,
-      muscleGroups: muscleGroups.length > 0 ? muscleGroups : [],
-      equipment: input.equipment ?? [],
-      difficulty: input.difficulty ?? 'Intermediate',
-      variations: input.variations ?? false,
-      autoApprove: input.autoApprove ?? false,
-      mergeExisting: input.mergeExisting ?? false,
+      description: input.prompt,
+      muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
     });
 
 
     // Progress updates are now handled by the service via onProgress callback
     return result;
   },
-  buildOutput: (result) => ({
-    summary: `Generati ${result.createResult.created} esercizi, ${result.createResult.updatedItems.length} aggiornati, ${result.createResult.skippedSlugs.length} saltati`,
-    createResult: {
-      created: result.createResult.created,
-      updated: result.createResult.updated,
-      skipped: result.createResult.skipped,
-      createdItems: result.createResult.createdItems,
-      updatedItems: result.createResult.updatedItems,
-      skippedSlugs: result.createResult.skippedSlugs,
-      errors: result.createResult.errors,
-    },
-    updateResult: result.updateResult,
-    deleteResult: result.deleteResult,
-    approvalResult: result.approvalResult,
-  }),
+  buildOutput: (result) => {
+    const exercises = result.output?.exercises || [];
+    return {
+      summary: `Generati ${exercises.length} esercizi`,
+      createResult: {
+        created: exercises.length,
+        updated: 0,
+        skipped: 0,
+        createdItems: exercises.map(e => ({ name: e.name, typeId: e.typeId })),
+        updatedItems: [],
+        skippedSlugs: [],
+        errors: [],
+      },
+    };
+  },
 });

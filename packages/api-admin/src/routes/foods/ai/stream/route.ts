@@ -1,12 +1,12 @@
 /**
  * Food AI Generation Streaming API Route
  *
- * Handles streaming food generation using FoodGenerationAgent.
+ * Handles streaming food generation using SDK 3.1.
  * Provides real-time progress updates via Server-Sent Events (SSE).
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { generateFoodsWithAgent } from '@onecoach/lib-ai-agents';
+import { generateFoods } from '@onecoach/one-nutrition';
 import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface FoodStreamInput {
@@ -21,7 +21,7 @@ interface FoodStreamInput {
  */
 export const POST = createStreamingHandler<
   FoodStreamInput,
-  Awaited<ReturnType<typeof generateFoodsWithAgent>>
+  Awaited<ReturnType<typeof generateFoods>>
 >({
   agentRole: AgentRole.FOOD_GENERATION,
   initialDescription: 'Starting food generation...',
@@ -34,7 +34,7 @@ export const POST = createStreamingHandler<
 
     return { valid: true, data: { prompt, mergeExisting } };
   },
-  executeGeneration: async ({ input, userId, sendEvent }) => {
+  executeGeneration: async ({ input, userId: _userId, sendEvent }) => {
     // Parse prompt to extract generation parameters
     const lowerPrompt = input.prompt.toLowerCase();
     const categoryIds: string[] = [];
@@ -116,37 +116,29 @@ export const POST = createStreamingHandler<
       },
     });
 
-    const result = await generateFoodsWithAgent({
+    const result = await generateFoods({
       count,
       description: input.prompt,
       existingFoods: existingFoods.map((f: { name: string }) => f.name),
       categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
-      userId,
-      mergeExisting: input.mergeExisting,
-      onProgress: (progress, message) => {
-        sendEvent({
-          type: 'agent_progress',
-          data: {
-            progress,
-            message,
-          },
-        });
-      },
     });
 
     // Progress updates are now handled by the service via onProgress callback
     return result;
   },
-  buildOutput: (result) => ({
-    summary: `Generati ${result.createResult.created} alimenti, ${result.createResult.updated} aggiornati, ${result.createResult.skipped} saltati`,
-    createResult: {
-      created: result.createResult.created,
-      updated: result.createResult.updated,
-      skipped: result.createResult.skipped,
-      createdItems: result.createResult.createdItems,
-      updatedItems: result.createResult.updatedItems,
-      skippedNames: result.createResult.skippedNames,
-      errors: result.createResult.errors,
-    },
-  }),
+  buildOutput: (result) => {
+    const foods = result.output?.foods || [];
+    return {
+      summary: `Generati ${foods.length} alimenti`,
+      createResult: {
+        created: foods.length,
+        updated: 0,
+        skipped: 0,
+        createdItems: foods.map(f => ({ name: f.name })),
+        updatedItems: [],
+        skippedSlugs: [],
+        errors: [],
+      },
+    };
+  },
 });

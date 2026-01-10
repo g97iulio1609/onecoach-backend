@@ -170,12 +170,6 @@
       "@onecoach/lib-ai/*": [
         "../lib-ai/src/*"
       ],
-      "@onecoach/lib-ai-agents": [
-        "../lib-ai-agents/src/index.ts"
-      ],
-      "@onecoach/lib-ai-agents/*": [
-        "../lib-ai-agents/src/*"
-      ],
       "@onecoach/lib-import-core": [
         "./packages/lib-import-core/src/index.ts"
       ],

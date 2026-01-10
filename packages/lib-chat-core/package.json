@@ -9,6 +9,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    },
     "./hooks": {
       "types": "./src/hooks/index.ts",
       "default": "./src/hooks/index.ts"
@@ -30,19 +34,27 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/react": "^3.0.5",
+    "@ai-sdk/react": "3.0.7",
     "@onecoach/lib-design-system": "workspace:*",
     "@onecoach/lib-stores": "workspace:*",
-    "@onecoach/types": "workspace:*",
     "@supabase/supabase-js": "^2.89.0",
-    "ai": "6.0.5",
+    "ai": "6.0.19",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
     "zustand": "^5.0.9",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "@onecoach/types-core": "workspace:*",
+    "@onecoach/types-workout": "workspace:*",
+    "@onecoach/types-nutrition": "workspace:*",
+    "@onecoach/types-chat": "workspace:*",
+    "@onecoach/types-analytics": "workspace:*",
+    "@onecoach/types-ai": "workspace:*",
+    "@onecoach/types-ui": "workspace:*",
+    "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types-database": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0",

@@ -4,12 +4,17 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createXai } from '@ai-sdk/xai';
 import { createMinimax } from 'vercel-minimax-ai-provider';
+// Note: ai-sdk-provider-gemini-cli uses native modules (node-pty) incompatible with Next.js bundling
+// Import is done dynamically in createGeminiCli to avoid build-time bundling
 import { getOpenRouterConfig, getAIProviderKey } from '../config/env';
+
+/** Gemini CLI thinkingLevel for Gemini 3 models */
+export type GeminiThinkingLevel = 'minimal' | 'low' | 'medium' | 'high';
 
 /**
  * AI Provider Types
  */
-export type AIProviderType = 'openrouter' | 'openai' | 'anthropic' | 'google' | 'xai' | 'minimax';
+export type AIProviderType = 'openrouter' | 'openai' | 'anthropic' | 'google' | 'xai' | 'minimax' | 'gemini-cli';
 
 /**
  * Provider Configuration
@@ -40,7 +45,7 @@ export class AIProviderFactory {
       throw new Error('OpenRouter API key is missing. Please set OPENROUTER_API_KEY environment variable.');
     }
 
-    // NOTE: Provider routing (order, allow_fallbacks) should be passed at request time
+    // NOTE: Provider routing (order, allowFallbacks) should be passed at request time
     // via providerOptions.openrouter.provider, NOT at factory level.
     // See: https://openrouter.ai/docs/features/provider-routing
     // The buildProviderOptions utility handles this correctly.
@@ -98,10 +103,41 @@ export class AIProviderFactory {
   }
 
   /**
+   * Create a Gemini CLI provider
+   * Uses Gemini CLI OAuth (default) or API key authentication
+   * Requires: npm install -g @google/gemini-cli && gemini (for OAuth setup)
+   * @see https://ai-sdk.dev/providers/community-providers/gemini-cli
+   * 
+   * NOTE: Uses dynamic import because gemini-cli-core has native node-pty dependencies
+   * that are incompatible with Next.js Turbopack bundling.
+   */
+  public static async createGeminiCli(config?: {
+    authType?: 'oauth-personal' | 'api-key';
+    apiKey?: string;
+    thinkingLevel?: GeminiThinkingLevel;
+  }): Promise<any> {
+    // Dynamic import to avoid Turbopack bundling native modules
+    const { createGeminiProvider } = await import('@onecoach/ai-sdk-provider-gemini-cli');
+    return createGeminiProvider({
+      authType: config?.authType ?? 'oauth-personal',
+      ...(config?.apiKey && { apiKey: config.apiKey }),
+    });
+  }
+
+  /**
    * Get a model instance from a provider
    * Simplifies the logic found in various places: provider(modelName)
+   * NOTE: This method is async because gemini-cli uses dynamic imports
    */
-  public static getModel(providerName: AIProviderType, modelName: string, config?: { apiKey?: string; preferredProvider?: string | null }) {
+  public static async getModel(
+    providerName: AIProviderType,
+    modelName: string,
+    config?: {
+      apiKey?: string;
+      preferredProvider?: string | null;
+      thinkingLevel?: GeminiThinkingLevel;
+    }
+  ) {
     switch (providerName) {
       case 'openrouter':
         return (this.createOpenRouter({ apiKey: config?.apiKey, preferredProvider: config?.preferredProvider }) as any)(modelName);
@@ -115,6 +151,13 @@ export class AIProviderFactory {
         return (this.createXAI(config?.apiKey) as any)(modelName);
       case 'minimax':
         return (this.createMiniMax(config?.apiKey) as any)(modelName);
+      case 'gemini-cli': {
+        const provider = await this.createGeminiCli({ apiKey: config?.apiKey, thinkingLevel: config?.thinkingLevel });
+        return provider(
+          modelName,
+          config?.thinkingLevel ? { thinkingConfig: { thinkingLevel: config.thinkingLevel } } : undefined
+        );
+      }
       default:
         throw new Error(`Unsupported provider: ${providerName}`);
     }

@@ -50,8 +50,16 @@
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/lib-theme": "workspace:*",
-    "@onecoach/types": "workspace:*",
-    "zustand": "^5.0.9"
+    "zustand": "^5.0.9",
+    "@onecoach/types-core": "workspace:*",
+    "@onecoach/types-workout": "workspace:*",
+    "@onecoach/types-nutrition": "workspace:*",
+    "@onecoach/types-chat": "workspace:*",
+    "@onecoach/types-analytics": "workspace:*",
+    "@onecoach/types-ai": "workspace:*",
+    "@onecoach/types-ui": "workspace:*",
+    "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types-database": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

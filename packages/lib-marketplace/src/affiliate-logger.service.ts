@@ -188,6 +188,14 @@ class AffiliateLogger {
     });
   }
 
+  error(message: string, error: unknown) {
+    this.logError({
+      event: 'generic_error',
+      error: error instanceof Error ? error : new Error(String(error)),
+      metadata: { message },
+    });
+  }
+
   // Metriche aggregate (per monitoring)
   async getMetrics(params?: { startDate?: Date; endDate?: Date }) {
     const start = params?.startDate ?? new Date(0);

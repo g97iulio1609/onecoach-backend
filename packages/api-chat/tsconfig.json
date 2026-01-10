@@ -6,7 +6,6 @@
     "strict": true
   },
   "references": [
-    { "path": "../../../lib-ai-agents" },
     { "path": "../../../one-agent" },
     { "path": "../lib-core" },
     { "path": "../../../onecoach-shared/packages/contracts" },

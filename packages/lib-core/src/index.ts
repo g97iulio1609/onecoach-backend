@@ -5,6 +5,9 @@
  * Implementa contratti da @onecoach/contracts
  */
 
+// Re-export ID generation utility
+export { createId } from '@paralleldrive/cuid2';
+
 export * from './prisma';
 export * from './db';
 export * from './user-memory.service';

@@ -32,7 +32,7 @@ import {
   HEALTH_DATA_TYPES,
   DEFAULT_SYNC_DAYS,
   HEALTH_STORAGE_KEYS,
-} from '@onecoach/constants.config';
+} from '@onecoach/constants';
 import { logger } from '@onecoach/lib-shared';
 import { getErrorMessage } from '@onecoach/lib-shared';
 

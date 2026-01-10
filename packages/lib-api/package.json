@@ -60,11 +60,20 @@
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/lib-stores": "workspace:*",
     "@onecoach/schemas": "workspace:*",
-    "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0",
     "@tanstack/react-query": "^5.90.16",
     "react": "^19.2.3",
-    "react-native": "^0.83.1"
+    "react-native": "^0.83.1",
+    "@onecoach/types": "workspace:*",
+    "@onecoach/types-core": "workspace:*",
+    "@onecoach/types-workout": "workspace:*",
+    "@onecoach/types-nutrition": "workspace:*",
+    "@onecoach/types-chat": "workspace:*",
+    "@onecoach/types-analytics": "workspace:*",
+    "@onecoach/types-ai": "workspace:*",
+    "@onecoach/types-ui": "workspace:*",
+    "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types-database": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=19.1.0 <20",

@@ -11,7 +11,8 @@
  * @module lib-import-core/vision
  */
 
-import { streamText, Output, AIFrameworkConfigService, FrameworkFeature, type ImportModelsConfig, AIProviderConfigService } from '@onecoach/lib-ai';
+import { streamText, Output } from 'ai';
+import { AIFrameworkConfigService, FrameworkFeature, type ImportModelsConfig, AIProviderConfigService } from '@onecoach/lib-ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { logger, creditService } from '@onecoach/lib-core';
 import type { VisionParseParams, ImportFileType } from './types';

@@ -37,9 +37,18 @@
     "@onecoach/lib-core": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/schemas": "workspace:*",
-    "@onecoach/types": "workspace:*",
     "@prisma/client": "^7.2.0",
-    "ai": "6.0.5"
+    "ai": "6.0.19",
+    "@onecoach/types": "workspace:*",
+    "@onecoach/types-core": "workspace:*",
+    "@onecoach/types-workout": "workspace:*",
+    "@onecoach/types-nutrition": "workspace:*",
+    "@onecoach/types-chat": "workspace:*",
+    "@onecoach/types-analytics": "workspace:*",
+    "@onecoach/types-ai": "workspace:*",
+    "@onecoach/types-ui": "workspace:*",
+    "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types-database": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

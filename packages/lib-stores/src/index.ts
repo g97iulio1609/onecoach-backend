@@ -203,7 +203,6 @@ export type {
   UseRealtimeSubscriptionOptions,
   UseSyncFieldOptions,
   UseRealtimeSyncOptions,
-  UseRealtimeSyncWithClientOptions,
   UseRealtimeSyncSingleOptions,
   MagicAnimationType,
   UseMagicAnimationOptions,

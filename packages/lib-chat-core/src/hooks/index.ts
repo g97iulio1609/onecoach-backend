@@ -4,6 +4,8 @@
  * Export centralizzato di tutti gli hooks.
  */
 
+'use client';
+
 export { useChatCore, useCopilotChatCore, useMainChatCore } from './use-chat-core';
 
 export {

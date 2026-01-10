@@ -50,9 +50,17 @@
     "@onecoach/lib-marketplace": "workspace:*",
     "@onecoach/lib-shared": "workspace:*",
     "@onecoach/lib-stores": "workspace:*",
-    "@onecoach/types": "workspace:*",
     "@tanstack/react-query": "^5.90.16",
-    "react": "^19.2.3"
+    "react": "^19.2.3",
+    "@onecoach/types-core": "workspace:*",
+    "@onecoach/types-workout": "workspace:*",
+    "@onecoach/types-nutrition": "workspace:*",
+    "@onecoach/types-chat": "workspace:*",
+    "@onecoach/types-analytics": "workspace:*",
+    "@onecoach/types-ai": "workspace:*",
+    "@onecoach/types-ui": "workspace:*",
+    "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types-database": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

@@ -1,5 +1,5 @@
 
-import { executeAiPlan } from '@onecoach/lib-ai-agents';
+import { generateExercises } from '@onecoach/one-workout';
 import { createGenerationHandler } from '@onecoach/lib-api';
 import { z } from 'zod';
 
@@ -14,16 +14,37 @@ const aiRequestSchema = z.object({
 /**
  * POST /api/admin/exercises/ai
  *
- * Generate exercises with non-streaming response
+ * Generate exercises with SDK 3.1
  */
 export const POST = createGenerationHandler({
   requestSchema: aiRequestSchema,
   executeGeneration: async ({ input }) => {
-    return await executeAiPlan({
-      prompt: input.prompt,
-      autoApprove: input.autoApprove,
-      mergeExisting: input.mergeExisting,
+    const countMatch = input.prompt.match(/(\d+)\s*(nuovi\s*)?(esercizi|exercises?)/i);
+    const count = countMatch && countMatch[1] ? parseInt(countMatch[1], 10) : 5;
+
+    const result = await generateExercises({
+      count,
+      description: input.prompt,
     });
+
+    if (!result.success) {
+      throw new Error(result.error?.message || 'Errore nella generazione esercizi');
+    }
+
+    const exercises = result.output?.exercises || [];
+    return {
+      summary: `Generati ${exercises.length} esercizi`,
+      createResult: {
+        created: exercises.length,
+        updated: 0,
+        skipped: 0,
+        createdItems: exercises.map(e => ({ name: e.name, typeId: e.typeId })),
+        updatedItems: [],
+        skippedSlugs: [],
+        errors: [],
+      },
+    };
   },
   errorMessage: "Errore durante l'esecuzione del piano AI",
 });
+
