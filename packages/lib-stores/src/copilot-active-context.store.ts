@@ -16,9 +16,9 @@
 
 import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
-import type { WorkoutProgram } from '@onecoach/types';
-import type { NutritionPlan } from '@onecoach/types';
-import type { Project, Task, Milestone } from '@onecoach/types';
+import type { WorkoutProgram } from '@onecoach/types-workout';
+import type { NutritionPlan } from '@onecoach/types-nutrition';
+import type { Project, Task, Milestone } from '@onecoach/types-domain';
 
 // ============================================================================
 // Domain-Specific Context Types

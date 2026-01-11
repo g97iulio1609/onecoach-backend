@@ -5,7 +5,19 @@
  * PUT:    Aggiorna il profilo con le informazioni fornite
  */
 
-import { NextResponse, prisma } from '@onecoach/lib-core';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { ActivityLevel, DietType, Sex, WeightUnit } from '@prisma/client';
+import { prisma, requireAuth, userProfileService } from '@onecoach/lib-core';
+import {
+  convertDecimalToNumber,
+  isError,
+  isPrismaError,
+  isZodError,
+  logError,
+  logger,
+  mapErrorToApiResponse,
+} from '@onecoach/lib-shared';
 export const dynamic = 'force-dynamic';
 
 // Prisma richiede il runtime Node.js
@@ -246,7 +258,6 @@ export async function PUT(_req: Request) {
     };
 
     // Normalized body è pronto per la validazione
-
     const parsed = profileSchema.parse(normalizedBody);
 
     // Aggiorna il profilo (equipment contiene già gli ID)

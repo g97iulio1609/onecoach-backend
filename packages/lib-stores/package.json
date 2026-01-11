@@ -59,6 +59,7 @@
     "@onecoach/types-ai": "workspace:*",
     "@onecoach/types-ui": "workspace:*",
     "@onecoach/types-domain": "workspace:*",
+    "@onecoach/types": "workspace:*",
     "@onecoach/types-database": "workspace:*"
   },
   "devDependencies": {

@@ -25,14 +25,21 @@ export async function GET() {
   }
 
   try {
-    const providers = syncService.getUserProviders(session.user.id);
+    type UserProvider = {
+      provider: string;
+      syncEnabled: boolean;
+      lastSyncAt?: string | Date | null;
+      accessToken?: string | null;
+    };
+
+    const providers = syncService.getUserProviders(session.user.id) as UserProvider[];
 
     return NextResponse.json({
       providers: providers.map((p: unknown) => ({
-        provider: p.provider,
-        syncEnabled: p.syncEnabled,
-        lastSyncAt: p.lastSyncAt,
-        hasToken: !!p.accessToken,
+        provider: (p as UserProvider).provider,
+        syncEnabled: (p as UserProvider).syncEnabled,
+        lastSyncAt: (p as UserProvider).lastSyncAt,
+        hasToken: !!(p as UserProvider).accessToken,
       })),
     });
   } catch (error: unknown) {
@@ -85,9 +92,10 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const { searchParams } = request.nextUrl;
+  const provider = searchParams.get('provider');
+
   try {
-    const { searchParams } = request.nextUrl;
-    const provider = searchParams.get('provider');
 
     if (!provider || !['google', 'microsoft', 'ical'].includes(provider)) {
       return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });

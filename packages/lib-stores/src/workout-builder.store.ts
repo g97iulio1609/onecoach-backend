@@ -8,7 +8,7 @@
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { WorkoutProgram } from '@onecoach/types';
+import type { WorkoutProgram } from '@onecoach/types-workout';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { logger } from '@onecoach/lib-core';

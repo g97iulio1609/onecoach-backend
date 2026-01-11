@@ -74,10 +74,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, conversations: conversationsWithMessages });
   } catch (error: unknown) {
     logError('Failed to list conversations', error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      'Errore nel recupero delle conversazioni'
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }
@@ -105,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     const canOverrideProvider = isAdminRole(userOrError.role);
 
-    const sanitizedInitialMessages = parsed.data.initialMessages?.map((message: unknown) => ({
+    const sanitizedInitialMessages = parsed.data.initialMessages?.map((message) => ({
       role: toConversationRole(message.role),
       content: message.content.trim(),
       metadata: message.metadata ?? null,
@@ -125,10 +122,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, conversation, messages }, { status: 201 });
   } catch (error: unknown) {
     logError('Failed to create conversation', error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      'Errore nella creazione della conversazione'
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

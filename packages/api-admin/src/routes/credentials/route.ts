@@ -93,7 +93,10 @@ export async function PATCH(req: Request) {
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
       return NextResponse.json(
-        { error: passwordValidation.error || 'Password non valida' },
+        {
+          error: passwordValidation.errors?.[0] || 'Password non valida',
+          details: passwordValidation.errors,
+        },
         { status: 400 }
       );
     }

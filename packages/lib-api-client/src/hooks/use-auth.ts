@@ -13,7 +13,7 @@ import { authKeys, authQueries } from '../queries/auth.queries';
 import { useAuthStore } from '@onecoach/lib-stores/auth.store';
 import type { RefreshTokenRequest } from '../queries/auth.queries';
 import type { User } from '@onecoach/lib-stores/auth.store';
-import { normalizeRole, roleSatisfies } from '@onecoach/types';
+import { normalizeRole, roleSatisfies } from '@onecoach/lib-core/auth/roles';
 
 /**
  * Hook to sync NextAuth session with Zustand store

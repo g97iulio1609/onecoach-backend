@@ -12,7 +12,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRealtimeSubscription } from './realtime.hooks';
 import { useBodyMeasurementsStore } from './body-measurements.store';
-import type { BodyMeasurement } from '@onecoach/types';
+import type { BodyMeasurement } from '@onecoach/types-analytics';
 
 import { logger } from '@onecoach/lib-core';
 // Query keys for body measurements

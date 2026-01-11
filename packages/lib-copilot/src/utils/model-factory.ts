@@ -16,8 +16,8 @@ export function createCustomModel(
   config: ModelConfig,
   _options: CustomModelOptions = {}, // Unused in model creation
   apiKey?: string
-): LanguageModel {
-  return AIProviderFactory.getModel(config.provider as any, config.model, { apiKey });
+): Promise<LanguageModel> {
+  return AIProviderFactory.getModel(config.provider as any, config.model, { apiKey }) as Promise<LanguageModel>;
 }
 
 export function getModelByTier(tier: 'fast' | 'balanced' | 'quality'): ModelConfig {

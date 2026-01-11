@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Project, CreateProjectInput as TypesCreateProjectInput } from '@onecoach/types';
+import type { Project } from '@onecoach/types-domain';
 
 export interface ProjectsResponse {
   projects: Project[];
@@ -9,7 +9,14 @@ export interface ProjectResponse {
   project: Project;
 }
 
-export type CreateProjectInput = TypesCreateProjectInput;
+export interface CreateProjectInput {
+  title: string;
+  description?: string;
+  startDate?: Date;
+  dueDate?: Date;
+  status?: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED' | 'ON_HOLD';
+  color?: string;
+}
 
 export const projectsApi = {
   getAll: async (): Promise<ProjectsResponse> => {

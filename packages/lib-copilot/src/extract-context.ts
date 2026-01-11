@@ -44,7 +44,7 @@ export async function extractContextFromMessage(
   }
 
   // Use centralized model creation with custom config
-  const model = createCustomModel(
+  const model = await createCustomModel(
     modelConfig,
     {
       maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
@@ -92,8 +92,8 @@ Rispondi SOLO con un oggetto JSON valido nel formato:
       output: Output.object({ schema: extractionSchema }),
       temperature: 0.1, // Bassa temperatura per risultati più deterministici
     } as any);
-    
-    const extracted = result.output as ExtractionResult;
+
+    const extracted = result.output as unknown as ExtractionResult;
 
     // Valida i valori estratti
     if (extracted.dayNumber !== null && extracted.dayNumber !== undefined) {

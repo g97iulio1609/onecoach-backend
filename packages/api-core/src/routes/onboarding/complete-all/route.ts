@@ -4,7 +4,9 @@
  * POST: Completa immediatamente l'intero onboarding (skip all)
  */
 
-import { NextResponse, logError, mapErrorToApiResponse } from '@onecoach/lib-core';
+import { NextResponse } from 'next/server';
+import { onboardingService, requireAuth } from '@onecoach/lib-core';
+import { logger, logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 export const dynamic = 'force-dynamic';
 
 export async function POST() {

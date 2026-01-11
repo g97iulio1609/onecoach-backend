@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
-import { CalendarSyncService } from '@onecoach/oneagenda-core';
+import { CalendarSyncService, type CalendarProvider } from '@onecoach/oneagenda-core';
 import { logger } from '@onecoach/lib-shared';
 
 const syncService = new CalendarSyncService();
@@ -23,13 +23,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  try {
-    const body = await request.json();
-    const { provider, startDate, endDate } = body;
+  let provider: CalendarProvider | undefined;
 
-    if (!provider) {
-      return NextResponse.json({ error: 'Provider is required' }, { status: 400 });
+  try {
+    const body = (await request.json()) as { provider?: string; startDate?: string; endDate?: string };
+
+    const rawProvider = body.provider;
+    if (rawProvider !== 'google' && rawProvider !== 'microsoft' && rawProvider !== 'ical') {
+      return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
     }
+
+    provider = rawProvider;
+    const { startDate, endDate } = body as { startDate?: string; endDate?: string };
+
+    // provider is validated above
 
     const start = startDate ? new Date(startDate) : new Date();
     const end = endDate ? new Date(endDate) : new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
@@ -65,10 +72,16 @@ export async function GET() {
   }
 
   try {
-    const providers = syncService.getUserProviders(session.user.id);
+    type UserProvider = {
+      provider: string;
+      syncEnabled: boolean;
+      lastSyncAt?: string | Date | null;
+    };
+
+    const providers = syncService.getUserProviders(session.user.id) as UserProvider[];
 
     return NextResponse.json({
-      providers: providers.map((p: unknown) => ({
+      providers: providers.map((p) => ({
         provider: p.provider,
         syncEnabled: p.syncEnabled,
         lastSyncAt: p.lastSyncAt,

@@ -6,10 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
-import { IntelligentAssistantService } from '@onecoach/oneagenda-core';
+import { IntelligentAssistantService, type Milestone } from '@onecoach/oneagenda-core';
 import { oneagendaDB } from '@onecoach/oneagenda-core';
 import { logger } from '@onecoach/lib-shared';
-import { prisma } from '@onecoach/lib-core';
 
 const assistant = new IntelligentAssistantService();
 
@@ -38,29 +37,9 @@ export async function GET(request: NextRequest) {
     const tasks = await oneagendaDB.getTasks(session.user.id);
     const goals = await oneagendaDB.getGoals(session.user.id);
 
-    // Fetch milestones for user's goals
-    const goalIds = goals.map((g: unknown) => g.id);
-    const milestonesData = await prisma.oneagenda_milestones.findMany({
-      where: {
-        goalId: { in: goalIds },
-      },
-      orderBy: {
-        order: 'asc',
-      },
-    });
-
-    const milestones = milestonesData.map((milestone: unknown) => ({
-      id: milestone.id,
-      goalId: milestone.goalId,
-      title: milestone.title,
-      description: milestone.description,
-      status: milestone.status,
-      targetDate: milestone.targetDate.toISOString(),
-      completedAt: milestone.completedAt?.toISOString(),
-      tasksCompleted: milestone.tasksCompleted,
-      tasksTotal: milestone.tasksTotal,
-      percentComplete: milestone.percentComplete,
-    }));
+    // Milestones persistence is not aligned with the domain model yet.
+    // For now, provide an empty list and let the assistant compute insights from tasks/goals.
+    const milestones: Milestone[] = [];
 
     // Generate insights using Reflection Agent
     const insights = await assistant.trackProgress({

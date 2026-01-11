@@ -4,12 +4,5 @@
     "outDir": "./dist",
     "composite": false,
     "strict": true
-  },
-  "references": [
-    { "path": "../../../one-agent" },
-    { "path": "../lib-core" },
-    { "path": "../../../onecoach-shared/packages/contracts" },
-    { "path": "../../../onecoach-schemas" },
-    { "path": "../../../onecoach-types" }
-  ]
+  }
 }

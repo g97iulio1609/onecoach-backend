@@ -5,7 +5,13 @@
  * Integra intent detection e tools per generazione piani
  */
 
-import { NextResponse, z } from '@onecoach/lib-core';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { AI_REASONING_CONFIG } from '@onecoach/constants';
+import { logger, logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
+import { requireAuth, userProfileService } from '@onecoach/lib-core';
+import { getChatAgent, type ChatCallOptions } from '@onecoach/one-agent';
+
 export const dynamic = 'force-dynamic';
 
 const chatStreamRequestSchema = z.object({
@@ -69,21 +75,13 @@ export async function POST(_req: Request) {
       );
     }
 
-    const override =
+    const modelOverride: ChatCallOptions['modelOverride'] =
       isAdmin && input.provider && input.model
         ? {
             provider: input.provider,
             model: input.model.trim(),
-            maxTokens: TOKEN_LIMITS.DEFAULT_MAX_TOKENS,
-            creditsPerRequest: 1,
           }
         : undefined;
-
-    // Convert messages to chat agent format (simple string content)
-    const chatMessages = input.messages.map((msg: any) => ({
-      role: msg.role as 'user' | 'assistant' | 'system',
-      content: msg.content,
-    }));
 
     // Recupera profilo utente per auto-fill parametri
     let userProfile;
@@ -102,33 +100,27 @@ export async function POST(_req: Request) {
       userProfile = undefined;
     }
 
-    // Usa chat agent con intent detection e tools
-    const chatResult = await createChatAgentStream({
-      userId: userOrError.id,
-      messages: chatMessages,
-      tier: input.tier,
-      override,
-      temperature: input.temperature,
-      userProfile,
-      enableIntentDetection: input.enableIntentDetection,
-      enableTools: input.enableTools,
-      reasoning: input.reasoning,
-      reasoningEffort: input.reasoningEffort,
+    // Build a simple transcript prompt. The ChatAgent works prompt-first.
+    const transcript = input.messages
+      .map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`)
+      .join('\n');
+
+    const agent = getChatAgent();
+    const streamResult = await agent.stream({
+      prompt: transcript,
+      options: {
+        userId: userOrError.id,
+        isAdmin,
+        tier: input.tier,
+        domain: 'general',
+        userProfile,
+        modelOverride,
+        reasoning: input.reasoning,
+        reasoningEffort: input.reasoningEffort,
+      },
     });
 
-    // Aggiungi header con informazioni intent detection
-    const headers = new Headers(chatResult.stream.headers);
-    if (chatResult.intent) {
-      headers.set('x-chat-intent', chatResult.intent.type);
-      headers.set('x-chat-confidence', String(chatResult.intent.confidence));
-      headers.set('x-chat-requires-more-info', String(chatResult.requiresMoreInfo));
-    }
-
-    return new Response(chatResult.stream.body, {
-      status: chatResult.stream.status,
-      statusText: chatResult.stream.statusText,
-      headers,
-    });
+    return streamResult.toTextStreamResponse();
   } catch (error: unknown) {
     logError('Errore nello streaming della chat', error);
     const { response, status } = mapErrorToApiResponse(error);

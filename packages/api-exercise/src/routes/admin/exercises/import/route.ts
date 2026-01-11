@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@onecoach/lib-core';
-import { ExerciseAdminService, exerciseImportSchema } from '@onecoach/lib-exercise-admin.service';
+import { ExerciseAdminService, exerciseImportSchema } from '@onecoach/lib-exercise/exercise-admin.service';
 import { z } from 'zod';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 
@@ -48,10 +48,7 @@ export async function POST(_req: NextRequest) {
     });
   } catch (error: unknown) {
     logError("Errore nell'importazione degli esercizi", error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'importazione degli esercizi"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

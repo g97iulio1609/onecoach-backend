@@ -6,9 +6,12 @@
  * DELETE: Elimina API key da Vercel per un provider (solo admin)
  */
 
-import { NextResponse, ProviderName } from '@onecoach/lib-ai';
+import { NextResponse } from 'next/server';
+import { AIProviderConfigService, PROVIDER_MAP } from '@onecoach/lib-ai';
+import type { ProviderName } from '@onecoach/lib-ai';
 import { deleteEnvVar, getEnvVarByKey } from '@onecoach/lib-vercel-admin';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
+import { requireAdmin } from '@onecoach/lib-core/auth/guards';
 
 export const dynamic = 'force-dynamic';
 

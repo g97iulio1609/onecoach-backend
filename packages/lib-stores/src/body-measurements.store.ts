@@ -10,7 +10,7 @@
  */
 
 import { create } from 'zustand';
-import type { BodyMeasurement } from '@onecoach/types';
+import type { BodyMeasurement } from '@onecoach/types-analytics';
 
 interface BodyMeasurementsState {
   /** All measurements (sorted by date, newest first) */

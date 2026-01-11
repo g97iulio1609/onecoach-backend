@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { MarketplacePlanType } from '@onecoach/types';
+import type { MarketplacePlanType } from '@onecoach/types-database';
 
 export interface MarketplacePlanCardProps {
   id: string;

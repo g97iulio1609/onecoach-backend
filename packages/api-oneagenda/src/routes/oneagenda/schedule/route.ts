@@ -7,10 +7,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@onecoach/lib-core/auth';
-import { IntelligentAssistantService } from '@onecoach/oneagenda-core';
+import { IntelligentAssistantService, type CalendarEvent, type Task } from '@onecoach/oneagenda-core';
 import { oneagendaDB } from '@onecoach/oneagenda-core';
 import { logger } from '@onecoach/lib-shared';
-import { prisma } from '@onecoach/lib-core';
 
 /**
  * POST /api/oneagenda/schedule
@@ -21,17 +20,27 @@ import { prisma } from '@onecoach/lib-core';
  * - events?: CalendarEvent[]
  */
 export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    const body = await request.json();
-    const { date, tasks = [], events = [] } = body;
+  const userId = session.user.id;
+  let requestedDate: string | undefined;
+
+  try {
+    const body = (await request.json()) as {
+      date?: string;
+      tasks?: unknown[];
+      events?: unknown[];
+    };
+
+    requestedDate = body.date;
+    const tasks = (Array.isArray(body.tasks) ? body.tasks : []) as Task[];
+    const events = (Array.isArray(body.events) ? body.events : []) as CalendarEvent[];
 
     // Validate required fields
-    if (!date) {
+    if (!requestedDate) {
       return NextResponse.json({ error: 'Date is required' }, { status: 400 });
     }
 
@@ -39,15 +48,13 @@ export async function POST(request: NextRequest) {
     const assistant = new IntelligentAssistantService();
 
     // Get user preferences (for future use)
-    const _preferences = await oneagendaDB.getUserPreferences(session.user.id);
-
     // If no tasks provided, fetch from database
-    const tasksToUse = tasks.length > 0 ? tasks : await oneagendaDB.getTasks(session.user.id);
+    const tasksToUse = tasks.length > 0 ? tasks : await oneagendaDB.getTasks(userId);
 
     // Generate schedule
     const scheduleResult = await assistant.planDay({
-      userId: session.user.id,
-      date,
+      userId,
+      date: requestedDate,
       tasks: tasksToUse,
       events,
     });
@@ -58,10 +65,10 @@ export async function POST(request: NextRequest) {
       blocks: scheduleResult.schedule.blocks,
     });
   } catch (error: unknown) {
-    logger.error('Error generating schedule', { error, userId: session.user.id, date });
+    logger.error('Error generating schedule', { error, userId, date: requestedDate });
     // Return empty schedule instead of error to allow UI to render
     return NextResponse.json({
-      date,
+      date: requestedDate ?? new Date().toISOString().split('T')[0],
       blocks: [],
     });
   }
@@ -94,37 +101,9 @@ export async function GET(request: NextRequest) {
     // Fetch tasks and events from database
     const tasks = await oneagendaDB.getTasks(session.user.id);
 
-    // Fetch calendar events for the specified date
-    const dateStart = new Date(date);
-    dateStart.setHours(0, 0, 0, 0);
-    const dateEnd = new Date(date);
-    dateEnd.setHours(23, 59, 59, 999);
-
-    const calendarEvents = await prisma.oneagenda_calendar_events.findMany({
-      where: {
-        userId: session.user.id,
-        startTime: {
-          gte: dateStart,
-          lte: dateEnd,
-        },
-        status: 'CONFIRMED',
-      },
-      orderBy: {
-        startTime: 'asc',
-      },
-    });
-
-    const events = calendarEvents.map((event: unknown) => ({
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      location: event.location,
-      startTime: event.startTime.toISOString(),
-      endTime: event.endTime.toISOString(),
-      allDay: event.allDay,
-      type: event.type,
-      source: event.source,
-    }));
+    // Calendar events persistence is not available in the agenda schema yet.
+    // Provide empty events for now.
+    const events: CalendarEvent[] = [];
 
     // If no tasks, return empty schedule immediately
     if (tasks.length === 0) {
@@ -135,8 +114,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user preferences (optional, will use defaults if not available, reserved for future use)
-    const _preferences = await oneagendaDB.getUserPreferences(session.user.id);
-
     // Create intelligent assistant
     const assistant = new IntelligentAssistantService();
 

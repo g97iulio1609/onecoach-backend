@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       throw new Error('Failed to exchange code for tokens');
     }
 
-    const _tokens = await tokenResponse.json();
+    await tokenResponse.json();
 
     // Store tokens in database (placeholder - requires CalendarProvider model)
     // await prisma.calendarProvider.upsert(...tokens)

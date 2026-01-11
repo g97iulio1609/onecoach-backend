@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@onecoach/lib-core';
-import type { CopilotContext } from './context-builder';
+import type { CopilotContext } from './types';
 import { getLatestBodyMeasurement } from '@onecoach/lib-analytics';
 import { getLatestProgressSnapshot } from '@onecoach/lib-analytics/progress-snapshot.service';
 

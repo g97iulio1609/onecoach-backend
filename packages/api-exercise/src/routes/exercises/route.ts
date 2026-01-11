@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@onecoach/lib-core';
-import { ExerciseService } from '@onecoach/lib-exercise.service';
+import { ExerciseService } from '@onecoach/lib-exercise/exercise.service';
 import { extractSearchParams } from '@onecoach/lib-shared/utils';
 import { createExerciseSchema, exerciseQuerySchema } from '@onecoach/schemas/exercise.schema';
 import { logError, mapErrorToApiResponse } from '@onecoach/lib-shared';

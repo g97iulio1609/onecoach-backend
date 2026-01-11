@@ -27,8 +27,8 @@ import {
   useCopilotActiveContextStore,
   type ActiveDomain,
 } from '@onecoach/lib-stores';
-import type { WorkoutProgram } from '@onecoach/types';
-import type { NutritionPlan } from '@onecoach/types';
+import type { WorkoutProgram } from '@onecoach/types-workout';
+import type { NutritionPlan } from '@onecoach/types-nutrition';
 
 // ============================================================================
 // Types

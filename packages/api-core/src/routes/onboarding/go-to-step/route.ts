@@ -4,7 +4,10 @@
  * POST: Naviga a uno step specifico dell'onboarding
  */
 
-import { NextResponse, z } from '@onecoach/lib-core';
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { TOTAL_STEPS, onboardingService, requireAuth } from '@onecoach/lib-core';
+import { logger, logError, mapErrorToApiResponse } from '@onecoach/lib-shared';
 export const dynamic = 'force-dynamic';
 
 const goToStepSchema = z.object({

@@ -58,10 +58,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true, conversation: { ...conversation, messages } });
   } catch (error: unknown) {
     logError('Failed to load conversation', error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      'Errore nel recupero della conversazione'
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }
@@ -97,10 +94,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true, conversation: updated });
   } catch (error: unknown) {
     logError('Failed to update conversation', error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      "Errore nell'aggiornamento della conversazione"
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }
@@ -123,10 +117,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     logError('Failed to delete conversation', error);
-    const { response, status } = mapErrorToApiResponse(
-      error,
-      'Errore nella cancellazione della conversazione'
-    );
+    const { response, status } = mapErrorToApiResponse(error);
     return NextResponse.json(response, { status });
   }
 }

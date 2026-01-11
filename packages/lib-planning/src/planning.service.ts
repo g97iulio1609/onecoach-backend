@@ -27,6 +27,7 @@ import type {
   PlanningPlanParams,
   TaskStatus,
 } from '@onecoach/types';
+import type { MealType } from '@onecoach/types-nutrition';
 
 // Type aliases for Prisma models with their relations
 type DbSubSubTask = Prisma.planning_sub_sub_tasksGetPayload<{}>;
@@ -75,6 +76,44 @@ function fromPrismaStatus(status: $Enums.PlanningStatus): TaskStatus {
     PAUSED: 'in-progress',
   };
   return mapping[status] || 'pending';
+}
+
+function inferMealType(mealNumber: number, mealsPerDay: number): MealType {
+  if (mealsPerDay <= 0) {
+    throw new Error('mealsPerDay must be > 0');
+  }
+
+  if (mealNumber === 1) return 'breakfast';
+
+  // Keep the last meal as dinner when we have 3+ meals.
+  if (mealsPerDay >= 3 && mealNumber === mealsPerDay) return 'dinner';
+
+  // With 2 meals/day, default the second meal to lunch (neutral default).
+  if (mealsPerDay === 2 && mealNumber === 2) return 'lunch';
+
+  // With 3 meals/day, middle is lunch.
+  if (mealsPerDay === 3 && mealNumber === 2) return 'lunch';
+
+  // For additional meals, use snack as a safe, generic type.
+  return 'snack';
+}
+
+function getDefaultMealName(mealNumber: number, mealType: MealType): string {
+  const baseNames: Record<MealType, string> = {
+    breakfast: 'Breakfast',
+    lunch: 'Lunch',
+    dinner: 'Dinner',
+    snack: 'Snack',
+    'pre-workout': 'Pre-workout',
+    'post-workout': 'Post-workout',
+  };
+
+  // If multiple snacks, keep them distinguishable.
+  if (mealType === 'snack') {
+    return `${baseNames[mealType]} ${mealNumber}`;
+  }
+
+  return baseNames[mealType];
 }
 
 /**
@@ -720,11 +759,8 @@ export class PlanningServiceV2 {
     subTaskId: string,
     mealsPerDay: number
   ): Promise<void> {
-    const { inferMealType, getDefaultMealName } =
-      await import('@onecoach/lib-ai-agents/schemas/meal-schemas');
-
     for (let mealNumber = 1; mealNumber <= mealsPerDay; mealNumber++) {
-      const mealType = inferMealType(mealNumber);
+      const mealType = inferMealType(mealNumber, mealsPerDay);
       const mealName = getDefaultMealName(mealNumber, mealType);
 
       await tx.planning_sub_sub_tasks.create({

@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Task } from '@onecoach/types';
+import type { Task } from '@onecoach/types-domain';
 
 export interface TaskResponse {
   task: Task;

@@ -15,11 +15,51 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Max, MaxVersion } from '@onecoach/types';
+import type { Visibility } from '@prisma/client';
 
 import { logger } from '@onecoach/lib-core';
-// Re-export types for backward compatibility
-export type { Max, MaxVersion, CreateMaxInput, UpdateMaxInput } from '@onecoach/types';
+
+// ============================================================================
+// Types (no legacy imports)
+// ============================================================================
+
+export interface Max {
+  id: string;
+  exerciseId: string;
+  exerciseName: string;
+  oneRepMax: number;
+  notes: string | null;
+  version: number;
+  lastUpdated: string;
+  createdAt: string;
+  visibility?: Visibility;
+  assignedToUserId?: string;
+  assignedByCoachId?: string;
+}
+
+export interface MaxVersion {
+  id: string;
+  maxId: string;
+  oneRepMax: number;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+}
+
+export interface CreateMaxInput {
+  exerciseId: string;
+  oneRepMax: number;
+  notes?: string | null;
+  visibility?: Visibility;
+  assignedToUserId?: string;
+}
+
+export interface UpdateMaxInput {
+  oneRepMax?: number;
+  notes?: string | null;
+  visibility?: Visibility;
+  assignedToUserId?: string;
+}
 
 // ============================================================================
 // State & Actions

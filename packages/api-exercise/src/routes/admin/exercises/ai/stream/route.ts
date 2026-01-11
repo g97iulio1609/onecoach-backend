@@ -6,7 +6,7 @@
  */
 
 import { AgentRole } from '@onecoach/one-agent';
-import { ExerciseAdminService } from '@onecoach/lib-exercise-admin.service';
+import { generateExercises } from '@onecoach/one-workout';
 import { createStreamingHandler } from '@onecoach/lib-api';
 
 interface ExerciseStreamInput {
@@ -22,7 +22,7 @@ interface ExerciseStreamInput {
  */
 export const POST = createStreamingHandler<
   ExerciseStreamInput,
-  Awaited<ReturnType<typeof ExerciseAdminService.generateExercisesWithAgent>>
+  Awaited<ReturnType<typeof generateExercises>>
 >({
   agentRole: AgentRole.EXERCISE_GENERATION,
   initialDescription: 'Starting exercise generation...',
@@ -35,11 +35,10 @@ export const POST = createStreamingHandler<
 
     return { valid: true, data: { prompt, autoApprove, mergeExisting } };
   },
-  executeGeneration: async ({ input, userId, sendEvent }) => {
+  executeGeneration: async ({ input, sendEvent }) => {
     // Parse prompt to extract generation parameters
     const lowerPrompt = input.prompt.toLowerCase();
     const muscleGroups: string[] = [];
-    const bodyPartIds: string[] = [];
     let count = 5; // Default count
     let forEachMuscleGroup = false;
 
@@ -92,7 +91,14 @@ export const POST = createStreamingHandler<
 
     // If "for each muscle group", use all available muscles
     if (forEachMuscleGroup) {
-      const allMuscleNames = metadata.muscles.map((m: unknown) => m.name.toLowerCase());
+      type NamedEntity = { name: string };
+
+      const allMuscleNames = metadata.muscles
+        .map((m: unknown) => {
+          const name = (m as NamedEntity | null)?.name;
+          return typeof name === 'string' ? name.toLowerCase() : null;
+        })
+        .filter((name): name is string => typeof name === 'string' && name.length > 0);
       const muscleNameMap: Record<string, string> = {
         abs: 'abs',
         biceps: 'biceps',
@@ -159,41 +165,28 @@ export const POST = createStreamingHandler<
       },
     });
 
-    const result = await ExerciseAdminService.generateExercisesWithAgent({
+    const result = await generateExercises({
       count: totalCount,
-      muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
-      bodyPartIds: bodyPartIds.length > 0 ? bodyPartIds : undefined,
       description: input.prompt,
-      userId,
-      autoApprove: input.autoApprove,
-      mergeExisting: input.mergeExisting,
-      onProgress: (progress, message) => {
-        sendEvent({
-          type: 'agent_progress',
-          data: {
-            progress,
-            message,
-          },
-        });
-      },
+      muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
     });
 
     // Progress updates are now handled by the service via onProgress callback
     return result;
   },
-  buildOutput: (result) => ({
-    summary: `Generati ${result.created} esercizi, ${result.updatedItems.length} aggiornati, ${result.skippedSlugs.length} saltati`,
-    createResult: {
-      created: result.created,
-      updated: result.updatedItems.length,
-      skipped: result.skippedSlugs.length,
-      createdItems: result.createdItems,
-      updatedItems: result.updatedItems,
-      skippedSlugs: result.skippedSlugs,
-      errors: result.errors,
-    },
-    updateResult: [],
-    deleteResult: [],
-    approvalResult: [],
-  }),
+  buildOutput: (result) => {
+    const exercises = result.output?.exercises || [];
+    return {
+      summary: `Generati ${exercises.length} esercizi`,
+      createResult: {
+        created: exercises.length,
+        updated: 0,
+        skipped: 0,
+        createdItems: exercises.map((e) => ({ name: e.name, typeId: e.typeId })),
+        updatedItems: [],
+        skippedSlugs: [],
+        errors: [],
+      },
+    };
+  },
 });

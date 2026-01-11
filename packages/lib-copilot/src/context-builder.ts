@@ -11,8 +11,7 @@
  */
 
 import { prisma } from '@onecoach/lib-core';
-import { normalizeNutritionPlan } from '@onecoach/lib-nutrition/plan-transform';
-import { resolveFoodReferences } from '@onecoach/lib-nutrition/helpers/plan-server-transform';
+import { normalizeNutritionPlan, resolveFoodReferences } from '@onecoach/one-nutrition';
 import {
   buildUserProfileData,
   USER_PROFILE_SELECT,

@@ -4,7 +4,16 @@
  * POST: Completa uno step dell'onboarding
  */
 
-import { NextResponse, saveOnboardingProfile } from '@onecoach/lib-core';
+import { NextResponse } from 'next/server';
+import {
+  ONBOARDING_STEPS,
+  TOTAL_STEPS,
+  onboardingService,
+  requireAuth,
+  saveOnboardingProfile,
+} from '@onecoach/lib-core';
+import { z } from 'zod';
+import { getErrorMessage, logError, logger } from '@onecoach/lib-shared';
 export const dynamic = 'force-dynamic';
 
 const completeStepSchema = z.object({

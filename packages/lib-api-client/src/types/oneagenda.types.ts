@@ -1,4 +1,4 @@
-import type { Task as BaseTask } from '@onecoach/types';
+import type { Task as BaseTask } from '@onecoach/types-domain';
 
 export enum TaskPriority {
   CRITICAL = 'CRITICAL',
