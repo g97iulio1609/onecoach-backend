@@ -89,6 +89,15 @@ export type { AuthState, AuthActions, AuthStore, User } from './auth.store';
 export { useAdminStore } from './admin.store';
 export type { ExerciseFilters, FoodFilters, AdminState } from './admin.store';
 
+// AI Settings Store (types are generic - canonical types in @onecoach/ui-admin)
+export {
+  useAISettingsStore,
+  selectActiveSection,
+  selectVisitedTabs,
+  selectIsInitialized,
+} from './ai-settings.store';
+export type { SectionId } from './ai-settings.store';
+
 export { useHeaderActions } from './header-actions.store';
 
 export { useNavigationStateStore } from './navigation-state.store';
@@ -302,6 +311,10 @@ export type {
 // Live Session Sync Hook
 export { useLiveSessionSync } from './hooks/useLiveSessionSync';
 export type { UseLiveSessionSyncOptions, LiveSessionSetData } from './hooks/useLiveSessionSync';
+
+// Session Persistence Hook (localStorage with TTL)
+export { useSessionPersistence } from './hooks/use-session-persistence';
+export type { SessionPersistenceOptions } from './hooks/use-session-persistence';
 
 // Versioning Store (for undo/redo and version history)
 export {
