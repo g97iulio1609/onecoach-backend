@@ -293,17 +293,28 @@ export const useRealtimeStore = create<RealtimeStore>()(
                   logger.warn(`[RealtimeStore] Subscribed to ${channelKey}`);
                 }
               } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                // Crea un errore informativo solo se necessario
-                const error =
-                  err instanceof Error
-                    ? err
-                    : new Error(
-                        `Realtime ${status} on channel ${channelKey}${err ? `: ${String(err)}` : ''}`
-                      );
+                // Build informative error message
+                // Empty {} error typically means Realtime not enabled on table or RLS blocking access
+                let errorDetails = '';
+                if (err instanceof Error) {
+                  errorDetails = err.message;
+                } else if (err && typeof err === 'object' && Object.keys(err).length > 0) {
+                  errorDetails = JSON.stringify(err);
+                } else if (err) {
+                  errorDetails = String(err);
+                }
+
+                const errorMessage = errorDetails
+                  ? `Realtime ${status} on ${channelKey}: ${errorDetails}`
+                  : `Realtime ${status} on ${channelKey} - Check if Realtime is enabled on table "${table}" in Supabase Dashboard`;
+
+                const error = err instanceof Error ? err : new Error(errorMessage);
 
                 // Log solo in development per evitare spam nella console
                 if (process.env.NODE_ENV === 'development') {
-                  logger.warn(`[RealtimeStore] ${status} on ${channelKey}`, { message: error.message });
+                  logger.warn(`[RealtimeStore] ${status} on ${channelKey}`, {
+                    message: error.message,
+                  });
                 }
 
                 // Aggiorna lo stato con l'errore
